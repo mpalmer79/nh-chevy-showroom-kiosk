@@ -47,6 +47,7 @@ interface NavigationOptions {
   model?: string;
   minPrice?: number;
   maxPrice?: number;
+  sortBy?: string;
 }
 
 // Screen error boundary props
@@ -190,6 +191,7 @@ const KioskApp: React.FC = () => {
         budgetRange: options.minPrice && options.maxPrice 
           ? { min: options.minPrice, max: options.maxPrice }
           : prev.budgetRange,
+        sortBy: options.sortBy || prev.sortBy,
       }));
     } else if (screenName === 'inventory') {
       // Clear ALL filters when navigating to inventory without options
@@ -199,6 +201,7 @@ const KioskApp: React.FC = () => {
       setCustomerData(prev => ({
         ...prev,
         bodyStyleFilter: undefined,
+        sortBy: undefined,
         ...(prevBase !== 'modelBudget' ? {
           selectedModel: undefined,
           selectedCab: undefined,
