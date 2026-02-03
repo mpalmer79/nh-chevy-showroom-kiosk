@@ -55,6 +55,7 @@ const GM_COLORS: GMColorsByModel = {
     { name: 'Sterling Gray Metallic', code: 'GXD', hex: '#6b6b6b', premium: false },
     { name: 'Nitro Yellow Metallic', code: 'G9K', hex: '#e6c200', premium: false },
     { name: 'Oasis Blue', code: 'GMD', hex: '#5ba4c9', premium: false },
+    { name: 'Apex Red', code: 'G1E', hex: '#a4282d', premium: false },
   ],
   'Blazer': [
     { name: 'Summit White', code: 'GAZ', hex: '#f5f5f5', premium: false },
