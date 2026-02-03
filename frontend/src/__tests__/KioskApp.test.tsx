@@ -14,12 +14,12 @@ jest.mock('../components/Welcomescreen', () => {
     return (
       <div data-testid="welcome-screen">
         <button onClick={() => navigateTo('inventory')}>Go to Inventory</button>
-        <button onClick={() => navigateTo('ai')}>Go to AI</button>
+        <button onClick={() => navigateTo('aiAssistant')}>Go to AI</button>
         <button onClick={() => navigateTo('modelBudget')}>Go to Model Budget</button>
         <button onClick={() => navigateTo('stockLookup')}>Go to Stock Lookup</button>
         <button onClick={() => navigateTo('inventory', { bodyStyle: 'SUV' })}>Go to SUV Inventory</button>
         <button onClick={() => navigateTo('trafficLog')} data-testid="welcome-sales-desk">Sales Desk</button>
-        <button onClick={() => updateCustomerData({ name: 'Test Customer' })}>Set Name</button>
+        <button onClick={() => updateCustomerData({ customerName: 'Test Customer' })}>Set Name</button>
       </div>
     );
   };
@@ -79,7 +79,7 @@ jest.mock('../components/TradeInEstimator', () => {
     return (
       <div data-testid="trade-in-screen">
         Trade In Screen
-        <button onClick={() => navigateTo('payment')}>Go to Payment</button>
+        <button onClick={() => navigateTo('paymentCalculator')}>Go to Payment</button>
         <button onClick={() => updateCustomerData({ tradeIn: { value: 5000 } })}>
           Set Trade Value
         </button>
