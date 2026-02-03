@@ -141,14 +141,21 @@ const initialCustomerData: CustomerData = {
   bodyStyleFilter: undefined,
 };
 
+// Helper to extract base screen name from navigation path
+// e.g., 'modelBudget/model/trucks' → 'modelBudget'
+const getBaseScreen = (path: string): ScreenName => {
+  return path.split('/')[0] as ScreenName;
+};
+
 // Main Kiosk Application - Customer Journey Controller
 const KioskApp: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('welcome');
   const [customerData, setCustomerData] = useState<CustomerData>(initialCustomerData);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+  const [modelBudgetSubRoute, setModelBudgetSubRoute] = useState<string>('category');
   
-  // Track navigation history for back button support
-  const navigationHistoryRef = useRef<ScreenName[]>(['welcome']);
+  // Track navigation history for back button support (stores full paths including sub-routes)
+  const navigationHistoryRef = useRef<string[]>(['welcome']);
   const isPopStateNavigationRef = useRef<boolean>(false);
 
   const updateCustomerData = useCallback((updates: Partial<CustomerData>): void => {
@@ -156,13 +163,21 @@ const KioskApp: React.FC = () => {
   }, []);
 
   // Navigate to a new screen with browser history support
+  // Supports sub-routes for modelBudget (e.g., 'modelBudget/model/trucks')
   // Now accepts optional navigation options for filtering
   const navigateTo = useCallback((screen: string, options?: NavigationOptions): void => {
-    const screenName = screen as ScreenName;
+    const screenName = getBaseScreen(screen);
     
-    // Don't push duplicate consecutive screens
+    // Handle modelBudget sub-routes
+    if (screen.startsWith('modelBudget/')) {
+      setModelBudgetSubRoute(screen.substring('modelBudget/'.length));
+    } else if (screenName === 'modelBudget') {
+      setModelBudgetSubRoute('category');
+    }
+    
+    // Don't push duplicate consecutive paths (compare full path, not just screen name)
     const currentHistory = navigationHistoryRef.current;
-    if (currentHistory[currentHistory.length - 1] === screenName && !options) {
+    if (currentHistory[currentHistory.length - 1] === screen && !options) {
       return;
     }
     
@@ -189,14 +204,14 @@ const KioskApp: React.FC = () => {
     setTimeout(() => {
       // If this navigation is triggered by popstate (back button), don't push to history
       if (!isPopStateNavigationRef.current) {
-        // Add to navigation history
-        navigationHistoryRef.current = [...navigationHistoryRef.current, screenName];
+        // Add full path to navigation history
+        navigationHistoryRef.current = [...navigationHistoryRef.current, screen];
         
-        // Push state to browser history
+        // Push state to browser history (store both base screen and full path)
         window.history.pushState(
-          { screen: screenName, index: navigationHistoryRef.current.length - 1 },
+          { screen: screenName, fullPath: screen, index: navigationHistoryRef.current.length - 1 },
           '',
-          `#${screenName}`
+          `#${screen}`
         );
       }
       
@@ -219,8 +234,16 @@ const KioskApp: React.FC = () => {
     const newHistory = currentHistory.slice(0, -1);
     navigationHistoryRef.current = newHistory;
     
-    // Get the previous screen
-    const previousScreen = newHistory[newHistory.length - 1];
+    // Get the previous full path and extract base screen name
+    const previousPath = newHistory[newHistory.length - 1];
+    const previousScreen = getBaseScreen(previousPath);
+    
+    // Restore modelBudget sub-route if going back to a modelBudget step
+    if (previousPath.startsWith('modelBudget/')) {
+      setModelBudgetSubRoute(previousPath.substring('modelBudget/'.length));
+    } else if (previousScreen === 'modelBudget') {
+      setModelBudgetSubRoute('category');
+    }
     
     // Clear filters when going back
     setCustomerData(prev => ({
@@ -246,6 +269,7 @@ const KioskApp: React.FC = () => {
       '#welcome'
     );
     
+    setModelBudgetSubRoute('category');
     setCustomerData(initialCustomerData);
     setCurrentScreen('welcome');
   }, []);
@@ -276,6 +300,13 @@ const KioskApp: React.FC = () => {
         
         // Mark this as a popstate navigation so navigateTo doesn't push to history
         isPopStateNavigationRef.current = true;
+        
+        // Restore modelBudget sub-route if applicable
+        if (state.fullPath && state.fullPath.startsWith('modelBudget/')) {
+          setModelBudgetSubRoute(state.fullPath.substring('modelBudget/'.length));
+        } else if (targetScreen === 'modelBudget') {
+          setModelBudgetSubRoute('category');
+        }
         
         // Clear filters when navigating via back/forward
         setCustomerData(prev => ({
@@ -592,7 +623,10 @@ const KioskApp: React.FC = () => {
         transform: isTransitioning ? 'translateY(10px)' : 'translateY(0)',
       }}>
         <ScreenErrorBoundary onReset={resetJourney} screenName={currentScreen}>
-          <CurrentScreenComponent {...screenProps} />
+          {currentScreen === 'modelBudget' 
+            ? <ModelBudgetSelector {...screenProps} subRoute={modelBudgetSubRoute} />
+            : <CurrentScreenComponent {...screenProps} />
+          }
         </ScreenErrorBoundary>
       </main>
 
