@@ -39,8 +39,8 @@ const AIAssistant: React.FC<KioskComponentProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const sendMessageRef = useRef<(content: string) => void>();
 
-  // Get session ID for worksheet
-  const sessionId = customerData?.selectedSessionId || `kiosk-${Date.now()}`;
+  // Get session ID for worksheet - use shared kiosk session to match chatWithAI
+  const sessionId = customerData?.selectedSessionId || api.getKioskSessionId();
 
   // Custom hooks
   const { extractDataFromMessage, detectObjection, detectHoursQuery } = useDataExtraction();
