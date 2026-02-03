@@ -15,130 +15,47 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Optional
-import os
 import logging
-import re
-from html import escape
+import time
+import uuid
 
 # Rate limiting
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
+# Core modules — single source of truth (no more duplicated code in main.py)
+from app.core.settings import get_settings
+from app.core.exceptions import (
+    AppException,
+    AIServiceException,
+    ValidationException,
+    RateLimitException,
+)
+from app.core.security import (
+    sanitize_user_input,
+    sanitize_stock_number,
+    sanitize_phone,
+)
+
 # Configure structured logging
+settings = get_settings()
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-LOG_LEVEL = logging.DEBUG if os.getenv("ENVIRONMENT") == "development" else logging.INFO
+LOG_LEVEL = logging.DEBUG if settings.is_development else logging.INFO
 
 logging.basicConfig(level=LOG_LEVEL, format=LOG_FORMAT)
 logger = logging.getLogger("quirk_kiosk")
 
 # Import routers
 from app.routers import inventory, recommendations, leads, analytics, traffic
-
-# Import v2 recommendations (enhanced filtering)
 from app.routers import recommendations_v2
-
-# Import v3 routers (smart recommendations + intelligent AI with tools/memory/RAG)
 from app.routers import smart_recommendations, ai_v3
-
-# Import photo analysis router
 from app.routers import photo_analysis
-
-# Import trade-in router (VIN decode, etc.)
 from app.routers import trade_in
-
-# Import TTS router (ElevenLabs integration)
 from app.routers import tts
-
-# Import worksheet router (Digital Worksheet for deal structuring)
 from app.routers import worksheet
 
 # Import database
 from app.database import init_database, close_database, is_database_configured
-
-
-# =============================================================================
-# CUSTOM EXCEPTIONS
-# =============================================================================
-
-class AppException(Exception):
-    """Base application exception for consistent error responses"""
-    def __init__(
-        self, 
-        message: str, 
-        code: str = "INTERNAL_ERROR", 
-        status_code: int = 500,
-        details: Optional[dict] = None
-    ):
-        self.message = message
-        self.code = code
-        self.status_code = status_code
-        self.details = details or {}
-        super().__init__(self.message)
-
-
-class AIServiceException(AppException):
-    """Raised when AI service is unavailable or fails"""
-    def __init__(self, message: str = "AI service temporarily unavailable"):
-        super().__init__(message, "AI_SERVICE_ERROR", 503)
-
-
-class ValidationException(AppException):
-    """Raised for input validation failures"""
-    def __init__(self, message: str, field: Optional[str] = None):
-        details = {"field": field} if field else {}
-        super().__init__(message, "VALIDATION_ERROR", 400, details)
-
-
-class RateLimitException(AppException):
-    """Raised when rate limit is exceeded"""
-    def __init__(self, message: str = "Too many requests. Please slow down."):
-        super().__init__(message, "RATE_LIMIT_EXCEEDED", 429)
-
-
-# =============================================================================
-# INPUT SANITIZATION UTILITIES
-# =============================================================================
-
-def sanitize_user_input(text: str, max_length: int = 2000) -> str:
-    """
-    Sanitize user input before processing.
-    
-    Args:
-        text: Raw user input
-        max_length: Maximum allowed length
-        
-    Returns:
-        Sanitized text safe for processing
-    """
-    if not text:
-        return ""
-    
-    # Truncate to max length
-    text = text[:max_length]
-    
-    # Remove control characters (except newlines and tabs)
-    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]', '', text)
-    
-    # Basic XSS prevention - escape HTML entities
-    text = escape(text)
-    
-    return text.strip()
-
-
-def sanitize_stock_number(stock: str) -> str:
-    """Sanitize stock number input - alphanumeric only"""
-    if not stock:
-        return ""
-    return re.sub(r'[^A-Za-z0-9\-]', '', stock)[:20]
-
-
-def sanitize_phone(phone: str) -> str:
-    """Sanitize phone number - digits only"""
-    if not phone:
-        return ""
-    return re.sub(r'[^\d]', '', phone)[:15]
 
 
 # =============================================================================
@@ -151,60 +68,20 @@ def get_client_identifier(request: Request) -> str:
     Uses X-Forwarded-For header if behind proxy, otherwise remote address.
     Also considers session ID for kiosk-specific limiting.
     """
-    # Check for forwarded header (behind load balancer/proxy)
     forwarded = request.headers.get("X-Forwarded-For")
     if forwarded:
-        # Take the first IP in the chain
         client_ip = forwarded.split(",")[0].strip()
     else:
         client_ip = request.client.host if request.client else "unknown"
-    
-    # Optionally combine with session ID for more granular limiting
+
     session_id = request.headers.get("X-Session-ID", "")
     if session_id:
         return f"{client_ip}:{session_id}"
-    
+
     return client_ip
 
 
 limiter = Limiter(key_func=get_client_identifier)
-
-
-# =============================================================================
-# ENVIRONMENT & CORS CONFIGURATION
-# =============================================================================
-
-# Default to production for security - must explicitly set development
-ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
-IS_DEVELOPMENT = ENVIRONMENT == "development"
-
-def get_cors_origins() -> list:
-    """
-    Get CORS origins based on environment.
-    Production requires explicit CORS_ORIGINS env var.
-    """
-    if IS_DEVELOPMENT:
-        logger.warning("⚠️  Running in DEVELOPMENT mode - CORS allows all origins")
-        return ["*"]
-    
-    # Production: use explicit allowlist
-    default_origins = [
-        "https://quirk-ai-kiosk.railway.app",
-        "https://quirk-ai-kiosk.netlify.app",
-        "https://quirk-ai-kiosk.vercel.app",
-        "https://quirk-frontend-production.up.railway.app",
-        "https://quirk-backend-production.up.railway.app",
-    ]
-    
-    # Allow override via environment variable
-    custom_origins = os.getenv("CORS_ORIGINS", "")
-    if custom_origins:
-        origins = [o.strip() for o in custom_origins.split(",") if o.strip()]
-        logger.info(f"✅ CORS configured with {len(origins)} custom origins")
-        return origins
-    
-    logger.info(f"✅ CORS configured with {len(default_origins)} default origins")
-    return default_origins
 
 
 # =============================================================================
@@ -214,14 +91,13 @@ def get_cors_origins() -> list:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application startup and shutdown handler"""
-    # Startup
     logger.info("🚀 Quirk AI Kiosk API starting...")
-    logger.info(f"📍 Environment: {ENVIRONMENT}")
+    logger.info(f"📍 Environment: {settings.environment}")
     logger.info("📊 Loading inventory enrichment service...")
     logger.info("🧠 Initializing entity extraction service...")
     logger.info("🔧 Initializing intelligent AI services (v3)...")
     logger.info("📋 Initializing Digital Worksheet service...")
-    
+
     # Initialize database
     if is_database_configured():
         logger.info("🗄️  Connecting to PostgreSQL database...")
@@ -232,16 +108,16 @@ async def lifespan(app: FastAPI):
             logger.warning("⚠️  PostgreSQL connection failed - using JSON fallback")
     else:
         logger.info("📁 No DATABASE_URL configured - using JSON file storage")
-    
+
     # Verify critical configuration
-    if not os.getenv("ANTHROPIC_API_KEY"):
+    if not settings.is_ai_configured:
         logger.warning("⚠️  ANTHROPIC_API_KEY not configured - AI chat will use fallback responses")
     else:
         logger.info("✅ Anthropic API key configured")
-    
+
     logger.info("✅ All services initialized")
     yield
-    
+
     # Shutdown
     logger.info("👋 Quirk AI Kiosk API shutting down...")
     await close_database()
@@ -256,9 +132,9 @@ app = FastAPI(
     title="Quirk AI Kiosk API",
     description="AI-powered vehicle recommendation and customer interaction system for Quirk Auto Dealers",
     version="3.0.0",
-    docs_url="/docs" if IS_DEVELOPMENT else None,
-    redoc_url="/redoc" if IS_DEVELOPMENT else None,
-    openapi_url="/openapi.json" if IS_DEVELOPMENT else None,
+    docs_url="/docs" if settings.is_development else None,
+    redoc_url="/redoc" if settings.is_development else None,
+    openapi_url="/openapi.json" if settings.is_development else None,
     lifespan=lifespan
 )
 
@@ -266,10 +142,16 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Configure CORS
+# Configure CORS — uses settings.cors_origins_list (single source of truth)
+cors_origins = settings.cors_origins_list if settings.is_production else ["*"]
+if not settings.is_production:
+    logger.warning("⚠️  Running in DEVELOPMENT mode - CORS allows all origins")
+else:
+    logger.info(f"✅ CORS configured with {len(cors_origins)} origins")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=get_cors_origins(),
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -304,7 +186,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={
             "error": "INTERNAL_ERROR",
             "message": "An unexpected error occurred",
-            "details": {"type": type(exc).__name__} if IS_DEVELOPMENT else {}
+            "details": {"type": type(exc).__name__} if settings.is_development else {}
         }
     )
 
@@ -312,29 +194,24 @@ async def global_exception_handler(request: Request, exc: Exception):
 @app.middleware("http")
 async def add_request_metadata(request: Request, call_next):
     """Add request ID and timing to all requests"""
-    import time
-    import uuid
-    
     request_id = str(uuid.uuid4())[:8]
     start_time = time.time()
-    
-    # Add request ID to state for logging
+
     request.state.request_id = request_id
-    
+
     response = await call_next(request)
-    
-    # Add headers
+
     process_time = time.time() - start_time
     response.headers["X-Request-ID"] = request_id
     response.headers["X-Process-Time"] = f"{process_time:.3f}s"
-    
+
     # Log request (skip health checks to reduce noise)
     if not request.url.path.endswith("/health"):
         logger.info(
             f"{request.method} {request.url.path} - {response.status_code} - {process_time:.3f}s",
             extra={"request_id": request_id}
         )
-    
+
     return response
 
 
@@ -380,8 +257,8 @@ async def root():
         "service": "Quirk AI Kiosk API",
         "status": "running",
         "version": "3.0.0",
-        "environment": ENVIRONMENT,
-        "docs": "/docs" if IS_DEVELOPMENT else "disabled",
+        "environment": settings.environment,
+        "docs": "/docs" if settings.is_development else "disabled",
         "features": {
             "v1": ["inventory", "recommendations", "leads", "analytics", "traffic", "trade-in", "tts"],
             "v2": ["enhanced-recommendations"],
@@ -395,21 +272,19 @@ async def root():
 async def health_check():
     """
     Comprehensive health check endpoint.
-    
     Checks all service dependencies and returns detailed status.
-    Used by load balancers and monitoring systems.
     """
     health_status = {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "service": "quirk-kiosk-api",
         "version": "3.0.0",
-        "environment": ENVIRONMENT,
+        "environment": settings.environment,
         "checks": {}
     }
-    
+
     overall_healthy = True
-    
+
     # Database check
     try:
         if is_database_configured():
@@ -429,18 +304,17 @@ async def health_check():
     except Exception as e:
         health_status["checks"]["database"] = {
             "status": "unhealthy",
-            "error": str(e) if IS_DEVELOPMENT else "connection_failed"
+            "error": str(e) if settings.is_development else "connection_failed"
         }
         overall_healthy = False
-    
+
     # AI Service check
-    anthropic_configured = bool(os.getenv("ANTHROPIC_API_KEY"))
     health_status["checks"]["ai_service"] = {
-        "status": "configured" if anthropic_configured else "fallback_mode",
+        "status": "configured" if settings.is_ai_configured else "fallback_mode",
         "provider": "anthropic",
         "model": "claude-sonnet-4-5-20250929"
     }
-    
+
     # Inventory check
     try:
         from app.routers.inventory import get_vehicle_count
@@ -452,9 +326,9 @@ async def health_check():
     except Exception as e:
         health_status["checks"]["inventory"] = {
             "status": "degraded",
-            "error": str(e) if IS_DEVELOPMENT else "load_error"
+            "error": str(e) if settings.is_development else "load_error"
         }
-    
+
     # V3 Intelligent AI check
     try:
         from app.services.vehicle_retriever import get_vehicle_retriever
@@ -466,9 +340,9 @@ async def health_check():
     except Exception as e:
         health_status["checks"]["intelligent_ai"] = {
             "status": "degraded",
-            "error": str(e) if IS_DEVELOPMENT else "init_error"
+            "error": str(e) if settings.is_development else "init_error"
         }
-    
+
     # Worksheet service check
     try:
         from app.services.worksheet_service import get_worksheet_service
@@ -481,34 +355,27 @@ async def health_check():
     except Exception as e:
         health_status["checks"]["worksheet_service"] = {
             "status": "degraded",
-            "error": str(e) if IS_DEVELOPMENT else "init_error"
+            "error": str(e) if settings.is_development else "init_error"
         }
-    
+
     # Set overall status
     if not overall_healthy:
         health_status["status"] = "unhealthy"
-    elif not anthropic_configured:
+    elif not settings.is_ai_configured:
         health_status["status"] = "degraded"
-    
+
     return health_status
 
 
 @app.get("/api/health/live")
 async def liveness_check():
-    """
-    Kubernetes liveness probe.
-    Simple check that the service is running.
-    """
+    """Kubernetes liveness probe."""
     return {"status": "alive"}
 
 
 @app.get("/api/health/ready")
 async def readiness_check():
-    """
-    Kubernetes readiness probe.
-    Checks if service is ready to accept traffic.
-    """
-    # Check database connectivity
+    """Kubernetes readiness probe."""
     if is_database_configured():
         try:
             from app.database import test_connection
@@ -522,27 +389,27 @@ async def readiness_check():
                 status_code=503,
                 content={"status": "not_ready", "reason": "database_error"}
             )
-    
+
     return {"status": "ready"}
 
 
 # =============================================================================
 # UTILITY EXPORTS (for use in routers)
+# Re-exports from core modules so existing imports continue to work
 # =============================================================================
 
-# Export utilities for use in other modules
 __all__ = [
     "app",
     "limiter",
+    # Re-exported from core.exceptions
     "AppException",
     "AIServiceException",
     "ValidationException",
     "RateLimitException",
+    # Re-exported from core.security
     "sanitize_user_input",
     "sanitize_stock_number",
     "sanitize_phone",
-    "IS_DEVELOPMENT",
-    "ENVIRONMENT",
 ]
 
 
@@ -552,15 +419,12 @@ __all__ = [
 
 if __name__ == "__main__":
     import uvicorn
-    
-    port = int(os.getenv("PORT", 8000))
-    host = os.getenv("HOST", "0.0.0.0")
-    
+
     uvicorn.run(
         "app.main:app",
-        host=host,
-        port=port,
-        reload=IS_DEVELOPMENT,
-        log_level="debug" if IS_DEVELOPMENT else "info",
-        access_log=IS_DEVELOPMENT,
+        host=settings.host,
+        port=settings.port,
+        reload=settings.is_development,
+        log_level="debug" if settings.is_development else "info",
+        access_log=settings.is_development,
     )
