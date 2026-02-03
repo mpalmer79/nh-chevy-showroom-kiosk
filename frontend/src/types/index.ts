@@ -109,6 +109,7 @@ export interface NavigationOptions {
   model?: string;
   minPrice?: number;
   maxPrice?: number;
+  sortBy?: string;
 }
 
 export interface CustomerData {
