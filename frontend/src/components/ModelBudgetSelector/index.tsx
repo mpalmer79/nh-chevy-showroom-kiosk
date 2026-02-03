@@ -59,6 +59,39 @@ const ModelBudgetSelector: React.FC<ModelBudgetSelectorProps> = ({
 
   const { step, categorySlug, modelSlug, cabSlug } = parseSubRoute(subRoute);
 
+  // Wrapped navigateTo that skips color selection for models with < 10 in stock
+  // When model count is low, skip straight to inventory showing ALL of that model
+  const stepNavigateTo = useCallback((screen: string, options?: Record<string, unknown>) => {
+    // Intercept navigation to the color selection step
+    if (screen.startsWith('modelBudget/color/')) {
+      const routeParts = screen.replace('modelBudget/color/', '').split('/');
+      const targetModelSlug = routeParts[0];
+      const targetCabSlug = routeParts[1];
+
+      // Find the model across all categories and check inventory count
+      for (const category of Object.values(vehicleCategories)) {
+        const model = category.models.find(m => toSlug(m.name) === targetModelSlug);
+        if (model && model.count < 10) {
+          // Less than 10 in stock: skip color selection, go to inventory
+          const cabName = targetCabSlug 
+            ? targetCabSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+            : undefined;
+
+          updateCustomerData({
+            selectedModel: model.name,
+            selectedCab: cabName,
+            path: 'modelBudget',
+          });
+          navigateTo('inventory');
+          return;
+        }
+      }
+    }
+
+    // Default: pass through to the real navigateTo
+    navigateTo(screen, options as Record<string, string | number | undefined>);
+  }, [navigateTo, vehicleCategories, updateCustomerData]);
+
   // Calculate current step number for progress bar
   const getStepNumber = useCallback((): number => {
     // Check if selected model has cab options
@@ -139,11 +172,11 @@ const ModelBudgetSelector: React.FC<ModelBudgetSelectorProps> = ({
     navigateTo('inventory');
   }, [modelSlug, cabSlug, state, vehicleCategories, updateCustomerData, navigateTo]);
 
-  // Shared props for all step components
+  // Shared props for all step components - uses stepNavigateTo wrapper
   const stepProps = {
     state,
     updateState,
-    navigateTo,
+    navigateTo: stepNavigateTo,
     inventoryByModel,
     vehicleCategories,
     resetJourney,
