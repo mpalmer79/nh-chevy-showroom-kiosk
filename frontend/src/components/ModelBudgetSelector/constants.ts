@@ -22,7 +22,7 @@ export const MODEL_IMAGES: Record<string, string> = {
   'Colorado': '/images/models/Colorado.jpg',
   // SUVs & Crossovers
   'Trax': '/images/models/trax.webp',
-  'Trailblazer': '/images/models/trailblazer.avif',
+  'Trailblazer': '/images/models/trailblazer.png',
   'Equinox': '/images/models/equinox.avif',
   'Equinox EV': '/images/models/equinox-ev.webp',
   'Blazer': '/images/models/blazer.webp',
