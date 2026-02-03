@@ -192,10 +192,18 @@ const KioskApp: React.FC = () => {
           : prev.budgetRange,
       }));
     } else if (screenName === 'inventory') {
-      // Clear filters when navigating to inventory without options
+      // Clear ALL filters when navigating to inventory without options
+      // UNLESS coming from modelBudget (which sets filters intentionally via updateCustomerData)
+      const prevPath = currentHistory[currentHistory.length - 1] || '';
+      const prevBase = getBaseScreen(prevPath);
       setCustomerData(prev => ({
         ...prev,
         bodyStyleFilter: undefined,
+        ...(prevBase !== 'modelBudget' ? {
+          selectedModel: undefined,
+          selectedCab: undefined,
+          budgetRange: { min: 300, max: 800 },
+        } : {}),
       }));
     }
     
@@ -249,6 +257,9 @@ const KioskApp: React.FC = () => {
     setCustomerData(prev => ({
       ...prev,
       bodyStyleFilter: undefined,
+      selectedModel: undefined,
+      selectedCab: undefined,
+      budgetRange: { min: 300, max: 800 },
     }));
     
     setIsTransitioning(true);
@@ -312,6 +323,9 @@ const KioskApp: React.FC = () => {
         setCustomerData(prev => ({
           ...prev,
           bodyStyleFilter: undefined,
+          selectedModel: undefined,
+          selectedCab: undefined,
+          budgetRange: { min: 300, max: 800 },
         }));
         
         setIsTransitioning(true);
@@ -461,7 +475,6 @@ const KioskApp: React.FC = () => {
     customerData.paymentPreference,
     customerData.contactInfo,
     customerData.conversationLog,
-    customerData,
   ]);
 
   // Screen components map
