@@ -280,7 +280,7 @@ interface AIChatResponse {
 // HELPER FUNCTIONS
 // ============================================
 
-// Helper function for API requests
+// Helper function for API requests (uses API_BASE_URL which includes /v1)
 const apiRequest = async <T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
   const url = `${API_BASE_URL}${endpoint}`;
   
@@ -309,6 +309,19 @@ const apiRequest = async <T = unknown>(endpoint: string, options: RequestOptions
     console.error(`API Request Failed: ${endpoint}`, error);
     throw error;
   }
+};
+
+/**
+ * Get base API URL without version prefix (/v1).
+ * Used for endpoints not under /v1 (health check, v3 AI routes, etc.)
+ * REACT_APP_API_URL already includes /v1, so this strips it.
+ */
+const getBaseApiUrl = (): string => {
+  let base = API_BASE_URL;
+  if (base.endsWith('/v1')) {
+    base = base.slice(0, -3);
+  }
+  return base;
 };
 
 /**
@@ -515,12 +528,13 @@ export interface PhotoAnalysisResponse {
 
 /**
  * Analyze trade-in photos using AI vision
+ * FIX: Removed /v1 prefix - apiRequest already prepends API_BASE_URL which includes /v1
  */
 export const analyzeTradeInPhotos = async (
   photos: PhotoItem[],
   vehicleInfo?: VehicleInfoForAnalysis
 ): Promise<PhotoAnalysisResponse> => {
-  return apiRequest<PhotoAnalysisResponse>('/v1/trade-in-photos/analyze', {
+  return apiRequest<PhotoAnalysisResponse>('/trade-in-photos/analyze', {
     method: 'POST',
     body: JSON.stringify({
       photos,
@@ -651,9 +665,18 @@ export const getKioskSessionId = getSessionId;
 
 /**
  * Health check
+ * FIX: Backend health endpoint is at /api/health (not /api/v1/health)
+ * Uses getBaseApiUrl() to strip the /v1 prefix
  */
 export const healthCheck = async (): Promise<{ status: string }> => {
-  return apiRequest<{ status: string }>('/health');
+  const url = `${getBaseApiUrl()}/health`;
+  const response = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!response.ok) {
+    throw new Error(`Health check failed: ${response.status}`);
+  }
+  return await response.json() as { status: string };
 };
 
 // ============================================
@@ -734,6 +757,7 @@ export const getSessionForDashboard = async (sessionId: string): Promise<ActiveS
 /**
  * Chat with AI assistant for vehicle recommendations
  * Uses V3 intelligent AI with tools and persistent memory
+ * FIX: Uses getBaseApiUrl() instead of duplicated /v1-stripping logic
  */
 export const chatWithAI = async (request: AIChatRequest): Promise<AIChatResponse> => {
   // Build V3-compatible request with session_id
@@ -747,16 +771,7 @@ export const chatWithAI = async (request: AIChatRequest): Promise<AIChatResponse
     customer_name: request.customerName || null
   };
   
-  // V3 endpoint is at /api/v3/ai/chat (not under /v1)
-  // Get base URL without any version prefix
-  let baseUrl = API_BASE_URL;
-  
-  // Remove /v1 suffix if present (REACT_APP_API_URL may include it)
-  if (baseUrl.endsWith('/v1')) {
-    baseUrl = baseUrl.slice(0, -3); // Remove '/v1'
-  }
-  
-  const url = `${baseUrl}/v3/ai/chat`;
+  const url = `${getBaseApiUrl()}/v3/ai/chat`;
   
   const response = await fetch(url, {
     method: 'POST',
@@ -777,6 +792,7 @@ export const chatWithAI = async (request: AIChatRequest): Promise<AIChatResponse
 /**
  * Notify staff when customer requests assistance
  * Triggers Slack/SMS/Email notifications
+ * FIX: Uses getBaseApiUrl() instead of duplicated /v1-stripping logic
  */
 export interface NotifyStaffRequest {
   notification_type: 'sales' | 'vehicle_request' | 'appraisal' | 'finance';
@@ -802,15 +818,7 @@ export interface NotifyStaffResponse {
 }
 
 export const notifyStaff = async (request: NotifyStaffRequest): Promise<NotifyStaffResponse> => {
-  // Get base URL without any version prefix
-  let baseUrl = API_BASE_URL;
-  
-  // Remove /v1 suffix if present
-  if (baseUrl.endsWith('/v1')) {
-    baseUrl = baseUrl.slice(0, -3);
-  }
-  
-  const url = `${baseUrl}/v3/ai/notify-staff`;
+  const url = `${getBaseApiUrl()}/v3/ai/notify-staff`;
   
   const response = await fetch(url, {
     method: 'POST',
