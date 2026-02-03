@@ -101,7 +101,11 @@ const WelcomeScreen: React.FC<KioskComponentProps> = ({ navigateTo, updateCustom
         navigateTo('inventory', { bodyStyle: 'Truck' });
         break;
       case 'total':
+        navigateTo('inventory');
+        break;
       case 'price':
+        navigateTo('inventory', { sortBy: 'priceLow' });
+        break;
       default:
         navigateTo('inventory');
         break;
