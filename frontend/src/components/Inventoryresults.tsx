@@ -39,8 +39,8 @@ const getColorCategory = (colorDesc: string): string => {
   const colorMappings: Array<{ category: string; keywords: string[] }> = [
     { category: 'black', keywords: ['black', 'blac', 'bla', 'mosaic', 'onyx', 'ebony'] },
     { category: 'white', keywords: ['white', 'whit', 'whi', 'summit', 'arctic', 'polar', 'iridescent', 'pearl'] },
-    { category: 'red', keywords: ['red', 'cherry', 'cajun', 'radiant', 'garnet', 'crimson'] },
-    { category: 'blue', keywords: ['blue', 'blu', 'northsky', 'glacier', 'reef', 'midnight', 'navy'] },
+    { category: 'red', keywords: ['red', 'cherry', 'cajun', 'radiant', 'garnet', 'crimson', 'apex'] },
+    { category: 'blue', keywords: ['blue', 'blu', 'northsky', 'glacier', 'reef', 'midnight', 'navy', 'lakeshore'] },
     { category: 'gray', keywords: ['gray', 'grey', 'gra', 'shadow', 'sterling', 'satin steel', 'graphite'] },
     { category: 'silver', keywords: ['silver', 'silve', 'silv', 'sil'] },
     { category: 'green', keywords: ['green', 'gree', 'gre', 'woodland', 'evergreen', 'forest'] },
@@ -64,19 +64,21 @@ const getColorCategory = (colorDesc: string): string => {
 
 // Get vehicle image URL based on model and color rules
 // PRIORITIZE local images over API URLs (API URLs often fail)
-const getVehicleImageUrl = (vehicle: Vehicle): string | null => {
+// Supports multiple formats: tries .jpg by default, .avif as fallback
+const getVehicleImageUrl = (vehicle: Vehicle, useAvif = false): string | null => {
   const fullModel = (vehicle.model || '').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const baseModel = fullModel.replace(/-ev$/, '').replace(/-hd$/, '').replace(/\d+$/, '');
   const exteriorColor = (vehicle.exteriorColor || vehicle.exterior_color || '').toLowerCase();
   const colorCategory = getColorCategory(exteriorColor);
   const modelForImage = baseModel || fullModel;
+  const ext = useAvif ? 'avif' : 'jpg';
   
   // Try local image first (most reliable)
   if (modelForImage && colorCategory) {
-    return `/images/vehicles/${modelForImage}-${colorCategory}.jpg`;
+    return `/images/vehicles/${modelForImage}-${colorCategory}.${ext}`;
   }
   if (modelForImage) {
-    return `/images/vehicles/${modelForImage}.jpg`;
+    return `/images/vehicles/${modelForImage}.${ext}`;
   }
   
   // Fall back to API URLs only if no local path can be generated
@@ -93,10 +95,18 @@ const InventoryResults: React.FC<KioskComponentProps> = ({ navigateTo, updateCus
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>((customerData?.sortBy as SortOption) || 'recommended');
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  // Track vehicles that should retry with .avif after .jpg failed
+  const [avifRetry, setAvifRetry] = useState<Set<string>>(new Set());
 
-  // Handle image load error - mark image as failed so placeholder shows
+  // Handle image load error - try .avif fallback before showing placeholder
   const handleImageError = (vehicleId: string) => {
-    setFailedImages(prev => new Set(prev).add(vehicleId));
+    if (!avifRetry.has(vehicleId)) {
+      // First failure (.jpg) - try .avif next
+      setAvifRetry(prev => new Set(prev).add(vehicleId));
+    } else {
+      // Second failure (.avif also failed) - show placeholder
+      setFailedImages(prev => new Set(prev).add(vehicleId));
+    }
   };
 
   // Handle vehicle card click - navigate to VehicleDetail page
@@ -385,7 +395,7 @@ const InventoryResults: React.FC<KioskComponentProps> = ({ navigateTo, updateCus
             const exteriorColor = vehicle.exteriorColor || vehicle.exterior_color || '';
             const stockNumber = vehicle.stockNumber || vehicle.stock_number || '';
             const vehicleId = String(vehicle.id || stockNumber || index);
-            const imageUrl = getVehicleImageUrl(vehicle);
+            const imageUrl = getVehicleImageUrl(vehicle, avifRetry.has(vehicleId));
             const showImage = imageUrl && !failedImages.has(vehicleId);
             
             return (
