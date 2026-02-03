@@ -1,14 +1,31 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import styles from '../../modelBudgetSelectorStyles';
 import type { StepProps, ColorChoices } from '../types';
-import type { AvailableModel, GMColor } from '../../../types';
+import type { Vehicle, AvailableModel, GMColor } from '../../../types';
 import GM_COLORS from '../../../types/gmColors';
 import { toSlug } from '../constants';
+import api from '../../api';
 
 interface ColorSelectionProps extends StepProps {
   modelSlug: string;
   cabSlug?: string;
 }
+
+// Match an inventory color string to a GM_COLORS entry
+// e.g. "Apex Red" in inventory matches "Apex Red" in GM_COLORS
+// Also handles partial/fuzzy: "Sterling Gray" matches "Sterling Gray Metallic"
+const colorMatchesGM = (inventoryColor: string, gmColorName: string): boolean => {
+  const inv = inventoryColor.toLowerCase().trim();
+  const gm = gmColorName.toLowerCase().trim();
+  if (inv === gm) return true;
+  // Check if one contains the other (handles "Sterling Gray" vs "Sterling Gray Metallic")
+  if (gm.includes(inv) || inv.includes(gm)) return true;
+  // Check first two words match (e.g. "Mosaic Black" matches "Mosaic Black Metallic")
+  const invWords = inv.split(/\s+/).slice(0, 2).join(' ');
+  const gmWords = gm.split(/\s+/).slice(0, 2).join(' ');
+  if (invWords.length > 3 && invWords === gmWords) return true;
+  return false;
+};
 
 const ColorSelection: React.FC<ColorSelectionProps> = ({ 
   state,
@@ -20,6 +37,8 @@ const ColorSelection: React.FC<ColorSelectionProps> = ({
   cabSlug,
 }) => {
   const [colorChoices, setColorChoices] = useState<ColorChoices>(state.colorChoices);
+  const [inStockColors, setInStockColors] = useState<string[]>([]);
+  const [loadingColors, setLoadingColors] = useState<boolean>(true);
   
   // Find the model across all categories
   let foundModel: AvailableModel | null = null;
@@ -47,6 +66,37 @@ const ColorSelection: React.FC<ColorSelectionProps> = ({
     }
   }, [foundModel, cabSlug, updateState]);
 
+  // Fetch actual inventory for this model to get in-stock colors
+  useEffect(() => {
+    if (!foundModel) return;
+
+    const fetchColors = async () => {
+      setLoadingColors(true);
+      try {
+        const data = await api.getInventory({ model: foundModel!.name });
+        const vehicles: Vehicle[] = Array.isArray(data)
+          ? data
+          : (data as { vehicles?: Vehicle[] }).vehicles || [];
+
+        // Extract unique exterior colors from inventory
+        const colorSet = new Set<string>();
+        vehicles.forEach((v) => {
+          const color = (v.exteriorColor || v.exterior_color || '').trim();
+          if (color) colorSet.add(color);
+        });
+        setInStockColors(Array.from(colorSet));
+      } catch (err) {
+        console.warn('Failed to fetch model inventory for colors:', err);
+        // On error, don't filter - show all GM colors
+        setInStockColors([]);
+      } finally {
+        setLoadingColors(false);
+      }
+    };
+
+    fetchColors();
+  }, [foundModel]);
+
   // If model not found, redirect (AFTER all hooks)
   if (!foundModel) {
     setTimeout(() => navigateTo('modelBudget/category'), 0);
@@ -54,11 +104,24 @@ const ColorSelection: React.FC<ColorSelectionProps> = ({
   }
 
   const inventoryCount = inventoryByModel[foundModel.name] || 0;
-  const colors: GMColor[] = GM_COLORS[foundModel.name] || GM_COLORS['Equinox'];
+  const allColors: GMColor[] = GM_COLORS[foundModel.name] || GM_COLORS['Equinox'];
+
+  // Filter GM colors to only those matching in-stock exterior colors
+  // If we have no in-stock data (error or still loading), show all colors as fallback
+  const colors: GMColor[] = inStockColors.length > 0
+    ? allColors.filter(gmColor =>
+        inStockColors.some(invColor => colorMatchesGM(invColor, gmColor.name))
+      )
+    : loadingColors ? [] : allColors;
+
   const availableForSecond = colors.filter(c => c.name !== colorChoices.first);
 
   const handleColorChange = (choice: keyof ColorChoices, value: string): void => {
     const newChoices = { ...colorChoices, [choice]: value };
+    // If user changed first choice and it now matches second, clear second
+    if (choice === 'first' && value === colorChoices.second) {
+      newChoices.second = '';
+    }
     setColorChoices(newChoices);
     updateState({ colorChoices: newChoices });
   };
@@ -96,7 +159,14 @@ const ColorSelection: React.FC<ColorSelectionProps> = ({
         </p>
       </div>
       <div style={styles.formSection}>
-        <p style={styles.formIntro}>Select up to 2 GM colors for {foundModel.name} in order of preference:</p>
+        <p style={styles.formIntro}>
+          {colors.length > 0
+            ? `Select up to 2 GM colors for ${foundModel.name} in order of preference:`
+            : loadingColors
+              ? `Loading available colors...`
+              : `Select up to 2 GM colors for ${foundModel.name} in order of preference:`
+          }
+        </p>
         <div style={styles.colorSelects}>
           <div style={styles.colorSelectGroup}>
             <label style={styles.inputLabel}>First Choice</label>
@@ -104,6 +174,7 @@ const ColorSelection: React.FC<ColorSelectionProps> = ({
               style={styles.selectInput} 
               value={colorChoices.first} 
               onChange={(e: ChangeEvent<HTMLSelectElement>) => handleColorChange('first', e.target.value)}
+              disabled={loadingColors}
             >
               <option value="">Select a color...</option>
               {colors.map((color) => (
@@ -114,7 +185,7 @@ const ColorSelection: React.FC<ColorSelectionProps> = ({
             </select>
             {colorChoices.first && (
               <div style={styles.colorPreview}>
-                <div style={{...styles.colorSwatch, backgroundColor: colors.find(c => c.name === colorChoices.first)?.hex || '#666'}} />
+                <div style={{...styles.colorSwatch, backgroundColor: allColors.find(c => c.name === colorChoices.first)?.hex || '#666'}} />
                 <span>{colorChoices.first}</span>
               </div>
             )}
@@ -136,7 +207,7 @@ const ColorSelection: React.FC<ColorSelectionProps> = ({
             </select>
             {colorChoices.second && (
               <div style={styles.colorPreview}>
-                <div style={{...styles.colorSwatch, backgroundColor: colors.find(c => c.name === colorChoices.second)?.hex || '#666'}} />
+                <div style={{...styles.colorSwatch, backgroundColor: allColors.find(c => c.name === colorChoices.second)?.hex || '#666'}} />
                 <span>{colorChoices.second}</span>
               </div>
             )}
