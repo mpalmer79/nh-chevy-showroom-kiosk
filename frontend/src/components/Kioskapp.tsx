@@ -20,7 +20,7 @@ import InventorySyncDashboard from './InventorySyncDashboard';
 import ErrorBoundary from './Errorboundary';
 import api from './api';
 
-import type { CustomerData, KioskComponentProps } from '../types';
+import type { CustomerData, KioskComponentProps, SortOption } from '../types';
 
 // Screen names type
 type ScreenName = 
@@ -191,7 +191,7 @@ const KioskApp: React.FC = () => {
         budgetRange: options.minPrice && options.maxPrice 
           ? { min: options.minPrice, max: options.maxPrice }
           : prev.budgetRange,
-        sortBy: options.sortBy || prev.sortBy,
+        sortBy: (options.sortBy as SortOption) || prev.sortBy,
       }));
     } else if (screenName === 'inventory') {
       // Clear ALL filters when navigating to inventory without options
