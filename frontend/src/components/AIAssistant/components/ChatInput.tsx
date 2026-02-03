@@ -67,6 +67,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         
         {/* Send Button */}
         <button
+                    aria-label="Send"
           style={styles.sendButton}
           onClick={onSend}
           disabled={isLoading || !value.trim()}
