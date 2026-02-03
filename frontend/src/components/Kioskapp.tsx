@@ -475,6 +475,7 @@ const KioskApp: React.FC = () => {
     customerData.paymentPreference,
     customerData.contactInfo,
     customerData.conversationLog,
+    customerData.vehicleRequested,
   ]);
 
   // Screen components map
