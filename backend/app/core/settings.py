@@ -28,9 +28,9 @@ class Settings(BaseSettings):
         extra="ignore",
     )
     
-    # =========================================================================
+    #
     # ENVIRONMENT
-    # =========================================================================
+    #
     
     environment: str = Field(
         default="production",
@@ -47,9 +47,9 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.environment.lower() == "production"
     
-    # =========================================================================
+    #
     # AI SERVICE
-    # =========================================================================
+    #
     
     anthropic_api_key: Optional[str] = Field(
         default=None,
@@ -60,9 +60,9 @@ class Settings(BaseSettings):
     def is_ai_configured(self) -> bool:
         return bool(self.anthropic_api_key and self.anthropic_api_key.startswith("sk-ant-"))
     
-    # =========================================================================
+    #
     # AUTHENTICATION
-    # =========================================================================
+    #
     
     jwt_secret_key: str = Field(
         default_factory=lambda: secrets.token_hex(32),
@@ -92,9 +92,9 @@ class Settings(BaseSettings):
             raise ValueError("JWT_SECRET_KEY must be at least 32 characters")
         return v
     
-    # =========================================================================
+    #
     # DATABASE
-    # =========================================================================
+    #
     
     database_url: Optional[str] = Field(
         default=None,
@@ -118,9 +118,9 @@ class Settings(BaseSettings):
     def is_database_configured(self) -> bool:
         return bool(self.database_url and "postgresql" in self.database_url)
     
-    # =========================================================================
+    #
     # CORS
-    # =========================================================================
+    #
     
     cors_origins: Optional[str] = Field(
         default=None,
@@ -142,9 +142,9 @@ class Settings(BaseSettings):
             "https://quirk-backend-production.up.railway.app",
         ]
     
-    # =========================================================================
+    #
     # RATE LIMITING
-    # =========================================================================
+    #
     
     ai_rate_limit_per_minute: int = Field(
         default=30,
@@ -155,9 +155,9 @@ class Settings(BaseSettings):
         description="General API requests per minute per IP"
     )
     
-    # =========================================================================
+    #
     # EXTERNAL SERVICES
-    # =========================================================================
+    #
     
     elevenlabs_api_key: Optional[str] = Field(default=None)
     elevenlabs_voice_id: Optional[str] = Field(default=None)
@@ -168,9 +168,9 @@ class Settings(BaseSettings):
     crm_api_key: Optional[str] = Field(default=None)
     crm_api_url: Optional[str] = Field(default=None)
     
-    # =========================================================================
+    #
     # STAFF NOTIFICATIONS (Slack & SMS)
-    # =========================================================================
+    #
     
     # Slack webhook URLs for different notification types
     slack_webhook_sales: Optional[str] = Field(
@@ -252,9 +252,9 @@ class Settings(BaseSettings):
             return [n.strip() for n in numbers_str.split(",") if n.strip()]
         return []
     
-    # =========================================================================
+    #
     # EMAIL NOTIFICATIONS
-    # =========================================================================
+    #
     
     # SendGrid (recommended)
     sendgrid_api_key: Optional[str] = Field(
@@ -314,17 +314,17 @@ class Settings(BaseSettings):
             return [e.strip() for e in emails_str.split(",") if e.strip()]
         return []
     
-    # =========================================================================
+    #
     # MONITORING
-    # =========================================================================
+    #
     
     sentry_dsn: Optional[str] = Field(default=None)
     log_level: str = Field(default="INFO")
     json_logging: bool = Field(default=True)
     
-    # =========================================================================
+    #
     # FEATURE FLAGS
-    # =========================================================================
+    #
     
     enable_analytics: bool = Field(default=True)
     enable_tts: bool = Field(default=True)
