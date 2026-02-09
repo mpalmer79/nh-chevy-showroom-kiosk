@@ -14,9 +14,9 @@ import sys
 sys.path.insert(0, '/home/runner/work/quirk-ai-kiosk/quirk-ai-kiosk/backend')
 
 
-# =============================================================================
+# ---
 # MOCK DATA
-# =============================================================================
+# ---
 
 SAMPLE_SESSION_DATA = {
     "sessionId": "K1234ABCD",
@@ -52,9 +52,9 @@ SAMPLE_TRADE_IN = {
 }
 
 
-# =============================================================================
+# ---
 # SESSION DATA VALIDATION TESTS
-# =============================================================================
+# ---
 
 class TestSessionDataValidation:
     """Tests for session data structure validation"""
@@ -105,9 +105,9 @@ class TestSessionDataValidation:
             assert "model" in vehicle
 
 
-# =============================================================================
+# ---
 # TRAFFIC STATISTICS TESTS
-# =============================================================================
+# ---
 
 class TestTrafficStatistics:
     """Tests for traffic statistics calculations"""
@@ -167,9 +167,9 @@ class TestTrafficStatistics:
         assert with_trade_in == 3
 
 
-# =============================================================================
+# ---
 # ACTIVE SESSIONS TESTS (Sales Dashboard)
-# =============================================================================
+# ---
 
 class TestActiveSessions:
     """Tests for active session tracking (Sales Dashboard feature)"""
@@ -238,9 +238,9 @@ class TestActiveSessions:
         assert dashboard_session["selectedVehicle"]["stockNumber"] == "M12345"
 
 
-# =============================================================================
+# ---
 # CHAT HISTORY TESTS
-# =============================================================================
+# ---
 
 class TestChatHistory:
     """Tests for AI chat history in traffic sessions"""
@@ -292,9 +292,9 @@ class TestChatHistory:
         assert "$500/month" in user_messages[2]
 
 
-# =============================================================================
+# ---
 # SESSION FILTERING TESTS
-# =============================================================================
+# ---
 
 class TestSessionFiltering:
     """Tests for filtering traffic log entries"""
@@ -345,9 +345,9 @@ class TestSessionFiltering:
         assert len(with_interest) == 2
 
 
-# =============================================================================
+# ---
 # PAGINATION TESTS
-# =============================================================================
+# ---
 
 class TestPagination:
     """Tests for traffic log pagination"""
@@ -396,9 +396,9 @@ class TestPagination:
         assert metadata["total_pages"] == 8
 
 
-# =============================================================================
+# ---
 # DATA AGGREGATION TESTS
-# =============================================================================
+# ---
 
 class TestDataAggregation:
     """Tests for aggregating traffic data"""
@@ -448,9 +448,9 @@ class TestDataAggregation:
         assert sorted_models[1] == ("Equinox", 2)
 
 
-# =============================================================================
+# ---
 # ERROR HANDLING TESTS
-# =============================================================================
+# ---
 
 class TestErrorHandling:
     """Tests for error handling in traffic operations"""
