@@ -53,9 +53,9 @@ class TestLeadScorer:
     def scorer(self):
         return LeadScorer()
     
-    # =========================================================================
+    #
     # TIER CLASSIFICATION TESTS
-    # =========================================================================
+    #
     
     def test_hot_lead_threshold(self, scorer):
         """Score 70+ should be HOT tier"""
@@ -107,9 +107,9 @@ class TestLeadScorer:
         assert result.total < 40
         assert "👀" in result.recommended_action
     
-    # =========================================================================
+    #
     # ENGAGEMENT SCORING TESTS
-    # =========================================================================
+    #
     
     def test_high_engagement_scoring(self, scorer):
         """15+ messages should give high engagement points"""
@@ -133,9 +133,9 @@ class TestLeadScorer:
         assert "long_session" in result.factors
         assert result.factors["long_session"] == 10
     
-    # =========================================================================
+    #
     # QUALIFICATION SCORING TESTS
-    # =========================================================================
+    #
     
     def test_down_payment_tiers(self, scorer):
         """Different down payment levels should score differently"""
@@ -178,9 +178,9 @@ class TestLeadScorer:
         assert "knows_payoff" in result2.factors
         assert result2.total > result1.total
     
-    # =========================================================================
+    #
     # WORKSHEET SCORING TESTS
-    # =========================================================================
+    #
     
     def test_worksheet_ready_bonus(self, scorer):
         """Marked ready should give big bonus"""
@@ -208,9 +208,9 @@ class TestLeadScorer:
         assert "in_negotiation" in result.factors
         assert result.factors["in_negotiation"] == 15
     
-    # =========================================================================
+    #
     # CONTACT INFO SCORING TESTS
-    # =========================================================================
+    #
     
     def test_phone_is_most_valuable_contact(self, scorer):
         """Phone number should be worth more than email"""
@@ -224,9 +224,9 @@ class TestLeadScorer:
         
         assert result.factors.get("has_phone", 0) > result.factors.get("has_email", 0)
     
-    # =========================================================================
+    #
     # CONVERSATION HISTORY TESTS
-    # =========================================================================
+    #
     
     def test_financing_keywords_in_conversation(self, scorer):
         """Financing questions should add intent points"""
@@ -251,9 +251,9 @@ class TestLeadScorer:
         
         assert "asked_about_warranty" in result.factors
     
-    # =========================================================================
+    #
     # SCORE CAPPING TESTS
-    # =========================================================================
+    #
     
     def test_score_capped_at_100(self, scorer):
         """Score should never exceed 100"""
@@ -289,9 +289,9 @@ class TestLeadScorer:
         
         assert result.total <= 100
     
-    # =========================================================================
+    #
     # PRIORITY RANKING TESTS
-    # =========================================================================
+    #
     
     def test_priority_ranking(self, scorer):
         """Higher scores should get lower rank numbers"""
@@ -311,9 +311,9 @@ class TestLeadScorer:
         assert ranked[-1].total == 30
         assert ranked[-1].priority_rank == 4
     
-    # =========================================================================
+    #
     # TIER SUMMARY TESTS
-    # =========================================================================
+    #
     
     def test_tier_summary(self, scorer):
         """Should correctly count leads by tier"""
@@ -331,9 +331,9 @@ class TestLeadScorer:
         assert summary["cold"] == 1
         assert summary["total"] == 4
     
-    # =========================================================================
+    #
     # SINGLETON TESTS
-    # =========================================================================
+    #
     
     def test_singleton(self):
         """Should return same instance"""
@@ -342,9 +342,9 @@ class TestLeadScorer:
         
         assert scorer1 is scorer2
     
-    # =========================================================================
+    #
     # SERIALIZATION TESTS
-    # =========================================================================
+    #
     
     def test_lead_score_to_dict(self, scorer):
         """LeadScore should serialize properly"""
