@@ -28,9 +28,7 @@ class TestParseModelCode:
     - Body: 3-digit code for cab/bed configuration
     """
 
-    # ==========================================================================
     # Light-Duty Trucks (1500/2500/3500 Series)
-    # ==========================================================================
 
     def test_crew_cab_short_bed_4wd(self):
         """CK10543: 4WD 1500 series, Crew Cab Short Bed"""
@@ -81,9 +79,7 @@ class TestParseModelCode:
         assert result['bed'] == 'Long Bed'
         assert result['drive'] == '4WD'
 
-    # ==========================================================================
     # Medium-Duty Trucks (4500/5500/6500 Series)
-    # ==========================================================================
 
     def test_medium_duty_regular_cab_2wd(self):
         """CC56403: 2WD Medium Duty (5500/6500), Regular Cab Chassis"""
@@ -113,9 +109,7 @@ class TestParseModelCode:
         assert result['bed'] == 'Chassis Cab'
         assert result['drive'] == '4WD'
 
-    # ==========================================================================
     # Drive Type Tests (CC = 2WD, CK = 4WD)
-    # ==========================================================================
 
     def test_cc_prefix_is_2wd(self):
         """CC prefix should always return 2WD"""
@@ -127,9 +121,7 @@ class TestParseModelCode:
         result = parse_model_code('CK10543')
         assert result['drive'] == '4WD'
 
-    # ==========================================================================
-    # Edge Cases & Invalid Inputs
-    # ==========================================================================
+    # Edge Cases
 
     def test_empty_string_returns_none(self):
         """Empty string should return all None values"""
