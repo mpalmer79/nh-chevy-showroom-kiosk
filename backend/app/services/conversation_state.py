@@ -269,9 +269,9 @@ class ConversationState:
         
         # Sentiment
         if self.frustration_signals > 2:
-            parts.append("⚠️ Customer showing signs of frustration")
+            parts.append("Customer showing signs of frustration")
         elif self.excitement_signals > 2:
-            parts.append("✓ Customer showing strong interest/excitement")
+            parts.append("Customer showing strong interest/excitement")
         
         return "\n".join(parts)
 
