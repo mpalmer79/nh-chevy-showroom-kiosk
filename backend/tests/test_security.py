@@ -21,9 +21,9 @@ from app.core.security import (
 )
 
 
-# =============================================================================
+# ---
 # SECRET VALUE TESTS
-# =============================================================================
+# ---
 
 class TestSecretValue:
     """Tests for SecretValue wrapper class"""
@@ -79,9 +79,9 @@ class TestSecretValue:
         assert "empty" in repr(secret)
 
 
-# =============================================================================
+# ---
 # API KEY MANAGER TESTS
-# =============================================================================
+# ---
 
 class TestAPIKeyManager:
     """Tests for APIKeyManager"""
@@ -156,9 +156,9 @@ class TestAPIKeyManager:
             assert manager.anthropic_key == "sk-ant-new-key-12345678901234567890"
 
 
-# =============================================================================
+# ---
 # INPUT SANITIZATION TESTS
-# =============================================================================
+# ---
 
 class TestSanitizeUserInput:
     """Tests for sanitize_user_input function"""
@@ -314,9 +314,9 @@ class TestSanitizeVin:
         assert sanitize_vin("") == ""
 
 
-# =============================================================================
+# ---
 # UTILITY FUNCTION TESTS
-# =============================================================================
+# ---
 
 class TestGenerateSessionId:
     """Tests for generate_session_id function"""
@@ -367,9 +367,9 @@ class TestMaskSensitiveData:
         assert mask_sensitive_data(None) == ""
 
 
-# =============================================================================
+# ---
 # INTEGRATION TESTS
-# =============================================================================
+# ---
 
 class TestSecurityIntegration:
     """Integration tests for security module"""
