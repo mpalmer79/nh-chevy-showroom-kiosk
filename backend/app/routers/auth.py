@@ -30,9 +30,9 @@ router = APIRouter()
 logger = logging.getLogger("quirk_kiosk.auth_router")
 
 
-# =============================================================================
+# ---
 # REQUEST/RESPONSE MODELS
-# =============================================================================
+# ---
 
 class LoginRequest(BaseModel):
     """Admin login request"""
@@ -72,9 +72,9 @@ class APIKeyValidationRequest(BaseModel):
     api_key: str
 
 
-# =============================================================================
+# ---
 # PUBLIC ENDPOINTS
-# =============================================================================
+# ---
 
 @router.post("/login", response_model=LoginResponse)
 async def login(request: LoginRequest, req: Request):
@@ -178,9 +178,9 @@ async def validate_api_key(request: APIKeyValidationRequest):
     return {"valid": False, "type": None}
 
 
-# =============================================================================
+# ---
 # PROTECTED ENDPOINTS (Require Admin)
-# =============================================================================
+# ---
 
 @router.get("/me", response_model=AdminUserResponse)
 async def get_current_admin(admin: dict = Depends(require_admin)):
@@ -276,9 +276,9 @@ async def delete_admin(
     return {"status": "deleted", "username": username}
 
 
-# =============================================================================
+# ---
 # INITIALIZATION ENDPOINT (Only works once)
-# =============================================================================
+# ---
 
 _initialized = False
 
