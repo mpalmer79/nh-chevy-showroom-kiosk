@@ -34,18 +34,18 @@ from functools import lru_cache
 from app.core.settings import get_settings, Settings
 
 
-# =============================================================================
+# ---
 # SETTINGS (already uses @lru_cache — re-exported for consistency)
-# =============================================================================
+# ---
 
 def get_app_settings() -> Settings:
     """App settings — cached singleton via Pydantic."""
     return get_settings()
 
 
-# =============================================================================
+# ---
 # CONVERSATION STATE MANAGER
-# =============================================================================
+# ---
 
 _state_manager = None
 
@@ -67,9 +67,9 @@ def get_state_manager():
     return _state_manager
 
 
-# =============================================================================
+# ---
 # VEHICLE RETRIEVER
-# =============================================================================
+# ---
 
 _vehicle_retriever = None
 
@@ -88,9 +88,9 @@ def get_vehicle_retriever():
     return _vehicle_retriever
 
 
-# =============================================================================
+# ---
 # OUTCOME TRACKER
-# =============================================================================
+# ---
 
 _outcome_tracker = None
 
@@ -104,9 +104,9 @@ def get_outcome_tracker():
     return _outcome_tracker
 
 
-# =============================================================================
+# ---
 # NOTIFICATION SERVICE
-# =============================================================================
+# ---
 
 _notification_service = None
 
@@ -121,9 +121,9 @@ def get_notification_service():
     return _notification_service
 
 
-# =============================================================================
+# ---
 # WORKSHEET SERVICE
-# =============================================================================
+# ---
 
 _worksheet_service = None
 
@@ -137,9 +137,9 @@ def get_worksheet_service():
     return _worksheet_service
 
 
-# =============================================================================
+# ---
 # ENRICHMENT SERVICE
-# =============================================================================
+# ---
 
 _enrichment_service = None
 
@@ -153,9 +153,9 @@ def get_enrichment_service():
     return _enrichment_service
 
 
-# =============================================================================
+# ---
 # ENTITY EXTRACTOR
-# =============================================================================
+# ---
 
 _entity_extractor = None
 
@@ -169,9 +169,9 @@ def get_entity_extractor():
     return _entity_extractor
 
 
-# =============================================================================
+# ---
 # TEST SUPPORT
-# =============================================================================
+# ---
 
 def reset_all():
     """
