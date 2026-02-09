@@ -1,11 +1,6 @@
 #!/bin/bash
-# =============================================================================
-# QUIRK AI KIOSK - Deployment Verification Script
-# Run this after deploying to verify all critical systems are operational
-# =============================================================================
+# Deployment Verification Script
 # Usage: ./scripts/verify-deployment.sh [backend_url] [frontend_url]
-# Example: ./scripts/verify-deployment.sh https://quirk-backend-production.up.railway.app
-# =============================================================================
 
 set -e
 
