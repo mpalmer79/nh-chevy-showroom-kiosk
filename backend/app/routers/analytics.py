@@ -16,9 +16,9 @@ from app.repositories.sqlite_repository import get_sqlite_repository
 router = APIRouter()
 
 
-# =============================================================================
+# ---
 # Repository Configuration
-# =============================================================================
+# ---
 
 REPOSITORY_TYPE = os.getenv("ANALYTICS_REPOSITORY", "memory")
 
@@ -37,9 +37,9 @@ def get_repository() -> AnalyticsRepository:
     return get_memory_repository()
 
 
-# =============================================================================
+# ---
 # Pydantic Models
-# =============================================================================
+# ---
 
 class ViewEvent(BaseModel):
     vehicleId: str
@@ -61,9 +61,9 @@ class SessionEnd(BaseModel):
     sessionId: str
 
 
-# =============================================================================
+# ---
 # Endpoints
-# =============================================================================
+# ---
 
 @router.post("/session/start")
 async def start_session(
