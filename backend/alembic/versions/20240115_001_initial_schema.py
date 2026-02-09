@@ -20,9 +20,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # ==========================================================================
+    #
     # TRAFFIC SESSIONS TABLE
-    # ==========================================================================
+    #
     op.create_table(
         'traffic_sessions',
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -59,9 +59,9 @@ def upgrade() -> None:
     op.create_index('ix_traffic_sessions_created_at', 'traffic_sessions', ['created_at'])
     op.create_index('ix_traffic_sessions_updated_at', 'traffic_sessions', ['updated_at'])
     
-    # ==========================================================================
+    #
     # ADMIN USERS TABLE
-    # ==========================================================================
+    #
     op.create_table(
         'admin_users',
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -78,9 +78,9 @@ def upgrade() -> None:
     
     op.create_index('ix_admin_users_username', 'admin_users', ['username'])
     
-    # ==========================================================================
+    #
     # AI CONVERSATION OUTCOMES TABLE (for learning/analytics)
-    # ==========================================================================
+    #
     op.create_table(
         'ai_conversation_outcomes',
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -110,9 +110,9 @@ def upgrade() -> None:
     op.create_index('ix_ai_outcomes_started_at', 'ai_conversation_outcomes', ['started_at'])
     op.create_index('ix_ai_outcomes_outcome', 'ai_conversation_outcomes', ['outcome'])
     
-    # ==========================================================================
+    #
     # LEAD SUBMISSIONS TABLE
-    # ==========================================================================
+    #
     op.create_table(
         'lead_submissions',
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
