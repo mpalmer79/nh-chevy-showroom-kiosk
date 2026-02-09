@@ -68,9 +68,9 @@ CATEGORY_MAP = {
 }
 
 
-# =============================================================================
+# ---
 # GM MODEL CODE DECODER
-# =============================================================================
+# ---
 
 # Body code mapping for light-duty trucks (Silverado 1500/2500/3500)
 BODY_CODE_MAP_LIGHT_DUTY = {
@@ -144,11 +144,11 @@ def parse_model_code(model_str: str) -> dict:
     return result
 
 
-# =============================================================================
+# ---
 # VEHICLE IMAGES - DIRECT Wikimedia Commons CDN URLs
 # These are DIRECT links that load immediately - NO redirects
 # All images are actual Chevrolet vehicles from Wikimedia Commons
-# =============================================================================
+# ---
 
 VEHICLE_IMAGES = {
     # Corvette - Red C8 Stingray
@@ -281,9 +281,9 @@ def get_image_url(model: str, exterior_color: str = '', cab_style: str = None) -
     return VEHICLE_IMAGES['default']
 
 
-# =============================================================================
+# ---
 # HELPER FUNCTIONS
-# =============================================================================
+# ---
 
 def get_engine(cylinders, model: str) -> str:
     """Derive engine string from cylinders and model"""
@@ -453,9 +453,9 @@ def get_body_style(body_type: str, model: str, cab_style: str = None) -> str:
     return 'SUV'
 
 
-# =============================================================================
+# ---
 # INVENTORY LOADING
-# =============================================================================
+# ---
 
 def load_inventory_from_excel() -> List[dict]:
     """Load and transform PBS Excel export to vehicle records"""
@@ -565,18 +565,18 @@ INVENTORY = load_inventory_from_excel()
 print(f"Loaded {len(INVENTORY)} vehicles from PBS inventory")
 
 
-# =============================================================================
+# ---
 # HEALTH CHECK HELPER
-# =============================================================================
+# ---
 
 def get_vehicle_count() -> int:
     """Get total vehicle count for health checks"""
     return len(INVENTORY)
 
 
-# =============================================================================
+# ---
 # API ENDPOINTS
-# =============================================================================
+# ---
 
 @router.get("", response_model=InventoryResponse)
 async def get_inventory(
