@@ -23,9 +23,9 @@ from app.services.conversation_state import ConversationState, ConversationStage
 from app.services.vehicle_retriever import ScoredVehicle
 
 
-# =============================================================================
+# ---
 # Fallback Response Tests
-# =============================================================================
+# ---
 
 class TestFallbackResponses:
     
@@ -85,9 +85,9 @@ class TestFallbackResponses:
         assert "María" in response
 
 
-# =============================================================================
+# ---
 # System Prompt Tests
-# =============================================================================
+# ---
 
 class TestSystemPrompt:
     """Tests to verify system prompt contains required sections"""
@@ -140,9 +140,9 @@ class TestSystemPrompt:
         assert "come in" in SYSTEM_PROMPT_TEMPLATE.lower()
 
 
-# =============================================================================
+# ---
 # Tool Configuration Tests
-# =============================================================================
+# ---
 
 class TestToolConfiguration:
     """Tests for Claude tool definitions"""
@@ -198,9 +198,9 @@ class TestToolConfiguration:
         assert "finance" in props["notification_type"]["enum"]
 
 
-# =============================================================================
+# ---
 # Model Configuration Tests
-# =============================================================================
+# ---
 
 class TestModelConfiguration:
     """Tests for model configuration"""
@@ -214,9 +214,9 @@ class TestModelConfiguration:
         assert "20250929" in MODEL_NAME
 
 
-# =============================================================================
+# ---
 # Context Building Tests
-# =============================================================================
+# ---
 
 class TestContextBuilding:
     """Tests for dynamic context building"""
@@ -242,9 +242,9 @@ class TestContextBuilding:
         assert "TRADE-IN" in context.upper() or "trade" in context.lower()
 
 
-# =============================================================================
+# ---
 # Vehicle Formatting Tests
-# =============================================================================
+# ---
 
 class TestVehicleFormatting:
     """Tests for vehicle result formatting"""
