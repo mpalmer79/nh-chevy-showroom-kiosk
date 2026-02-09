@@ -64,9 +64,9 @@ from app.ai.helpers import (
 router = APIRouter()
 logger = logging.getLogger("quirk_ai.intelligent")
 
-# =============================================================================
+# ---
 # CONFIGURATION
-# =============================================================================
+# ---
 
 ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
 PROMPT_VERSION = "3.7.0"  # Added Digital Worksheet tool
@@ -79,9 +79,9 @@ BASE_DELAY = 1.0
 MAX_DELAY = 10.0
 
 
-# =============================================================================
+# ---
 # RATE LIMITER SETUP
-# =============================================================================
+# ---
 
 def get_session_identifier(request: Request) -> str:
     """
@@ -135,9 +135,9 @@ async def call_with_retry(
     raise last_exception
 
 
-# =============================================================================
+# ---
 # REQUEST/RESPONSE MODELS
-# =============================================================================
+# ---
 
 class ConversationMessage(BaseModel):
     role: str
@@ -169,9 +169,9 @@ class IntelligentChatResponse(BaseModel):
     metadata: Optional[Dict[str, Any]] = None
 
 
-# =============================================================================
+# ---
 # MAIN CHAT ENDPOINT
-# =============================================================================
+# ---
 
 @router.post("/chat", response_model=IntelligentChatResponse)
 @ai_limiter.limit("30/minute")
@@ -458,9 +458,9 @@ async def intelligent_chat(
         )
 
 
-# =============================================================================
+# ---
 # NOTIFY STAFF ENDPOINT
-# =============================================================================
+# ---
 
 class NotifyStaffRequest(BaseModel):
     """Request to notify staff"""
@@ -540,9 +540,9 @@ async def notify_staff_endpoint(
         }
 
 
-# =============================================================================
+# ---
 # ADDITIONAL ENDPOINTS
-# =============================================================================
+# ---
 
 @router.get("/state/{session_id}")
 async def get_conversation_state(session_id: str):
