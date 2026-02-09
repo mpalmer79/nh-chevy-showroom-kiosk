@@ -62,9 +62,9 @@ class AffordabilityResult:
         }
 
 
-# =============================================================================
+# ---
 # CORE FORMULAS
-# =============================================================================
+# ---
 
 def _present_value_factor(monthly_rate: float, term_months: int) -> float:
     """
@@ -87,9 +87,9 @@ def _payment_factor(monthly_rate: float, term_months: int) -> float:
     return (monthly_rate * compound) / (compound - 1)
 
 
-# =============================================================================
+# ---
 # PUBLIC API
-# =============================================================================
+# ---
 
 def calculate_max_vehicle_price(
     down_payment: float,
