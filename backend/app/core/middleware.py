@@ -23,9 +23,9 @@ from app.core.settings import get_settings
 logger = logging.getLogger("quirk_kiosk.middleware")
 
 
-# =============================================================================
+# ---
 # REQUEST ID MIDDLEWARE
-# =============================================================================
+# ---
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
     """
@@ -58,9 +58,9 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
         return response
 
 
-# =============================================================================
+# ---
 # TIMING MIDDLEWARE
-# =============================================================================
+# ---
 
 class TimingMiddleware(BaseHTTPMiddleware):
     """
@@ -82,9 +82,9 @@ class TimingMiddleware(BaseHTTPMiddleware):
         return response
 
 
-# =============================================================================
+# ---
 # SECURITY HEADERS MIDDLEWARE
-# =============================================================================
+# ---
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """
@@ -140,9 +140,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
-# =============================================================================
+# ---
 # REQUEST LOGGING MIDDLEWARE
-# =============================================================================
+# ---
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """
@@ -219,9 +219,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         return any(p in path.lower() for p in sensitive_patterns)
 
 
-# =============================================================================
+# ---
 # ERROR TRACKING MIDDLEWARE (Sentry Integration)
-# =============================================================================
+# ---
 
 class ErrorTrackingMiddleware(BaseHTTPMiddleware):
     """
@@ -260,9 +260,9 @@ class ErrorTrackingMiddleware(BaseHTTPMiddleware):
             raise
 
 
-# =============================================================================
+# ---
 # RATE LIMIT HEADERS MIDDLEWARE
-# =============================================================================
+# ---
 
 class RateLimitHeadersMiddleware(BaseHTTPMiddleware):
     """
@@ -289,9 +289,9 @@ class RateLimitHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
-# =============================================================================
+# ---
 # HELPER: Setup all middleware
-# =============================================================================
+# ---
 
 def setup_middleware(app) -> None:
     """
