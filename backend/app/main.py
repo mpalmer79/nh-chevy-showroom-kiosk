@@ -58,9 +58,9 @@ from app.routers import worksheet
 from app.database import init_database, close_database, is_database_configured
 
 
-# =============================================================================
+# ---
 # RATE LIMITER SETUP
-# =============================================================================
+# ---
 
 def get_client_identifier(request: Request) -> str:
     """
@@ -84,49 +84,45 @@ def get_client_identifier(request: Request) -> str:
 limiter = Limiter(key_func=get_client_identifier)
 
 
-# =============================================================================
-# LIFESPAN HANDLER
-# =============================================================================
+# Lifespan handler
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application startup and shutdown handler"""
-    logger.info("🚀 Quirk AI Kiosk API starting...")
-    logger.info(f"📍 Environment: {settings.environment}")
-    logger.info("📊 Loading inventory enrichment service...")
-    logger.info("🧠 Initializing entity extraction service...")
-    logger.info("🔧 Initializing intelligent AI services (v3)...")
-    logger.info("📋 Initializing Digital Worksheet service...")
+    logger.info("Quirk AI Kiosk API starting...")
+    logger.info(f"Environment: {settings.environment}")
+    logger.info("Loading inventory enrichment service...")
+    logger.info("Initializing entity extraction service...")
+    logger.info("Initializing intelligent AI services (v3)...")
+    logger.info("Initializing Digital Worksheet service...")
 
     # Initialize database
     if is_database_configured():
-        logger.info("🗄️  Connecting to PostgreSQL database...")
+        logger.info("Connecting to PostgreSQL database...")
         db_success = await init_database()
         if db_success:
-            logger.info("✅ PostgreSQL database connected")
+            logger.info("PostgreSQL database connected")
         else:
-            logger.warning("⚠️  PostgreSQL connection failed - using JSON fallback")
+            logger.warning("PostgreSQL connection failed - using JSON fallback")
     else:
-        logger.info("📁 No DATABASE_URL configured - using JSON file storage")
+        logger.info("No DATABASE_URL configured - using JSON file storage")
 
     # Verify critical configuration
     if not settings.is_ai_configured:
-        logger.warning("⚠️  ANTHROPIC_API_KEY not configured - AI chat will use fallback responses")
+        logger.warning("ANTHROPIC_API_KEY not configured - AI chat will use fallback responses")
     else:
-        logger.info("✅ Anthropic API key configured")
+        logger.info("Anthropic API key configured")
 
-    logger.info("✅ All services initialized")
+    logger.info("All services initialized")
     yield
 
     # Shutdown
-    logger.info("👋 Quirk AI Kiosk API shutting down...")
+    logger.info("Quirk AI Kiosk API shutting down...")
     await close_database()
-    logger.info("✅ Cleanup complete")
+    logger.info("Cleanup complete")
 
 
-# =============================================================================
-# APP INITIALIZATION
-# =============================================================================
+# App initialization
 
 app = FastAPI(
     title="Quirk AI Kiosk API",
@@ -159,9 +155,9 @@ app.add_middleware(
 )
 
 
-# =============================================================================
+# ---
 # EXCEPTION HANDLERS
-# =============================================================================
+# ---
 
 @app.exception_handler(AppException)
 async def app_exception_handler(request: Request, exc: AppException):
@@ -215,9 +211,9 @@ async def add_request_metadata(request: Request, call_next):
     return response
 
 
-# =============================================================================
+# ---
 # ROUTES
-# =============================================================================
+# ---
 
 # V1 Routes (Core functionality)
 app.include_router(inventory.router, prefix="/api/v1/inventory", tags=["inventory"])
@@ -246,9 +242,9 @@ app.include_router(trade_in.router, prefix="/api/v1/trade-in", tags=["trade-in"]
 app.include_router(tts.router, prefix="/api/v1/tts", tags=["tts"])
 
 
-# =============================================================================
+# ---
 # CORE ENDPOINTS
-# =============================================================================
+# ---
 
 @app.get("/")
 async def root():
@@ -393,10 +389,10 @@ async def readiness_check():
     return {"status": "ready"}
 
 
-# =============================================================================
+# ---
 # UTILITY EXPORTS (for use in routers)
 # Re-exports from core modules so existing imports continue to work
-# =============================================================================
+# ---
 
 __all__ = [
     "app",
@@ -413,9 +409,9 @@ __all__ = [
 ]
 
 
-# =============================================================================
+# ---
 # MAIN ENTRY POINT
-# =============================================================================
+# ---
 
 if __name__ == "__main__":
     import uvicorn
