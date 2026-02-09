@@ -171,9 +171,9 @@ class Worksheet(BaseModel):
         return data
 
 
-# =============================================================================
+# ---
 # REQUEST/RESPONSE MODELS
-# =============================================================================
+# ---
 
 class WorksheetCreateRequest(BaseModel):
     """Request to create a new worksheet"""
