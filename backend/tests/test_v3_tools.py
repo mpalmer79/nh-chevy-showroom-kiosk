@@ -19,9 +19,9 @@ from app.services.vehicle_retriever import (
 )
 
 
-# =============================================================================
+# ---
 # TEST DATA
-# =============================================================================
+# ---
 
 SAMPLE_INVENTORY = [
     {
@@ -83,9 +83,9 @@ SAMPLE_INVENTORY = [
 ]
 
 
-# =============================================================================
+# ---
 # TOOL DEFINITIONS TESTS
-# =============================================================================
+# ---
 
 class TestToolDefinitions:
     """Tests for Claude tool definitions"""
@@ -155,9 +155,9 @@ class TestToolDefinitions:
         assert "appraisal" in tool["input_schema"]["properties"]["notification_type"]["enum"]
 
 
-# =============================================================================
+# ---
 # CALCULATE BUDGET TOOL TESTS
-# =============================================================================
+# ---
 
 class TestCalculateBudgetTool:
     """Tests for the calculate_budget tool execution"""
@@ -225,9 +225,9 @@ class TestCalculateBudgetTool:
         assert state.monthly_payment_target == 500
 
 
-# =============================================================================
+# ---
 # SEARCH INVENTORY TOOL TESTS
-# =============================================================================
+# ---
 
 class TestSearchInventoryTool:
     """Tests for the search_inventory tool execution"""
@@ -288,9 +288,9 @@ class TestSearchInventoryTool:
             assert "equinox" not in r.vehicle.get("Model", "").lower()
 
 
-# =============================================================================
+# ---
 # GET VEHICLE DETAILS TOOL TESTS
-# =============================================================================
+# ---
 
 class TestGetVehicleDetailsTool:
     """Tests for the get_vehicle_details tool execution"""
@@ -332,9 +332,9 @@ Body: {vehicle.get('Body')}
             assert "52,000" in details
 
 
-# =============================================================================
+# ---
 # NOTIFY STAFF TOOL TESTS
-# =============================================================================
+# ---
 
 class TestNotifyStaffTool:
     """Tests for the notify_staff tool execution"""
@@ -377,9 +377,9 @@ class TestNotifyStaffTool:
         assert "M12345" in result
 
 
-# =============================================================================
+# ---
 # TOOL LOOP TESTS
-# =============================================================================
+# ---
 
 class TestToolLoop:
     """Tests for multi-tool execution loop"""
@@ -432,9 +432,9 @@ class TestToolLoop:
         assert len(all_vehicles) == 3
 
 
-# =============================================================================
+# ---
 # SPANISH LANGUAGE TESTS
-# =============================================================================
+# ---
 
 class TestSpanishLanguage:
     """Tests for Spanish language support in tool responses"""
@@ -470,9 +470,9 @@ class TestSpanishLanguage:
             assert "remolque" in response  # "towing" in Spanish
 
 
-# =============================================================================
+# ---
 # RATE LIMITING TESTS
-# =============================================================================
+# ---
 
 class TestRateLimiting:
     """Tests for AI chat rate limiting"""
