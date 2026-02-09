@@ -108,9 +108,7 @@ async def execute_tool(
     return result, vehicles_to_show, staff_notified
 
 
-# =============================================================================
-# HELPER: Vehicle field access
-# =============================================================================
+# Vehicle field helpers
 
 def _get_vehicle_price(vehicle: dict) -> float:
     """Get best available price from a vehicle dict."""
@@ -126,9 +124,7 @@ def _get_vehicle_description(vehicle: dict) -> str:
     return f"{year} {model} {trim} ({color})".strip()
 
 
-# =============================================================================
-# TOOL IMPLEMENTATIONS
-# =============================================================================
+# Tool implementations
 
 async def _execute_calculate_budget(
     tool_input: Dict[str, Any],
@@ -211,7 +207,7 @@ async def _execute_check_affordability(
     state.monthly_payment_target = monthly_payment
 
     if affordability.is_affordable:
-        result = f"""AFFORDABILITY CHECK: ✅ YES - WITHIN BUDGET!
+        result = f"""AFFORDABILITY CHECK: YES - WITHIN BUDGET
 
 Vehicle: {vehicle_desc}
 Stock #: {stock_number or 'N/A'}
@@ -222,7 +218,7 @@ Customer's Budget:
 - Target Monthly Payment: ${monthly_payment:,.0f}/month
 - Max Affordable Price: ${affordability.max_affordable:,.0f}
 
-RESULT: ✅ Customer CAN afford this vehicle!
+RESULT: Customer CAN afford this vehicle.
 - Budget headroom: ${abs(affordability.gap):,.0f} under their max
 - Actual monthly payment would be: ~${affordability.required_monthly:,.0f}/month (under their ${monthly_payment:,.0f} target)
 
@@ -234,7 +230,7 @@ DISCLOSE: Taxes and fees are separate. NH doesn't tax payments; other states may
         needed_budget = calculate_max_vehicle_price(down_payment, monthly_payment, apr, term_months)
         needed_down = vehicle_price - needed_budget.financed_amount
 
-        result = f"""AFFORDABILITY CHECK: ❌ OVER BUDGET
+        result = f"""AFFORDABILITY CHECK: OVER BUDGET
 
 Vehicle: {vehicle_desc}
 Stock #: {stock_number or 'N/A'}
@@ -245,7 +241,7 @@ Customer's Budget:
 - Target Monthly Payment: ${monthly_payment:,.0f}/month
 - Max Affordable Price: ${affordability.max_affordable:,.0f}
 
-RESULT: ❌ This vehicle is ${abs(affordability.gap):,.0f} OVER their budget.
+RESULT: This vehicle is ${abs(affordability.gap):,.0f} OVER their budget.
 - To afford this vehicle, they would need EITHER:
   • Increase down payment to ~${needed_down:,.0f} (add ${needed_down - down_payment:,.0f})
   • Increase monthly payment to ~${affordability.required_monthly:,.0f}/month
@@ -583,9 +579,7 @@ FALLBACK: Let customer know there was a technical issue and offer to get a sales
     return (result, vehicles_to_show, False)
 
 
-# =============================================================================
-# QUERY PARSING HELPERS
-# =============================================================================
+# Query parsing
 
 def _extract_budget_from_query(query: str) -> Optional[int]:
     """Extract a budget ceiling from natural language query."""
