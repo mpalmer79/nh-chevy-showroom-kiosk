@@ -128,9 +128,9 @@ def get_key_manager() -> APIKeyManager:
     return APIKeyManager()
 
 
-# =============================================================================
+# ---
 # INPUT SANITIZATION
-# =============================================================================
+# ---
 
 def sanitize_user_input(text: str, max_length: int = 2000) -> str:
     """
