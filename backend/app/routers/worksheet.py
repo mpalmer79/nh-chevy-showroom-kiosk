@@ -27,9 +27,9 @@ router = APIRouter(prefix="/worksheet", tags=["worksheet"])
 logger = logging.getLogger("quirk_ai.worksheet_router")
 
 
-# =============================================================================
+# ---
 # CUSTOMER-FACING ENDPOINTS
-# =============================================================================
+# ---
 
 @router.post("/create", response_model=WorksheetResponse)
 async def create_worksheet(request: WorksheetCreateRequest):
@@ -287,9 +287,9 @@ async def get_session_worksheets(session_id: str):
     )
 
 
-# =============================================================================
+# ---
 # MANAGER-FACING ENDPOINTS
-# =============================================================================
+# ---
 
 @router.get("/manager/active", response_model=List[WorksheetSummary])
 async def get_active_worksheets(
@@ -521,9 +521,9 @@ async def decline_worksheet(
         raise HTTPException(status_code=500, detail="Failed to decline worksheet")
 
 
-# =============================================================================
+# ---
 # WEBSOCKET ENDPOINTS (Real-time updates)
-# =============================================================================
+# ---
 
 # Track active WebSocket connections
 active_connections: dict = {}  # worksheet_id -> List[WebSocket]
@@ -628,9 +628,9 @@ async def manager_feed_websocket(websocket: WebSocket):
         manager_connections.remove(websocket)
 
 
-# =============================================================================
+# ---
 # HELPER FUNCTIONS FOR BROADCASTING
-# =============================================================================
+# ---
 
 async def broadcast_worksheet_update(worksheet: Worksheet):
     """Broadcast worksheet update to connected clients."""
