@@ -37,9 +37,9 @@ api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 admin_key_header = APIKeyHeader(name="X-Admin-Key", auto_error=False)
 
 
-# =============================================================================
+# ---
 # PASSWORD UTILITIES
-# =============================================================================
+# ---
 
 def hash_password(password: str) -> str:
     """Hash a password using bcrypt"""
@@ -51,9 +51,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-# =============================================================================
+# ---
 # JWT TOKEN HANDLING
-# =============================================================================
+# ---
 
 def create_access_token(
     data: Dict[str, Any],
@@ -142,9 +142,9 @@ def decode_token(token: str) -> Dict[str, Any]:
         )
 
 
-# =============================================================================
+# ---
 # API KEY VALIDATION
-# =============================================================================
+# ---
 
 def generate_api_key() -> str:
     """Generate a new API key"""
@@ -185,9 +185,9 @@ def validate_service_key(api_key: str) -> bool:
     return secrets.compare_digest(api_key, settings.api_service_key)
 
 
-# =============================================================================
+# ---
 # DEPENDENCY FUNCTIONS FOR ROUTE PROTECTION
-# =============================================================================
+# ---
 
 async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Security(bearer_scheme)
@@ -308,9 +308,9 @@ async def optional_api_key(
     return None
 
 
-# =============================================================================
+# ---
 # SESSION TOKEN FOR KIOSK
-# =============================================================================
+# ---
 
 def create_kiosk_session_token(session_id: str) -> str:
     """
@@ -370,9 +370,9 @@ def verify_kiosk_session_token(token: str) -> Optional[str]:
         return None
 
 
-# =============================================================================
+# ---
 # ADMIN USER MANAGEMENT (Simple in-memory for now)
-# =============================================================================
+# ---
 
 # In production, this would be a database table
 ADMIN_USERS = {
