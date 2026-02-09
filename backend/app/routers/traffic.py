@@ -42,7 +42,7 @@ EST_OFFSET = timedelta(hours=-5)
 ACTIVE_SESSION_TIMEOUT = 30
 
 
-# ============ Time Utilities ============
+# ---
 
 def get_eastern_time() -> datetime:
     """Get current time in Eastern Time."""
@@ -74,7 +74,7 @@ def parse_timestamp(ts_str: str) -> datetime:
         return datetime.now()
 
 
-# ============ JSON Fallback Storage ============
+# ---
 
 def load_traffic_log() -> List[Dict]:
     """Load traffic log from JSON file (fallback)."""
@@ -102,7 +102,7 @@ def save_traffic_log(data: List[Dict]):
 traffic_sessions_cache = load_traffic_log()
 
 
-# ============ Pydantic Models ============
+# ---
 
 class VehicleInfo(BaseModel):
     stockNumber: Optional[str] = None
@@ -186,7 +186,7 @@ class SessionResponse(BaseModel):
     storage: str  # 'postgresql' or 'json'
 
 
-# ============ Helper Functions ============
+# ---
 
 def format_session_for_dashboard(session: Dict) -> Dict:
     """Format a session for the Sales Manager Dashboard 4-square view."""
@@ -249,7 +249,7 @@ async def get_db_session():
         yield None
 
 
-# ============ Database Operations ============
+# ---
 
 async def db_create_or_update_session(session: AsyncSession, data: Dict) -> str:
     """Create or update session in PostgreSQL."""
@@ -442,7 +442,7 @@ async def db_get_stats(session: AsyncSession) -> Dict:
     }
 
 
-# ============ JSON Fallback Operations ============
+# ---
 
 def json_create_or_update_session(data: Dict) -> str:
     """Create or update session in JSON file."""
@@ -476,7 +476,7 @@ def json_create_or_update_session(data: Dict) -> str:
     return session_id
 
 
-# ============ Endpoints ============
+# ---
 
 @router.post("/session", response_model=SessionResponse)
 async def log_session(session_data: SessionCreate):
