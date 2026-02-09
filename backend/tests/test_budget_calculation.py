@@ -19,9 +19,9 @@ from app.services.budget_calculator import (
 )
 
 
-# =============================================================================
+# ---
 # HELPER: Adapt BudgetResult to dict for backward-compatible assertions
-# =============================================================================
+# ---
 
 def _budget_to_dict(result: BudgetResult) -> dict:
     """Convert BudgetResult dataclass to dict matching old test expectations."""
@@ -51,9 +51,9 @@ def _payment_to_dict(result: BudgetResult) -> dict:
     }
 
 
-# =============================================================================
+# ---
 # BUDGET CALCULATION TESTS
-# =============================================================================
+# ---
 
 class TestCalculateMaxVehiclePrice:
     """Tests for max vehicle price calculation from budget"""
@@ -324,9 +324,9 @@ class TestRealWorldScenarios:
         assert not any(v["model"] == "Corvette" for v in affordable)
 
 
-# =============================================================================
+# ---
 # CHECK VEHICLE AFFORDABILITY TESTS
-# =============================================================================
+# ---
 
 class TestCheckVehicleAffordability:
     """Tests for the check_vehicle_affordability tool logic"""
@@ -455,9 +455,9 @@ class TestCheckVehicleAffordability:
             f"Expected can_afford=True with monthly={needed_monthly:.2f}, got difference={result_high_monthly.get('difference', 'N/A')}"
 
 
-# =============================================================================
+# ---
 # DATACLASS TESTS (new — validates the budget_calculator API)
-# =============================================================================
+# ---
 
 class TestBudgetResultDataclass:
     """Tests for the BudgetResult immutable dataclass."""
