@@ -96,9 +96,9 @@ class VehicleFields:
 VF = VehicleFields
 
 
-# =============================================================================
+# ---
 # FIELD MAPPINGS: variant name → canonical name
-# =============================================================================
+# ---
 
 _FIELD_MAP: Dict[str, str] = {
     # Stock Number variants (Excel header → camelCase)
@@ -212,9 +212,9 @@ _FIELD_MAP: Dict[str, str] = {
 }
 
 
-# =============================================================================
+# ---
 # PUBLIC API
-# =============================================================================
+# ---
 
 def normalize_vehicle(vehicle: Dict[str, Any]) -> Dict[str, Any]:
     """
