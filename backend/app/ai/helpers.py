@@ -8,10 +8,10 @@ from app.services.conversation_state import ConversationState
 from app.services.vehicle_retriever import SemanticVehicleRetriever, ScoredVehicle
 
 
-# =============================================================================
+# ---
 # GM MODEL NUMBER DECODER
 # Maps GM model codes to human-readable vehicle descriptions
-# =============================================================================
+# ---
 
 GM_MODEL_DECODER = {
     # Silverado 1500
@@ -75,9 +75,9 @@ def decode_model_number(model_number: str) -> str:
     return GM_MODEL_DECODER.get(model_number, model_number)
 
 
-# =============================================================================
+# ---
 # CONTEXT BUILDING FUNCTIONS
-# =============================================================================
+# ---
 
 def build_dynamic_context(state: ConversationState) -> str:
     """Build dynamic context from conversation state"""
@@ -96,8 +96,8 @@ CONVERSATION PROGRESS:
     if state.trade_model:
         context += f"""
 
-⚠️ TRADE-IN EXCLUSION: Customer is trading in a {state.trade_model}.
-DO NOT show or search for {state.trade_model} vehicles - they want something DIFFERENT!
+TRADE-IN EXCLUSION: Customer is trading in a {state.trade_model}.
+DO NOT show or search for {state.trade_model} vehicles - they want something DIFFERENT.
 Focus on their original request (what they want to BUY, not trade)."""
     
     return context
@@ -117,9 +117,9 @@ def build_inventory_context(retriever: SemanticVehicleRetriever) -> str:
 - Top models: {', '.join(summary.get('top_models', {}).keys())}"""
 
 
-# =============================================================================
+# ---
 # VEHICLE FORMATTING FUNCTIONS
-# =============================================================================
+# ---
 
 def format_vehicle_for_response(vehicle: Dict[str, Any], reasons: List[str] = None) -> Dict[str, Any]:
     """Format vehicle data for response"""
@@ -220,7 +220,7 @@ TRADE-IN:
 - Estimated Equity: ${worksheet.trade_equity:,.0f} (pending appraisal)
 """
     
-    return f"""✅ DIGITAL WORKSHEET CREATED!
+    return f"""DIGITAL WORKSHEET CREATED
 
 VEHICLE: {worksheet.vehicle.year} {worksheet.vehicle.model} {worksheet.vehicle.trim or ''}
 Stock #: {worksheet.vehicle.stock_number}
@@ -248,9 +248,9 @@ RESPONSE GUIDANCE:
 The worksheet is now displayed on the kiosk. Customer can interact with it directly."""
 
 
-# =============================================================================
+# ---
 # FALLBACK RESPONSE
-# =============================================================================
+# ---
 
 def generate_fallback_response(message: str, customer_name: Optional[str] = None) -> str:
     """Generate fallback response when AI is unavailable"""
