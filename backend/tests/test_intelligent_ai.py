@@ -25,9 +25,9 @@ from app.services.outcome_tracker import (
 )
 
 
-# =============================================================================
+# ---
 # TEST DATA
-# =============================================================================
+# ---
 
 SAMPLE_INVENTORY = [
     {
@@ -88,9 +88,9 @@ SAMPLE_INVENTORY = [
 ]
 
 
-# =============================================================================
+# ---
 # CONVERSATION STATE TESTS
-# =============================================================================
+# ---
 
 class TestConversationStateManager:
     """Tests for ConversationStateManager"""
@@ -250,9 +250,9 @@ class TestConversationStateManager:
         assert "Ford" in summary
 
 
-# =============================================================================
+# ---
 # VEHICLE RETRIEVER TESTS
-# =============================================================================
+# ---
 
 class TestTFIDFVectorizer:
     """Tests for TF-IDF vectorizer"""
@@ -400,9 +400,9 @@ class TestSemanticVehicleRetriever:
         assert 'price_range' in summary
 
 
-# =============================================================================
+# ---
 # OUTCOME TRACKER TESTS  
-# =============================================================================
+# ---
 
 class TestOutcomeTracker:
     """Tests for OutcomeTracker"""
@@ -520,9 +520,9 @@ class TestOutcomeTracker:
         assert any(s['type'] in ['critical', 'warning'] for s in suggestions)
 
 
-# =============================================================================
+# ---
 # INTEGRATION TESTS
-# =============================================================================
+# ---
 
 class TestIntelligentAIIntegration:
     """Integration tests for the intelligent AI system"""
