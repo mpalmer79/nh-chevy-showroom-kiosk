@@ -15,9 +15,9 @@ class TestPaymentCalculator:
         """Get calculator instance"""
         return get_payment_calculator()
     
-    # =========================================================================
+    #
     # BASIC PAYMENT CALCULATION TESTS
-    # =========================================================================
+    #
     
     def test_calculate_payment_standard(self, calculator):
         """Standard payment calculation: $35,000 financed @ 7% for 72 months"""
@@ -90,9 +90,9 @@ class TestPaymentCalculator:
         assert result.total_of_payments == 0
         assert result.total_interest == 0
     
-    # =========================================================================
+    #
     # MAX AFFORDABLE CALCULATION TESTS
-    # =========================================================================
+    #
     
     def test_calculate_max_affordable(self, calculator):
         """Calculate max affordable from down payment and monthly payment"""
@@ -143,9 +143,9 @@ class TestPaymentCalculator:
         # Should match original target (within rounding)
         assert abs(result.monthly_payment - target_payment) < 1
     
-    # =========================================================================
+    #
     # VEHICLE AFFORDABILITY CHECK TESTS
-    # =========================================================================
+    #
     
     def test_check_affordability_within_budget(self, calculator):
         """Vehicle within budget"""
@@ -201,9 +201,9 @@ class TestPaymentCalculator:
         assert result.target_monthly_payment == 600
         assert result.down_payment == 5000
     
-    # =========================================================================
+    #
     # TERM OPTIONS GENERATION TESTS
-    # =========================================================================
+    #
     
     def test_generate_term_options(self, calculator):
         """Generate standard term options"""
@@ -249,9 +249,9 @@ class TestPaymentCalculator:
         assert 48 in terms
         assert 60 in terms
     
-    # =========================================================================
+    #
     # TOTAL DUE AT SIGNING TESTS
-    # =========================================================================
+    #
     
     def test_total_due_at_signing_basic(self, calculator):
         """Basic due at signing calculation"""
@@ -293,9 +293,9 @@ class TestPaymentCalculator:
         # Default: doc_fee=599, title_fee=25
         assert total == 5624
     
-    # =========================================================================
+    #
     # TRADE-IN CALCULATION TESTS
-    # =========================================================================
+    #
     
     def test_calculate_with_trade_positive_equity(self, calculator):
         """Trade with positive equity reduces amount financed"""
@@ -339,9 +339,9 @@ class TestPaymentCalculator:
         assert result["amount_financed"] == 23000  # 40000 - 5000 - 12000
         assert result["is_underwater"] is False
     
-    # =========================================================================
+    #
     # WHAT IT TAKES CALCULATION TESTS
-    # =========================================================================
+    #
     
     def test_what_it_takes_needs_more_down(self, calculator):
         """Calculate what it takes when more down payment needed"""
@@ -376,9 +376,9 @@ class TestPaymentCalculator:
         # Monthly needed should be less than current
         assert result["option_increase_monthly"]["needed_monthly"] <= 600
     
-    # =========================================================================
+    #
     # SINGLETON TESTS
-    # =========================================================================
+    #
     
     def test_singleton_instance(self):
         """Verify singleton pattern works"""
