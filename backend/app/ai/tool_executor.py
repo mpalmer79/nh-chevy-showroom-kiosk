@@ -437,7 +437,7 @@ async def _execute_lookup_conversation(
     if len(phone_digits) != 10:
         result = "I need a valid 10-digit phone number to look up your previous conversation. Please provide your phone number with area code."
     else:
-        previous_state = state_manager.get_state_by_phone(phone_digits)
+        previous_state = await state_manager.get_state_by_phone(phone_digits)
 
         if previous_state:
             summary_parts = ["✓ Found your previous conversation! Here's what I remember:"]

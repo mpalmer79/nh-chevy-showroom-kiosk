@@ -61,9 +61,9 @@
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts",
-      "!src/index.js",
+      "!src/index.tsx",
       "!src/reportWebVitals.js",
-      "!src/setupTests.js"
+      "!src/setupTests.ts"
     ],
     "coverageReporters": [
       "text",
