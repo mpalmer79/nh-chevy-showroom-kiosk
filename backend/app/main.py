@@ -107,6 +107,15 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("No DATABASE_URL configured - using JSON file storage")
 
+    # Initialize cache (Redis or in-memory fallback)
+    from app.core.cache import get_cache, shutdown_cache
+    try:
+        cache = await get_cache()
+        cache_type = "Redis" if hasattr(cache, '_use_redis') and cache._use_redis else "In-memory"
+        logger.info(f"Cache initialized: {cache_type}")
+    except Exception as e:
+        logger.warning(f"Cache initialization failed, will use in-memory fallback: {e}")
+
     # Verify critical configuration
     if not settings.is_ai_configured:
         logger.warning("ANTHROPIC_API_KEY not configured - AI chat will use fallback responses")
@@ -118,6 +127,7 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("Quirk AI Kiosk API shutting down...")
+    await shutdown_cache()
     await close_database()
     logger.info("Cleanup complete")
 
@@ -303,6 +313,20 @@ async def health_check():
             "error": str(e) if settings.is_development else "connection_failed"
         }
         overall_healthy = False
+
+    # Redis check
+    try:
+        from app.core.cache import get_cache
+        cache = await get_cache()
+        if hasattr(cache, '_use_redis') and cache._use_redis:
+            health_status["checks"]["redis"] = {"status": "healthy", "type": "redis"}
+        else:
+            health_status["checks"]["redis"] = {"status": "healthy", "type": "in_memory_fallback"}
+    except Exception as e:
+        health_status["checks"]["redis"] = {
+            "status": "unavailable",
+            "error": str(e) if settings.is_development else "connection_failed"
+        }
 
     # AI Service check
     health_status["checks"]["ai_service"] = {

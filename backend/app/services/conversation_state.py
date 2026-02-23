@@ -24,6 +24,7 @@ from app.services.entity_extraction import (
     ExtractedEntities,
     get_entity_extractor
 )
+from app.core.cache import get_cache
 
 logger = logging.getLogger("quirk_ai.conversation_state")
 
@@ -309,31 +310,181 @@ class ConversationStateManager:
         'great', 'fantastic', 'beautiful', 'incredible'
     ]
     
+    # Redis key prefixes and TTL
+    CONV_KEY_PREFIX = "conv:"
+    PHONE_KEY_PREFIX = "phone:"
+    STATE_TTL = 86400  # 24 hours
+
     def __init__(self):
         self.extractor = get_entity_extractor()
         self._sessions: Dict[str, ConversationState] = {}
         self._phone_index: Dict[str, str] = {}  # phone -> session_id mapping
-    
-    def get_or_create_state(
-        self, 
-        session_id: str, 
+
+    async def persist_state(self, state: ConversationState) -> bool:
+        """
+        Persist conversation state to Redis (L2 cache).
+
+        Serializes state using to_dict() and stores with 24-hour TTL.
+        Also stores phone -> session_id mapping if phone is available.
+
+        Returns True on success, False on failure.
+        """
+        try:
+            cache = await get_cache()
+            state_data = state.to_dict()
+            key = f"{self.CONV_KEY_PREFIX}{state.session_id}"
+            await cache.set(key, state_data, ttl=self.STATE_TTL)
+
+            # Store phone -> session_id mapping if phone is available
+            if state.customer_phone:
+                phone_key = f"{self.PHONE_KEY_PREFIX}{state.customer_phone}"
+                await cache.set(phone_key, state.session_id, ttl=self.STATE_TTL)
+
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to persist state to cache for session {state.session_id}: {e}")
+            return False
+
+    async def load_state(self, session_id: str) -> Optional[ConversationState]:
+        """
+        Load conversation state from Redis (L2 cache).
+
+        Checks cache for key conv:{session_id} and deserializes.
+        Returns ConversationState or None.
+        """
+        try:
+            cache = await get_cache()
+            key = f"{self.CONV_KEY_PREFIX}{session_id}"
+            data = await cache.get(key)
+
+            if not data:
+                return None
+
+            # Reconstruct ConversationState from dict
+            state = ConversationState(session_id=data.get('session_id', session_id))
+            state.customer_name = data.get('customer_name')
+            state.customer_phone = data.get('customer_phone')
+            state.customer_email = data.get('customer_email')
+
+            # Restore timestamps
+            started = data.get('started_at')
+            if started:
+                try:
+                    state.started_at = datetime.fromisoformat(started)
+                except (ValueError, TypeError):
+                    pass
+            last_activity = data.get('last_activity')
+            if last_activity:
+                try:
+                    state.last_activity = datetime.fromisoformat(last_activity)
+                except (ValueError, TypeError):
+                    pass
+
+            # Restore budget
+            budget = data.get('budget', {})
+            state.budget_min = budget.get('min')
+            state.budget_max = budget.get('max')
+            state.monthly_payment_target = budget.get('monthly_target')
+            state.down_payment = budget.get('down_payment')
+
+            # Restore preferences
+            prefs = data.get('preferences', {})
+            state.preferred_types = set(prefs.get('types', []))
+            state.preferred_features = set(prefs.get('features', []))
+            state.use_cases = set(prefs.get('use_cases', []))
+            state.min_seating = prefs.get('min_seating')
+            state.min_towing = prefs.get('min_towing')
+            state.fuel_preference = prefs.get('fuel')
+            state.drivetrain_preference = prefs.get('drivetrain')
+            state.color_preferences = set(prefs.get('colors', []))
+
+            # Restore trade-in
+            trade = data.get('trade_in', {})
+            state.has_trade_in = trade.get('has_trade', False)
+            state.trade_year = trade.get('year')
+            state.trade_make = trade.get('make')
+            state.trade_model = trade.get('model')
+            state.trade_mileage = trade.get('mileage')
+            state.trade_monthly_payment = trade.get('monthly_payment')
+            state.trade_payoff = trade.get('payoff')
+            state.trade_lender = trade.get('lender')
+            if trade.get('is_lease') is not None:
+                state.trade_is_lease = trade.get('is_lease')
+
+            # Restore conversation state
+            stage_value = data.get('stage', 'greeting')
+            try:
+                state.stage = ConversationStage(stage_value)
+            except ValueError:
+                state.stage = ConversationStage.GREETING
+
+            interest_value = data.get('interest_level', 'cold')
+            try:
+                state.interest_level = InterestLevel(interest_value)
+            except ValueError:
+                state.interest_level = InterestLevel.COLD
+
+            state.message_count = data.get('message_count', 0)
+            state.favorite_vehicles = data.get('favorite_vehicles', [])
+            state.needs_spouse_approval = data.get('needs_spouse_approval', False)
+            state.staff_notified = data.get('staff_notified', False)
+            state.test_drive_requested = data.get('test_drive_requested', False)
+            state.overall_sentiment = data.get('overall_sentiment', 'neutral')
+
+            # Restore discussed vehicles
+            discussed = data.get('discussed_vehicles', {})
+            for stock, vdata in discussed.items():
+                state.discussed_vehicles[stock] = DiscussedVehicle(
+                    stock_number=vdata.get('stock_number', stock),
+                    model=vdata.get('model', 'Unknown'),
+                    mentioned_at=datetime.utcnow(),
+                    times_mentioned=vdata.get('times_mentioned', 1),
+                    customer_sentiment=vdata.get('sentiment', 'neutral'),
+                    is_favorite=vdata.get('is_favorite', False),
+                )
+
+            logger.info(f"Loaded state from cache for session {session_id}")
+            return state
+
+        except Exception as e:
+            logger.warning(f"Failed to load state from cache for session {session_id}: {e}")
+            return None
+
+    async def get_or_create_state(
+        self,
+        session_id: str,
         customer_name: Optional[str] = None
     ) -> ConversationState:
-        """Get existing state or create new one for session"""
-        if session_id not in self._sessions:
-            self._sessions[session_id] = ConversationState(
-                session_id=session_id,
-                customer_name=customer_name
-            )
-            logger.info(f"Created new conversation state for session {session_id}")
-        
-        state = self._sessions[session_id]
-        if customer_name and not state.customer_name:
-            state.customer_name = customer_name
-        
+        """Get existing state or create new one for session.
+
+        Checks L1 (in-memory) first, then L2 (Redis), then creates new.
+        """
+        # Check L1 (in-memory)
+        if session_id in self._sessions:
+            state = self._sessions[session_id]
+            if customer_name and not state.customer_name:
+                state.customer_name = customer_name
+            return state
+
+        # Check L2 (Redis/cache)
+        loaded = await self.load_state(session_id)
+        if loaded:
+            self._sessions[session_id] = loaded
+            if customer_name and not loaded.customer_name:
+                loaded.customer_name = customer_name
+            return loaded
+
+        # Create new
+        state = ConversationState(
+            session_id=session_id,
+            customer_name=customer_name
+        )
+        self._sessions[session_id] = state
+        logger.info(f"Created new conversation state for session {session_id}")
+
         return state
     
-    def update_state(
+    async def update_state(
         self,
         session_id: str,
         user_message: str,
@@ -343,18 +494,18 @@ class ConversationStateManager:
     ) -> ConversationState:
         """
         Update conversation state based on new message exchange.
-        
+
         Args:
             session_id: Session identifier
             user_message: The customer's message
             assistant_response: The AI's response
             mentioned_vehicles: Vehicles mentioned in the response
             customer_name: Customer's name if known
-            
+
         Returns:
             Updated ConversationState
         """
-        state = self.get_or_create_state(session_id, customer_name)
+        state = await self.get_or_create_state(session_id, customer_name)
         state.last_activity = datetime.utcnow()
         state.message_count += 1
         
@@ -450,9 +601,12 @@ class ConversationStateManager:
         self._record_key_moments(state, user_message, entities)
         
         logger.debug(f"Updated state for {session_id}: stage={state.stage}, interest={state.interest_level}")
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self.persist_state(state)
+
         return state
-    
+
     def _update_stage(self, state: ConversationState, message: str) -> None:
         """Update conversation stage based on message content"""
         message_lower = message.lower()
@@ -591,35 +745,50 @@ class ConversationStateManager:
                 self._phone_index[normalized] = session_id
                 logger.info(f"Indexed session {session_id} by phone {normalized[-4:]}")
     
-    def get_state_by_phone(self, phone: str) -> Optional[ConversationState]:
+    async def get_state_by_phone(self, phone: str) -> Optional[ConversationState]:
         """
         Look up a conversation state by phone number.
         Returns the most recent conversation for that phone.
+        Checks L1 (in-memory), then L2 (Redis), then disk persistence.
         """
         # Normalize phone number
         normalized = ''.join(c for c in phone if c.isdigit())
-        
+
         if len(normalized) != 10:
             logger.warning(f"Invalid phone number format: {phone}")
             return None
-        
-        # Check in-memory index first
+
+        # Check in-memory index first (L1)
         if normalized in self._phone_index:
             session_id = self._phone_index[normalized]
             if session_id in self._sessions:
                 return self._sessions[session_id]
-        
-        # Search all sessions for this phone
+
+        # Search all in-memory sessions for this phone
         matching_sessions = [
             state for state in self._sessions.values()
             if state.customer_phone == normalized
         ]
-        
+
         if matching_sessions:
             # Return the most recent one
             return max(matching_sessions, key=lambda s: s.last_activity)
-        
-        # Check persisted sessions
+
+        # Check L2 (Redis/cache) for phone -> session_id mapping
+        try:
+            cache = await get_cache()
+            phone_key = f"{self.PHONE_KEY_PREFIX}{normalized}"
+            session_id = await cache.get(phone_key)
+            if session_id and isinstance(session_id, str):
+                loaded = await self.load_state(session_id)
+                if loaded:
+                    self._sessions[session_id] = loaded
+                    self._phone_index[normalized] = session_id
+                    return loaded
+        except Exception as e:
+            logger.warning(f"Failed to check cache for phone lookup: {e}")
+
+        # Check persisted sessions on disk (legacy fallback)
         return self._load_persisted_session(normalized)
     
     def persist_session(self, session_id: str) -> bool:
