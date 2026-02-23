@@ -251,13 +251,22 @@ class TestAIChatEndpoint:
         }
         mock_anthropic_response.text = ""
 
+        # Build an async-context-manager mock that only intercepts the
+        # httpx.AsyncClient created *inside* the route (for the Anthropic
+        # API call), while leaving the test-level AsyncClient untouched.
+        mock_internal_client = AsyncMock()
+        mock_internal_client.post.return_value = mock_anthropic_response
+
         with patch("app.routers.ai_v3.get_key_manager") as mock_km, \
-             patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+             patch("app.routers.ai_v3.httpx.AsyncClient") as MockClientCls:
 
             mock_manager = MagicMock()
             mock_manager.anthropic_key = "sk-test-key"
             mock_km.return_value = mock_manager
-            mock_post.return_value = mock_anthropic_response
+
+            # Make the class act as an async context manager returning our mock
+            MockClientCls.return_value.__aenter__ = AsyncMock(return_value=mock_internal_client)
+            MockClientCls.return_value.__aexit__ = AsyncMock(return_value=False)
 
             resp = await client.post(
                 self.CHAT_URL,
@@ -301,16 +310,34 @@ class TestAIChatEndpoint:
         }
         text_response.text = ""
 
+        # Build an async-context-manager mock for the internal httpx client.
+        # The route creates a *new* httpx.AsyncClient context on each API call
+        # (initial + tool-loop), so we build two separate mock instances.
+        mock_client_1 = AsyncMock()
+        mock_client_1.post.return_value = tool_response
+
+        mock_client_2 = AsyncMock()
+        mock_client_2.post.return_value = text_response
+
+        client_instances = iter([mock_client_1, mock_client_2])
+
         with patch("app.routers.ai_v3.get_key_manager") as mock_km, \
-             patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post, \
+             patch("app.routers.ai_v3.httpx.AsyncClient") as MockClientCls, \
              patch("app.routers.ai_v3.execute_tool", new_callable=AsyncMock) as mock_exec:
 
             mock_manager = MagicMock()
             mock_manager.anthropic_key = "sk-test-key"
             mock_km.return_value = mock_manager
 
-            # First call returns tool use, second returns text
-            mock_post.side_effect = [tool_response, text_response]
+            # Each `async with httpx.AsyncClient() as c:` gets the next mock
+            def make_ctx():
+                ctx = MagicMock()
+                inst = next(client_instances)
+                ctx.__aenter__ = AsyncMock(return_value=inst)
+                ctx.__aexit__ = AsyncMock(return_value=False)
+                return ctx
+
+            MockClientCls.side_effect = lambda: make_ctx()
 
             # Tool returns no vehicles, no staff notified
             mock_exec.return_value = ("Found 5 trucks in inventory", [], False)
