@@ -18,9 +18,11 @@ This module has been refactored for maintainability:
 """
 
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import httpx
+import json
 import re
 import logging
 import asyncio
@@ -222,7 +224,7 @@ async def intelligent_chat(
             logger.error(f"Failed to load inventory for retriever: {e}")
     
     # Get or create conversation state
-    state = state_manager.get_or_create_state(
+    state = await state_manager.get_or_create_state(
         chat_request.session_id,
         chat_request.customer_name
     )
@@ -393,7 +395,7 @@ async def intelligent_chat(
         
         # Update conversation state
         mentioned_vehicles = [sv.vehicle for sv in all_vehicles] if all_vehicles else None
-        state = state_manager.update_state(
+        state = await state_manager.update_state(
             session_id=chat_request.session_id,
             user_message=chat_request.message,
             assistant_response=final_response,
@@ -456,6 +458,372 @@ async def intelligent_chat(
             message=generate_fallback_response(chat_request.message, chat_request.customer_name),
             metadata={"fallback": True, "reason": "error", "error": str(e)[:100]}
         )
+
+
+# ---
+# STREAMING CHAT ENDPOINT
+# ---
+
+@router.post("/chat/stream")
+@ai_limiter.limit("30/minute")
+async def intelligent_chat_stream(
+    chat_request: IntelligentChatRequest,
+    background_tasks: BackgroundTasks,
+    request: Request
+):
+    """
+    Streaming version of intelligent chat.
+    Returns Server-Sent Events with progressive updates.
+
+    Event types:
+    - thinking: AI is processing (sent immediately)
+    - tool_start: Tool execution beginning
+    - tool_result: Tool execution complete
+    - text_delta: Incremental text from Claude
+    - vehicles: Vehicle recommendations
+    - worksheet: Worksheet created
+    - done: Response complete with final metadata
+    - error: Error occurred
+    """
+    async def event_stream():
+        tools_used = []
+        all_vehicles = []
+        staff_notified = False
+        worksheet_id = None
+
+        # Get services
+        key_manager = get_key_manager()
+        api_key = key_manager.anthropic_key
+        state_manager = get_state_manager()
+        retriever = get_vehicle_retriever()
+
+        if not api_key:
+            fallback = generate_fallback_response(
+                chat_request.message, chat_request.customer_name
+            )
+            yield f"event: text_delta\ndata: {json.dumps({'text': fallback})}\n\n"
+            yield f"event: done\ndata: {json.dumps({'fallback': True})}\n\n"
+            return
+
+        # Send thinking event immediately
+        yield f"event: thinking\ndata: {json.dumps({'status': 'processing'})}\n\n"
+
+        # Ensure retriever is fitted with inventory
+        if not retriever._is_fitted:
+            try:
+                from app.routers.inventory import INVENTORY
+                retriever.fit(INVENTORY)
+            except Exception:
+                pass
+
+        # Get or create conversation state
+        state = await state_manager.get_or_create_state(
+            chat_request.session_id,
+            chat_request.customer_name
+        )
+
+        # Extract budget from user message if mentioned
+        user_msg_lower = chat_request.message.lower()
+        budget_patterns = [
+            r'under\s*\$?([\d,]+)\s*k\b',
+            r'under\s*\$?([\d,]+)\b',
+            r'below\s*\$?([\d,]+)\s*k\b',
+            r'below\s*\$?([\d,]+)\b',
+            r'less\s*than\s*\$?([\d,]+)\s*k\b',
+            r'less\s*than\s*\$?([\d,]+)\b',
+            r'budget\s*(?:is|of)?\s*\$?([\d,]+)\s*k\b',
+            r'budget\s*(?:is|of)?\s*\$?([\d,]+)\b',
+            r'\$?([\d,]+)\s*k?\s*(?:or\s*less|max|maximum)',
+        ]
+        for pattern in budget_patterns:
+            match = re.search(pattern, user_msg_lower)
+            if match:
+                amount_str = match.group(1).replace(',', '')
+                amount = float(amount_str)
+                if 'k' in pattern or amount < 1000:
+                    amount *= 1000
+                state.budget_max = int(amount)
+                logger.info(
+                    f"Extracted budget from user message: ${state.budget_max:,.0f}"
+                )
+                break
+
+        # Build dynamic system prompt (same as non-streaming)
+        conversation_context = build_dynamic_context(state)
+        inventory_context = build_inventory_context(retriever)
+
+        system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
+            conversation_context=conversation_context,
+            inventory_context=inventory_context
+        )
+
+        # Build messages
+        messages = []
+        for msg in chat_request.conversation_history[-10:]:
+            messages.append({"role": msg.role, "content": msg.content})
+
+        # Add current message with context hints
+        user_message = chat_request.message
+        if chat_request.customer_name and not chat_request.conversation_history:
+            user_message = (
+                f"(Customer's name is {chat_request.customer_name}) "
+                f"{chat_request.message}"
+            )
+        messages.append({"role": "user", "content": user_message})
+
+        try:
+            max_tool_iterations = 5
+            iteration = 0
+
+            while iteration < max_tool_iterations:
+                iteration += 1
+
+                # Call Anthropic API with streaming
+                async with httpx.AsyncClient() as client:
+                    async with client.stream(
+                        "POST",
+                        ANTHROPIC_API_URL,
+                        headers={
+                            "Content-Type": "application/json",
+                            "x-api-key": api_key,
+                            "anthropic-version": "2023-06-01",
+                        },
+                        json={
+                            "model": MODEL_NAME,
+                            "max_tokens": 2048,
+                            "system": system_prompt,
+                            "messages": messages,
+                            "tools": TOOLS,
+                            "stream": True,
+                        },
+                        timeout=60.0,
+                    ) as response:
+                        if response.status_code != 200:
+                            error_body = await response.aread()
+                            logger.error(
+                                f"Anthropic streaming API error: "
+                                f"{response.status_code} - {error_body[:500]}"
+                            )
+                            yield (
+                                f"event: error\n"
+                                f"data: {json.dumps({'error': f'API error: {response.status_code}'})}\n\n"
+                            )
+                            return
+
+                        # Parse SSE stream from Anthropic
+                        text_content = ""
+                        tool_use_blocks = []
+                        current_tool = None
+                        current_tool_input = ""
+                        stop_reason = None
+                        content_blocks = []
+
+                        async for line in response.aiter_lines():
+                            if not line.startswith("data: "):
+                                continue
+
+                            data_str = line[6:]  # Remove "data: " prefix
+                            if data_str == "[DONE]":
+                                break
+
+                            try:
+                                event_data = json.loads(data_str)
+                            except json.JSONDecodeError:
+                                continue
+
+                            event_type = event_data.get("type", "")
+
+                            if event_type == "content_block_start":
+                                block = event_data.get("content_block", {})
+                                if block.get("type") == "tool_use":
+                                    current_tool = {
+                                        "type": "tool_use",
+                                        "id": block.get("id"),
+                                        "name": block.get("name"),
+                                        "input": {},
+                                    }
+                                    current_tool_input = ""
+                                    yield (
+                                        f"event: tool_start\n"
+                                        f"data: {json.dumps({'tool': block.get('name')})}\n\n"
+                                    )
+                                elif block.get("type") == "text":
+                                    # Starting a text block; nothing extra to yield yet
+                                    pass
+
+                            elif event_type == "content_block_delta":
+                                delta = event_data.get("delta", {})
+                                if delta.get("type") == "text_delta":
+                                    text = delta.get("text", "")
+                                    text_content += text
+                                    yield (
+                                        f"event: text_delta\n"
+                                        f"data: {json.dumps({'text': text})}\n\n"
+                                    )
+                                elif delta.get("type") == "input_json_delta":
+                                    current_tool_input += delta.get(
+                                        "partial_json", ""
+                                    )
+
+                            elif event_type == "content_block_stop":
+                                if current_tool:
+                                    try:
+                                        current_tool["input"] = (
+                                            json.loads(current_tool_input)
+                                            if current_tool_input
+                                            else {}
+                                        )
+                                    except json.JSONDecodeError:
+                                        current_tool["input"] = {}
+                                    tool_use_blocks.append(current_tool)
+                                    content_blocks.append(current_tool)
+                                    current_tool = None
+                                    current_tool_input = ""
+
+                            elif event_type == "message_delta":
+                                delta = event_data.get("delta", {})
+                                stop_reason = delta.get("stop_reason")
+
+                            elif event_type == "message_stop":
+                                # End of message stream
+                                pass
+
+                # Finalize text content block if we accumulated text
+                if text_content:
+                    # Add the text block to content_blocks for tool loop continuation
+                    content_blocks_has_text = any(
+                        b.get("type") == "text" for b in content_blocks
+                    )
+                    if not content_blocks_has_text:
+                        content_blocks.insert(
+                            0, {"type": "text", "text": text_content}
+                        )
+
+                # If no tool use, we're done
+                if stop_reason != "tool_use" or not tool_use_blocks:
+                    break
+
+                # Execute tools
+                tool_results = []
+                for tool_block in tool_use_blocks:
+                    tool_name = tool_block.get("name")
+                    tool_id = tool_block.get("id")
+                    tool_input = tool_block.get("input", {})
+
+                    tools_used.append(tool_name)
+                    logger.info(
+                        f"Stream: Executing tool: {tool_name} "
+                        f"with input: {tool_input}"
+                    )
+
+                    tool_result, vehicles, notified = await execute_tool(
+                        tool_name, tool_input, state, retriever, state_manager
+                    )
+
+                    all_vehicles.extend(vehicles)
+                    if notified:
+                        staff_notified = True
+
+                    # Check for worksheet
+                    if (
+                        tool_name == "create_worksheet"
+                        and "WORKSHEET ID:" in str(tool_result)
+                    ):
+                        ws_match = re.search(
+                            r'WORKSHEET ID: ([a-f0-9-]+)', str(tool_result)
+                        )
+                        if ws_match:
+                            worksheet_id = ws_match.group(1)
+                            yield (
+                                f"event: worksheet\n"
+                                f"data: {json.dumps({'worksheet_id': worksheet_id})}\n\n"
+                            )
+
+                    yield (
+                        f"event: tool_result\n"
+                        f"data: {json.dumps({'tool': tool_name, 'success': True})}\n\n"
+                    )
+
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": tool_id,
+                        "content": tool_result,
+                    })
+
+                # Send vehicles if found
+                if all_vehicles:
+                    vehicle_data = []
+                    for sv in all_vehicles[:6]:
+                        vehicle_data.append({
+                            "stock_number": (
+                                sv.vehicle.get("Stock Number")
+                                or sv.vehicle.get("stockNumber", "")
+                            ),
+                            "model": (
+                                f"{sv.vehicle.get('Year', '')} "
+                                f"{sv.vehicle.get('Model', '')} "
+                                f"{sv.vehicle.get('Trim', '')}"
+                            ).strip(),
+                            "price": (
+                                sv.vehicle.get("MSRP")
+                                or sv.vehicle.get("price")
+                            ),
+                        })
+                    yield (
+                        f"event: vehicles\n"
+                        f"data: {json.dumps({'vehicles': vehicle_data})}\n\n"
+                    )
+
+                # Continue conversation with tool results
+                messages.append(
+                    {"role": "assistant", "content": content_blocks}
+                )
+                messages.append({"role": "user", "content": tool_results})
+
+                # Reset for next iteration
+                text_content = ""
+                tool_use_blocks = []
+                content_blocks = []
+
+            # Update conversation state
+            try:
+                mentioned_vehicles = (
+                    [sv.vehicle for sv in all_vehicles]
+                    if all_vehicles
+                    else None
+                )
+                state_manager.update_state(
+                    session_id=chat_request.session_id,
+                    user_message=chat_request.message,
+                    assistant_response=text_content,
+                    mentioned_vehicles=mentioned_vehicles,
+                    customer_name=chat_request.customer_name,
+                )
+            except Exception as e:
+                logger.error(f"Failed to update state after stream: {e}")
+
+            # Done event
+            yield (
+                f"event: done\n"
+                f"data: {json.dumps({'tools_used': tools_used, 'staff_notified': staff_notified, 'worksheet_id': worksheet_id})}\n\n"
+            )
+
+        except Exception as e:
+            logger.exception(f"Streaming chat error: {e}")
+            yield (
+                f"event: error\n"
+                f"data: {json.dumps({'error': str(e)[:200]})}\n\n"
+            )
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # ---
@@ -577,8 +945,8 @@ async def lookup_by_phone(phone_number: str):
             detail="Phone number must be exactly 10 digits"
         )
     
-    state = state_manager.get_state_by_phone(phone_digits)
-    
+    state = await state_manager.get_state_by_phone(phone_digits)
+
     if not state:
         raise HTTPException(
             status_code=404, 

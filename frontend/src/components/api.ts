@@ -790,6 +790,122 @@ export const chatWithAI = async (request: AIChatRequest): Promise<AIChatResponse
 };
 
 /**
+ * Chat with AI assistant using Server-Sent Events (SSE) streaming.
+ * Provides real-time text deltas, tool execution events, and vehicle recommendations
+ * as they are produced by the backend.
+ *
+ * @param message - The user's message text
+ * @param sessionId - Current kiosk session ID
+ * @param conversationHistory - Previous messages in the conversation
+ * @param customerName - Optional customer name for personalization
+ * @param onTextDelta - Called with each incremental text chunk from the AI
+ * @param onVehicles - Called when vehicle recommendations are available
+ * @param onToolStart - Called when the AI begins executing a tool
+ * @param onWorksheet - Called when a Digital Worksheet is created
+ * @param onDone - Called when the full response is complete, with metadata
+ * @param onError - Called if an error occurs during streaming
+ */
+export const chatWithAIStream = async (
+  message: string,
+  sessionId: string,
+  conversationHistory: Array<{ role: string; content: string }>,
+  customerName: string | undefined,
+  onTextDelta: (text: string) => void,
+  onVehicles?: (vehicles: Array<{
+    stock_number: string;
+    model: string;
+    price?: number;
+  }>) => void,
+  onToolStart?: (toolName: string) => void,
+  onWorksheet?: (worksheetId: string) => void,
+  onDone?: (metadata: Record<string, unknown>) => void,
+  onError?: (error: string) => void,
+): Promise<void> => {
+  const url = `${getBaseApiUrl()}/v3/ai/chat/stream`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Session-ID': sessionId,
+    },
+    body: JSON.stringify({
+      message,
+      session_id: sessionId,
+      conversation_history: conversationHistory.map(m => ({
+        role: m.role,
+        content: m.content,
+      })),
+      customer_name: customerName || null,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      (errorData as Record<string, string>).detail || `Stream request failed: ${response.status}`
+    );
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error('No response body for streaming');
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      let eventType = '';
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          eventType = line.slice(7).trim();
+        } else if (line.startsWith('data: ') && eventType) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            switch (eventType) {
+              case 'text_delta':
+                onTextDelta(data.text);
+                break;
+              case 'vehicles':
+                onVehicles?.(data.vehicles);
+                break;
+              case 'tool_start':
+                onToolStart?.(data.tool);
+                break;
+              case 'worksheet':
+                onWorksheet?.(data.worksheet_id);
+                break;
+              case 'done':
+                onDone?.(data);
+                break;
+              case 'error':
+                onError?.(data.error);
+                break;
+              // 'thinking' and 'tool_result' events are informational;
+              // consumers can extend handling if needed
+            }
+          } catch {
+            // Skip malformed SSE event data
+          }
+          eventType = '';
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+};
+
+/**
  * Notify staff when customer requests assistance
  * Triggers Slack/SMS/Email notifications
  * FIX: Uses getBaseApiUrl() instead of duplicated /v1-stripping logic
@@ -963,6 +1079,7 @@ const api = {
   
   // AI Assistant
   chatWithAI,
+  chatWithAIStream,
   notifyStaff,
   
   // Text-to-Speech
