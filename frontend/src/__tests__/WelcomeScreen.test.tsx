@@ -1,6 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import WelcomeScreen from '../components/Welcomescreen';
+import WelcomeScreen from '../components/WelcomeScreen';
 
 // Mock the api module
 jest.mock('../components/api', () => ({
@@ -41,8 +40,8 @@ const renderWelcomeScreen = (props = {}) => {
 describe('WelcomeScreen Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    api.getInventoryStats.mockResolvedValue(mockStats);
-    api.logTrafficSession.mockResolvedValue(undefined);
+    (api.getInventoryStats as jest.Mock).mockResolvedValue(mockStats);
+    (api.logTrafficSession as jest.Mock).mockResolvedValue(undefined);
   });
 
   // ===========================================================================
@@ -102,21 +101,21 @@ describe('WelcomeScreen Component', () => {
 
     test('entering name updates input value', () => {
       renderWelcomeScreen();
-      const input = screen.getByPlaceholderText(/first name/i);
+      const input = screen.getByPlaceholderText(/first name/i) as HTMLInputElement;
       fireEvent.change(input, { target: { value: 'john' } });
       expect(input.value).toBe('john');
     });
 
     test('entering phone formats as (xxx) xxx-xxxx', () => {
       renderWelcomeScreen();
-      const input = screen.getByPlaceholderText(/saves your progress/i);
+      const input = screen.getByPlaceholderText(/saves your progress/i) as HTMLInputElement;
       fireEvent.change(input, { target: { value: '6175551234' } });
       expect(input.value).toBe('(617) 555-1234');
     });
 
     test('phone input only accepts digits', () => {
       renderWelcomeScreen();
-      const input = screen.getByPlaceholderText(/saves your progress/i);
+      const input = screen.getByPlaceholderText(/saves your progress/i) as HTMLInputElement;
       fireEvent.change(input, { target: { value: 'abc123def456' } });
       expect(input.value).toBe('(123) 456');
     });
@@ -333,9 +332,9 @@ describe('WelcomeScreen Component', () => {
 
     test('clicking Stock Number card navigates to stockLookup', async () => {
       await renderPhase2();
-      
+
       const card = screen.getByText(/I Have a Stock Number/i).closest('div');
-      fireEvent.click(card);
+      fireEvent.click(card!);
 
       await waitFor(() => {
         expect(mockNavigateTo).toHaveBeenCalledWith('stockLookup');
@@ -344,9 +343,9 @@ describe('WelcomeScreen Component', () => {
 
     test('clicking Model Budget card navigates to modelBudget', async () => {
       await renderPhase2();
-      
+
       const card = screen.getByText(/I Know What I Want/i).closest('div');
-      fireEvent.click(card);
+      fireEvent.click(card!);
 
       await waitFor(() => {
         expect(mockNavigateTo).toHaveBeenCalledWith('modelBudget');
@@ -355,9 +354,9 @@ describe('WelcomeScreen Component', () => {
 
     test('clicking Chat with AI card navigates to aiAssistant', async () => {
       await renderPhase2();
-      
+
       const card = screen.getByText(/Chat with Quirk AI/i).closest('div');
-      fireEvent.click(card);
+      fireEvent.click(card!);
 
       await waitFor(() => {
         expect(mockNavigateTo).toHaveBeenCalledWith('aiAssistant');
@@ -366,9 +365,9 @@ describe('WelcomeScreen Component', () => {
 
     test('clicking path card updates customer data with path', async () => {
       await renderPhase2();
-      
+
       const card = screen.getByText(/Chat with Quirk AI/i).closest('div');
-      fireEvent.click(card);
+      fireEvent.click(card!);
 
       await waitFor(() => {
         expect(mockUpdateCustomerData).toHaveBeenCalledWith({ path: 'aiAssistant' });
@@ -377,9 +376,9 @@ describe('WelcomeScreen Component', () => {
 
     test('clicking path card logs traffic session', async () => {
       await renderPhase2();
-      
+
       const card = screen.getByText(/I Have a Stock Number/i).closest('div');
-      fireEvent.click(card);
+      fireEvent.click(card!);
 
       await waitFor(() => {
         expect(api.logTrafficSession).toHaveBeenCalledWith(
@@ -483,7 +482,7 @@ describe('WelcomeScreen Component', () => {
       });
 
       const suvStat = screen.getByText('112').closest('button');
-      fireEvent.click(suvStat);
+      fireEvent.click(suvStat!);
 
       await waitFor(() => {
         expect(mockNavigateTo).toHaveBeenCalledWith('inventory', { bodyStyle: 'SUV' });
@@ -492,13 +491,13 @@ describe('WelcomeScreen Component', () => {
 
     test('clicking Truck stat navigates to inventory with Truck filter', async () => {
       await renderWithStats();
-      
+
       await waitFor(() => {
         expect(screen.getByText('106')).toBeInTheDocument();
       });
 
       const truckStat = screen.getByText('106').closest('button');
-      fireEvent.click(truckStat);
+      fireEvent.click(truckStat!);
 
       await waitFor(() => {
         expect(mockNavigateTo).toHaveBeenCalledWith('inventory', { bodyStyle: 'Truck' });
@@ -507,13 +506,13 @@ describe('WelcomeScreen Component', () => {
 
     test('clicking SUV stat updates bodyStyleFilter in customer data', async () => {
       await renderWithStats();
-      
+
       await waitFor(() => {
         expect(screen.getByText('112')).toBeInTheDocument();
       });
 
       const suvStat = screen.getByText('112').closest('button');
-      fireEvent.click(suvStat);
+      fireEvent.click(suvStat!);
 
       await waitFor(() => {
         expect(mockUpdateCustomerData).toHaveBeenCalledWith({ bodyStyleFilter: 'SUV' });
@@ -522,13 +521,13 @@ describe('WelcomeScreen Component', () => {
 
     test('clicking total vehicles navigates to inventory without filter', async () => {
       await renderWithStats();
-      
+
       await waitFor(() => {
         expect(screen.getByText('250')).toBeInTheDocument();
       });
 
       const totalStat = screen.getByText('250').closest('button');
-      fireEvent.click(totalStat);
+      fireEvent.click(totalStat!);
 
       await waitFor(() => {
         expect(mockNavigateTo).toHaveBeenCalledWith('inventory');
@@ -541,7 +540,7 @@ describe('WelcomeScreen Component', () => {
   // ===========================================================================
   describe('Error Handling', () => {
     test('handles stats API error gracefully', async () => {
-      api.getInventoryStats.mockRejectedValue(new Error('API Error'));
+      (api.getInventoryStats as jest.Mock).mockRejectedValue(new Error('API Error'));
       
       renderWelcomeScreen({ customerData: { customerName: 'John' } });
 
@@ -555,7 +554,7 @@ describe('WelcomeScreen Component', () => {
     });
 
     test('handles traffic log API error gracefully', async () => {
-      api.logTrafficSession.mockRejectedValue(new Error('API Error'));
+      (api.logTrafficSession as jest.Mock).mockRejectedValue(new Error('API Error'));
       
       renderWelcomeScreen();
 
@@ -606,7 +605,7 @@ describe('WelcomeScreen Component', () => {
       });
 
       const statBtn = screen.getByText('250').closest('button');
-      expect(statBtn.tagName).toBe('BUTTON');
+      expect(statBtn!.tagName).toBe('BUTTON');
     });
   });
 
@@ -641,7 +640,7 @@ describe('WelcomeScreen Component', () => {
     test('pre-fills phone input from customerData', () => {
       renderWelcomeScreen({ customerData: { phone: '(617) 555-1234' } });
       
-      const phoneInput = screen.getByPlaceholderText(/saves your progress/i);
+      const phoneInput = screen.getByPlaceholderText(/saves your progress/i) as HTMLInputElement;
       expect(phoneInput.value).toBe('(617) 555-1234');
     });
   });

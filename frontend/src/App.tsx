@@ -1,6 +1,6 @@
 import React from 'react';
-import KioskApp from './components/Kioskapp';
-import ErrorBoundary from './components/Errorboundary';
+import KioskApp from './components/KioskApp';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const App: React.FC = () => {
   return (

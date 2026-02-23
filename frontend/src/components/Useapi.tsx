@@ -321,7 +321,7 @@ export const useTradeIn = (): UseTradeInReturn => {
     setError(null);
     
     try {
-      const result = await api.requestAppraisal(tradeInData as Parameters<typeof api.requestAppraisal>[0]);
+      const result = await api.requestAppraisal(tradeInData as unknown as Parameters<typeof api.requestAppraisal>[0]);
       return result;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An error occurred';
@@ -365,9 +365,9 @@ export const usePayments = (): UsePaymentsReturn => {
     setError(null);
     
     try {
-      const result = await api.calculateLease(params as Parameters<typeof api.calculateLease>[0]);
-      setLeasePayment(result as PaymentResult);
-      return result as PaymentResult;
+      const result = await api.calculateLease(params as unknown as Parameters<typeof api.calculateLease>[0]);
+      setLeasePayment(result as unknown as PaymentResult);
+      return result as unknown as PaymentResult;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);
@@ -382,9 +382,9 @@ export const usePayments = (): UsePaymentsReturn => {
     setError(null);
     
     try {
-      const result = await api.calculateFinance(params as Parameters<typeof api.calculateFinance>[0]);
-      setFinancePayment(result as PaymentResult);
-      return result as PaymentResult;
+      const result = await api.calculateFinance(params as unknown as Parameters<typeof api.calculateFinance>[0]);
+      setFinancePayment(result as unknown as PaymentResult);
+      return result as unknown as PaymentResult;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An error occurred';
       setError(message);

@@ -17,7 +17,7 @@ interface QuizQuestion {
   options: QuizOption[];
 }
 
-const GuidedQuiz: React.FC<KioskComponentProps> = ({ navigateTo, updateCustomerData, customerData }) => {
+const GuidedQuiz: React.FC<KioskComponentProps> = ({ navigateTo, updateCustomerData, customerData: _customerData }) => {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [showLeaseHelp, setShowLeaseHelp] = useState<boolean>(false);

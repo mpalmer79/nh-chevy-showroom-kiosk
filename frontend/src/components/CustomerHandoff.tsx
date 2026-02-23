@@ -1,36 +1,11 @@
 import React, { useState } from 'react';
 import api from './api';
-import type { KioskComponentProps, Vehicle, CustomerData } from '../types';
+import type { KioskComponentProps } from '../types';
 
 // ============================================
 // TYPE DEFINITIONS
 // ============================================
 
-interface LeadSubmitPayload {
-  phone: string;
-  name: string | null;
-  vehicle: {
-    stockNumber?: string;
-    year?: number;
-    make?: string;
-    model?: string;
-    trim?: string;
-    salePrice?: number;
-  } | null;
-  payment_preference: {
-    type?: string;
-    monthly?: number;
-    term?: number;
-    downPayment?: number;
-  } | null;
-  trade_in: {
-    year?: number;
-    make?: string;
-    model?: string;
-    estimatedValue?: number;
-  } | null;
-  quiz_answers: Record<string, string> | null;
-}
 
 interface LeadSubmitResult {
   leadId?: string;

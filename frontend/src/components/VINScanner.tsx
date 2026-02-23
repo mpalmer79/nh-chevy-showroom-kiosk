@@ -36,7 +36,7 @@ const VINScanner: React.FC<VINScannerProps> = ({ isOpen, onClose, onScan }) => {
   const [torchOn, setTorchOn] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
-  const [scanAttempts, setScanAttempts] = useState(0);
+  const [_scanAttempts, setScanAttempts] = useState(0);
 
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);

@@ -34,7 +34,7 @@ const PaymentCalculator: React.FC<KioskComponentProps> = ({ navigateTo, updateCu
 
   // Trade-in (read-only from customerData)
   const tradeValue = customerData.tradeIn?.estimatedValue || 0;
-  const tradeOwed = customerData.tradeIn?.amountOwed || 0;
+  const tradeOwed = Number(customerData.tradeIn?.amountOwed) || 0;
 
   // Calculate Lease Payment
   const calculateLease = (): LeaseCalcResult => {

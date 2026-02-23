@@ -179,7 +179,7 @@ const HomePage: React.FC = () => {
       <FilterModal
         isOpen={showFilters}
         onClose={() => setShowFilters(false)}
-        onApply={handleApplyFilters}
+        onApply={(filters) => handleApplyFilters(filters as unknown as Filters)}
         currentFilters={filters}
       />
     </div>

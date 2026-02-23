@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import SalesManagerDashboard from '../components/SalesManagerDashboard';
 
@@ -106,8 +105,8 @@ describe('SalesManagerDashboard Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    api.getActiveSessions.mockResolvedValue({ sessions: mockSessions });
-    api.getTrafficSession.mockResolvedValue(mockSessionDetail);
+    (api.getActiveSessions as jest.Mock).mockResolvedValue({ sessions: mockSessions });
+    (api.getTrafficSession as jest.Mock).mockResolvedValue(mockSessionDetail);
   });
 
   afterEach(() => {
@@ -142,7 +141,7 @@ describe('SalesManagerDashboard Component', () => {
     });
 
     test('displays loading state initially', async () => {
-      api.getActiveSessions.mockImplementation(
+      (api.getActiveSessions as jest.Mock).mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve({ sessions: mockSessions }), 1000))
       );
 
@@ -270,7 +269,7 @@ describe('SalesManagerDashboard Component', () => {
 
   describe('Empty State', () => {
     test('displays message when no sessions', async () => {
-      api.getActiveSessions.mockResolvedValue({ sessions: [] });
+      (api.getActiveSessions as jest.Mock).mockResolvedValue({ sessions: [] });
 
       await renderDashboard();
 
@@ -281,7 +280,7 @@ describe('SalesManagerDashboard Component', () => {
   });
 
   describe('Error Handling', () => {
-    let consoleErrorSpy;
+    let consoleErrorSpy: jest.SpyInstance;
 
     beforeEach(() => {
       consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -292,7 +291,7 @@ describe('SalesManagerDashboard Component', () => {
     });
 
     test('handles API error gracefully', async () => {
-      api.getActiveSessions.mockRejectedValue(new Error('API Error'));
+      (api.getActiveSessions as jest.Mock).mockRejectedValue(new Error('API Error'));
 
       await renderDashboard();
 

@@ -83,14 +83,14 @@ const safeNumber = (v: string) => {
 
 const isTestEnv = process.env.NODE_ENV === 'test';
 
-const TradeInEstimator: React.FC<TradeInEstimatorProps> = ({ 
-  isModal = true, 
-  onClose, 
+const TradeInEstimator: React.FC<TradeInEstimatorProps> = ({
+  isModal = true,
+  onClose,
   vehicle,
   navigateTo,
   customerData,
-  updateCustomerData,
-  resetJourney,
+  updateCustomerData: _updateCustomerData,
+  resetJourney: _resetJourney,
 }) => {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<TradeForm>(() => {

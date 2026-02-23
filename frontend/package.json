@@ -1,25 +1,26 @@
 {
   "name": "quirk-ai-kiosk",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "private": true,
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "axios": "^1.7.0",
+    "framer-motion": "^11.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
-    "axios": "^1.6.2",
-    "framer-motion": "^10.16.4",
-    "recharts": "^2.10.3"
+    "recharts": "^2.13.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0",
-    "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^14.1.2",
-    "@testing-library/user-event": "^14.5.1",
-    "@types/react": "^18.2.45",
-    "@types/react-dom": "^18.2.18",
-    "@types/node": "^20.10.5",
-    "typescript": "^4.9.5",
-    "web-vitals": "^3.5.0"
+    "@playwright/test": "^1.48.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.6.0",
+    "web-vitals": "^4.0.0"
   },
   "optionalDependencies": {
     "@sentry/react": "^7.91.0"
@@ -46,16 +47,24 @@
     ],
     "rules": {
       "no-unused-vars": "warn",
-      "no-console": ["warn", { "allow": ["warn", "error"] }]
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "warn",
+            "error"
+          ]
+        }
+      ]
     }
   },
   "jest": {
     "coverageThreshold": {
       "global": {
-        "branches": 60,
-        "functions": 60,
-        "lines": 65,
-        "statements": 65
+        "branches": 65,
+        "functions": 70,
+        "lines": 75,
+        "statements": 75
       }
     },
     "collectCoverageFrom": [

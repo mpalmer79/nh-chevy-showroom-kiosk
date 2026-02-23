@@ -1,8 +1,9 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor, RenderResult } from '@testing-library/react';
+import { render, screen, fireEvent, RenderResult } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TradeInEstimator from '../components/TradeInEstimator';
 
+const mockNavigateTo = jest.fn();
+const mockUpdateCustomerData = jest.fn();
 const mockOnClose = jest.fn();
 
 interface RenderProps {
@@ -22,6 +23,9 @@ interface RenderProps {
 const renderTradeInEstimator = (props: RenderProps = {}): RenderResult => {
   return render(
     <TradeInEstimator
+      navigateTo={mockNavigateTo}
+      customerData={{}}
+      updateCustomerData={mockUpdateCustomerData}
       isModal={props.isModal !== undefined ? props.isModal : true}
       onClose={props.onClose || mockOnClose}
       vehicle={props.vehicle}
@@ -206,6 +210,9 @@ describe('TradeInEstimator Step 2 - Usage', () => {
   test('component mounts without error', () => {
     render(
       <TradeInEstimator
+        navigateTo={mockNavigateTo}
+        customerData={{}}
+        updateCustomerData={mockUpdateCustomerData}
         isModal={true}
         onClose={jest.fn()}
       />
@@ -218,6 +225,9 @@ describe('TradeInEstimator Step 3 - Loan', () => {
   test('component mounts without error', () => {
     render(
       <TradeInEstimator
+        navigateTo={mockNavigateTo}
+        customerData={{}}
+        updateCustomerData={mockUpdateCustomerData}
         isModal={true}
         onClose={jest.fn()}
       />
@@ -230,6 +240,9 @@ describe('TradeInEstimator Integration', () => {
   test('complete component renders', () => {
     render(
       <TradeInEstimator
+        navigateTo={mockNavigateTo}
+        customerData={{}}
+        updateCustomerData={mockUpdateCustomerData}
         isModal={true}
         onClose={jest.fn()}
       />

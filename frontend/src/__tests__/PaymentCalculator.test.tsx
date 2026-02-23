@@ -1,6 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, RenderResult } from '@testing-library/react';
-import PaymentCalculator from '../components/Paymentcalculator';
+import PaymentCalculator from '../components/PaymentCalculator';
 
 const mockNavigateTo = jest.fn();
 const mockUpdateCustomerData = jest.fn();

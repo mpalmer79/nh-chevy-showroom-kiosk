@@ -2,7 +2,7 @@ import React from 'react';
 import type { Vehicle } from '../types';
 
 // Professional gradient backgrounds based on vehicle type
-const getVehicleGradient = (bodyStyle: string | undefined, model: string | undefined): string => {
+const getVehicleGradient = (_bodyStyle: string | undefined, model: string | undefined): string => {
   const modelLower = (model || '').toLowerCase();
 
   if (modelLower.includes('corvette')) {

@@ -1,6 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, RenderResult } from '@testing-library/react';
-import InventoryResults from '../components/Inventoryresults';
+import InventoryResults from '../components/InventoryResults';
 
 // Mock the api module
 jest.mock('../components/api', () => ({
@@ -96,13 +95,13 @@ const renderInventoryResults = (props: RenderProps = {}): RenderResult => {
 describe('InventoryResults Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    api.getInventory.mockResolvedValue(mockVehicles);
+    (api.getInventory as jest.Mock).mockResolvedValue(mockVehicles);
   });
 
   describe('Loading State', () => {
     test('displays loading text while fetching', async () => {
       // Delay resolution to catch loading state
-      api.getInventory.mockImplementation(
+      (api.getInventory as jest.Mock).mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve(mockVehicles), 100))
       );
       
@@ -120,7 +119,7 @@ describe('InventoryResults Component', () => {
 
   describe('Error State', () => {
     test('displays error message when API fails', async () => {
-      api.getInventory.mockRejectedValue(new Error('Network error'));
+      (api.getInventory as jest.Mock).mockRejectedValue(new Error('Network error'));
       renderInventoryResults();
 
       await waitFor(() => {
@@ -129,7 +128,7 @@ describe('InventoryResults Component', () => {
     });
 
     test('displays retry button on error', async () => {
-      api.getInventory.mockRejectedValue(new Error('Network error'));
+      (api.getInventory as jest.Mock).mockRejectedValue(new Error('Network error'));
       renderInventoryResults();
 
       await waitFor(() => {
@@ -138,7 +137,7 @@ describe('InventoryResults Component', () => {
     });
 
     test('displays error icon on error', async () => {
-      api.getInventory.mockRejectedValue(new Error('Network error'));
+      (api.getInventory as jest.Mock).mockRejectedValue(new Error('Network error'));
       renderInventoryResults();
 
       await waitFor(() => {
@@ -337,7 +336,7 @@ describe('InventoryResults Component', () => {
       renderInventoryResults();
 
       await waitFor(() => {
-        const select = screen.getByRole('combobox');
+        const select = screen.getByRole('combobox') as HTMLSelectElement;
         expect(select).toBeInTheDocument();
         expect(select.value).toBe('recommended');
       });
@@ -361,14 +360,14 @@ describe('InventoryResults Component', () => {
         expect(screen.getByRole('combobox')).toBeInTheDocument();
       });
 
-      const initialCallCount = api.getInventory.mock.calls.length;
+      const initialCallCount = (api.getInventory as jest.Mock).mock.calls.length;
       
-      const select = screen.getByRole('combobox');
+      const select = screen.getByRole('combobox') as HTMLSelectElement;
       fireEvent.change(select, { target: { value: 'priceLow' } });
 
       expect(select.value).toBe('priceLow');
       // Verify no additional API call was made (client-side sort)
-      expect(api.getInventory.mock.calls.length).toBe(initialCallCount);
+      expect((api.getInventory as jest.Mock).mock.calls.length).toBe(initialCallCount);
     });
   });
 
@@ -416,7 +415,7 @@ describe('InventoryResults Component', () => {
       // Click the card (parent of trim text)
       const trim = screen.getByText('LT Crew Cab');
       const card = trim.closest('div[style*="cursor"]');
-      fireEvent.click(card);
+      fireEvent.click(card!);
 
       expect(mockNavigateTo).toHaveBeenCalledWith('vehicleDetail');
     });
@@ -460,7 +459,7 @@ describe('InventoryResults Component', () => {
 
   describe('Empty State', () => {
     test('displays no results message when no vehicles match', async () => {
-      api.getInventory.mockResolvedValue([]);
+      (api.getInventory as jest.Mock).mockResolvedValue([]);
       renderInventoryResults();
 
       await waitFor(() => {
@@ -469,7 +468,7 @@ describe('InventoryResults Component', () => {
     });
 
     test('displays search icon and suggestion in empty state', async () => {
-      api.getInventory.mockResolvedValue([]);
+      (api.getInventory as jest.Mock).mockResolvedValue([]);
       renderInventoryResults();
 
       await waitFor(() => {
@@ -512,7 +511,7 @@ describe('InventoryResults Component', () => {
 describe('InventoryResults Vehicle Selection', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    api.getInventory.mockResolvedValue(mockVehicles);
+    (api.getInventory as jest.Mock).mockResolvedValue(mockVehicles);
   });
 
   test('selecting vehicle stores all original vehicle properties', async () => {
@@ -568,7 +567,7 @@ describe('InventoryResults API Integration', () => {
   });
 
   test('calls API once on mount', async () => {
-    api.getInventory.mockResolvedValue(mockVehicles);
+    (api.getInventory as jest.Mock).mockResolvedValue(mockVehicles);
     renderInventoryResults();
 
     await waitFor(() => {
@@ -579,7 +578,7 @@ describe('InventoryResults API Integration', () => {
   });
 
   test('passes model filter to API', async () => {
-    api.getInventory.mockResolvedValue(mockVehicles);
+    (api.getInventory as jest.Mock).mockResolvedValue(mockVehicles);
     renderInventoryResults({
       customerData: { selectedModel: 'Silverado 1500' },
     });
@@ -592,7 +591,7 @@ describe('InventoryResults API Integration', () => {
   });
 
   test('passes cab type filter to API', async () => {
-    api.getInventory.mockResolvedValue(mockVehicles);
+    (api.getInventory as jest.Mock).mockResolvedValue(mockVehicles);
     renderInventoryResults({
       customerData: { selectedCab: 'Crew Cab' },
     });
@@ -605,7 +604,7 @@ describe('InventoryResults API Integration', () => {
   });
 
   test('passes body style filter to API', async () => {
-    api.getInventory.mockResolvedValue(mockVehicles);
+    (api.getInventory as jest.Mock).mockResolvedValue(mockVehicles);
     renderInventoryResults({
       customerData: { bodyStyleFilter: 'SUV' },
     });
@@ -618,7 +617,7 @@ describe('InventoryResults API Integration', () => {
   });
 
   test('handles API response with vehicles property', async () => {
-    api.getInventory.mockResolvedValue({ vehicles: mockVehicles });
+    (api.getInventory as jest.Mock).mockResolvedValue({ vehicles: mockVehicles });
     renderInventoryResults();
 
     await waitFor(() => {
@@ -630,7 +629,7 @@ describe('InventoryResults API Integration', () => {
 describe('InventoryResults Accessibility', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    api.getInventory.mockResolvedValue(mockVehicles);
+    (api.getInventory as jest.Mock).mockResolvedValue(mockVehicles);
   });
 
   test('interactive elements are proper buttons', async () => {

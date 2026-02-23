@@ -79,12 +79,12 @@ const LeadForm: React.FC<LeadFormProps> = ({ isOpen, onClose, vehicle, formType 
       if (formType === 'test-drive') {
         payload.preferred_date = formData.preferred_date;
         payload.preferred_time = formData.preferred_time;
-        await scheduleTestDrive(payload as Parameters<typeof scheduleTestDrive>[0]);
+        await scheduleTestDrive(payload as unknown as Parameters<typeof scheduleTestDrive>[0]);
       } else if (formType === 'info') {
         payload.questions = formData.questions;
-        await submitLead(payload as Parameters<typeof submitLead>[0]);
+        await submitLead(payload as unknown as Parameters<typeof submitLead>[0]);
       } else {
-        await submitLead(payload as Parameters<typeof submitLead>[0]);
+        await submitLead(payload as unknown as Parameters<typeof submitLead>[0]);
       }
 
       setIsSuccess(true);

@@ -4,7 +4,7 @@ import type { Vehicle, KioskComponentProps } from '../types';
 
 type KeypadKey = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'clear' | 'backspace';
 
-const StockLookup: React.FC<KioskComponentProps> = ({ navigateTo, updateCustomerData, customerData }) => {
+const StockLookup: React.FC<KioskComponentProps> = ({ navigateTo, updateCustomerData, customerData: _customerData }) => {
   const [stockNumber, setStockNumber] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchResult, setSearchResult] = useState<Vehicle | null>(null);

@@ -83,7 +83,7 @@ const comparisonSpecs = [
 
 const VehicleComparison: React.FC<KioskComponentProps> = ({
   navigateTo,
-  customerData,
+  customerData: _customerData,
   updateCustomerData,
 }) => {
   const [inventory, setInventory] = useState<ComparisonVehicle[]>([]);

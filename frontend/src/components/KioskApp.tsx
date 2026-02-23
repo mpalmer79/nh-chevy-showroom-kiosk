@@ -1,23 +1,23 @@
 import React, { useState, useCallback, useEffect, useRef, CSSProperties, ReactNode } from 'react';
 
-// Import all customer journey components (matching actual filenames - case sensitive)
-import WelcomeScreen from './Welcomescreen';
-import StockLookup from './Stocklookup';
+// Import all customer journey components (PascalCase filenames)
+import WelcomeScreen from './WelcomeScreen';
+import StockLookup from './StockLookup';
 import ModelBudgetSelector from './ModelBudgetSelector';
-import GuidedQuiz from './Guidedquiz';
-import InventoryResults from './Inventoryresults';
-import VehicleDetail from './Vehicledetail';
+import GuidedQuiz from './GuidedQuiz';
+import InventoryResults from './InventoryResults';
+import VehicleDetail from './VehicleDetail';
 import VehicleComparison from './VehicleComparison';
 import VirtualTestDrive from './VirtualTestDrive';
-import PaymentCalculator from './Paymentcalculator';
+import PaymentCalculator from './PaymentCalculator';
 import TradeInEstimator from './TradeInEstimator';
-import CustomerHandoff from './Customerhandoff';
-import ProtectionPackages from './Protectionpackages';
-import TrafficLog from './Trafficlog';
+import CustomerHandoff from './CustomerHandoff';
+import ProtectionPackages from './ProtectionPackages';
+import TrafficLog from './TrafficLog';
 import AIAssistant from './AIAssistant';
 import SalesManagerDashboard from './SalesManagerDashboard';
 import InventorySyncDashboard from './InventorySyncDashboard';
-import ErrorBoundary from './Errorboundary';
+import ErrorBoundary from './ErrorBoundary';
 import api from './api';
 
 import type { CustomerData, KioskComponentProps, SortOption } from '../types';
@@ -496,9 +496,9 @@ const KioskApp: React.FC = () => {
     tradeIn: TradeInEstimator,
     handoff: CustomerHandoff,
     protectionPackages: ProtectionPackages,
-    trafficLog: TrafficLog,
-    salesDashboard: SalesManagerDashboard,
-    inventorySync: InventorySyncDashboard,
+    trafficLog: TrafficLog as unknown as React.FC<KioskComponentProps>,
+    salesDashboard: SalesManagerDashboard as unknown as React.FC<KioskComponentProps>,
+    inventorySync: InventorySyncDashboard as unknown as React.FC<KioskComponentProps>,
   };
 
   const CurrentScreenComponent = screens[currentScreen] || WelcomeScreen;
