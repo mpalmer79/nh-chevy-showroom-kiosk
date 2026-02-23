@@ -1,7 +1,18 @@
-import React, { Component } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 
-class ErrorBoundary extends Component {
-  constructor(props) {
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
@@ -10,22 +21,22 @@ class ErrorBoundary extends Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error('ErrorBoundary caught an error:', error);
     console.error('Component stack:', errorInfo.componentStack);
-    
+
     this.setState({ errorInfo });
     this.logErrorToBackend(error, errorInfo);
   }
 
-  logErrorToBackend = async (error, errorInfo) => {
+  logErrorToBackend = async (error: Error, errorInfo: ErrorInfo): Promise<void> => {
     try {
       const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-      
+
       await fetch(`${API_BASE_URL}/api/v1/analytics/interaction`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -46,15 +57,15 @@ class ErrorBoundary extends Component {
     }
   };
 
-  handleRestart = () => {
+  handleRestart = (): void => {
     this.setState({ hasError: false, error: null, errorInfo: null });
   };
 
-  handleFullRestart = () => {
+  handleFullRestart = (): void => {
     window.location.href = '/';
   };
 
-  render() {
+  render(): ReactNode {
     const { hasError, error, errorInfo } = this.state;
     const { children, fallback } = this.props;
 
@@ -122,7 +133,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: '100vh',
     display: 'flex',
@@ -134,7 +145,7 @@ const styles = {
   },
   content: {
     maxWidth: '500px',
-    textAlign: 'center',
+    textAlign: 'center' as const,
   },
   iconContainer: {
     marginBottom: '24px',
@@ -156,7 +167,7 @@ const styles = {
     gap: '16px',
     justifyContent: 'center',
     marginBottom: '32px',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap' as const,
   },
   primaryButton: {
     display: 'flex',
@@ -186,7 +197,7 @@ const styles = {
   },
   details: {
     marginBottom: '24px',
-    textAlign: 'left',
+    textAlign: 'left' as const,
   },
   summary: {
     fontSize: '14px',
@@ -205,7 +216,7 @@ const styles = {
     fontSize: '13px',
     color: '#ef4444',
     margin: '0 0 12px 0',
-    wordBreak: 'break-word',
+    wordBreak: 'break-word' as const,
   },
   stackTrace: {
     fontSize: '11px',
@@ -216,8 +227,8 @@ const styles = {
     borderRadius: '4px',
     overflow: 'auto',
     maxHeight: '200px',
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
+    whiteSpace: 'pre-wrap' as const,
+    wordBreak: 'break-word' as const,
   },
   helpText: {
     fontSize: '13px',

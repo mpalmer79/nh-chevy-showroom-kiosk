@@ -1,12 +1,29 @@
 import React, { useState } from 'react';
+import { KioskComponentProps, StyleObject } from '../types';
 
-const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [showLeaseHelp, setShowLeaseHelp] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+interface QuizOption {
+  value: string;
+  label: string;
+  icon: string;
+  desc: string;
+}
 
-  const questions = [
+interface QuizQuestion {
+  id: string;
+  question: string;
+  subtitle: string;
+  multiSelect?: boolean;
+  maxSelections?: number;
+  options: QuizOption[];
+}
+
+const GuidedQuiz: React.FC<KioskComponentProps> = ({ navigateTo, updateCustomerData, customerData }) => {
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [showLeaseHelp, setShowLeaseHelp] = useState<boolean>(false);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+
+  const questions: QuizQuestion[] = [
     {
       id: 'primaryUse',
       question: 'What will you primarily use this vehicle for?',
@@ -121,37 +138,37 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
     },
   ];
 
-  const handleAnswer = (value) => {
+  const handleAnswer = (value: string): void => {
     const question = questions[currentQuestion];
-    
+
     if (question.multiSelect) {
-      const currentSelections = answers[question.id] || [];
-      let newSelections;
-      
+      const currentSelections = (answers[question.id] as string[]) || [];
+      let newSelections: string[];
+
       if (currentSelections.includes(value)) {
         newSelections = currentSelections.filter(v => v !== value);
-      } else if (currentSelections.length < question.maxSelections) {
+      } else if (currentSelections.length < (question.maxSelections || Infinity)) {
         newSelections = [...currentSelections, value];
       } else {
         return; // Max selections reached
       }
-      
+
       setAnswers(prev => ({ ...prev, [question.id]: newSelections }));
     } else {
       setAnswers(prev => ({ ...prev, [question.id]: value }));
-      
+
       // Special handling for lease/finance question
       if (question.id === 'paymentType' && value === 'unsure') {
         setShowLeaseHelp(true);
         return;
       }
-      
+
       // Auto-advance for single-select
       setTimeout(() => handleNext(), 300);
     }
   };
 
-  const handleNext = () => {
+  const handleNext = (): void => {
     if (currentQuestion < questions.length - 1) {
       setIsAnimating(true);
       setTimeout(() => {
@@ -163,7 +180,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
     }
   };
 
-  const handlePrevious = () => {
+  const handlePrevious = (): void => {
     if (currentQuestion > 0) {
       setIsAnimating(true);
       setTimeout(() => {
@@ -173,12 +190,12 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
     }
   };
 
-  const handleComplete = () => {
-    updateCustomerData({ quizAnswers: answers });
+  const handleComplete = (): void => {
+    updateCustomerData({ quizAnswers: answers as Record<string, string> });
     navigateTo('inventory');
   };
 
-  const handleLeaseDecision = (choice) => {
+  const handleLeaseDecision = (choice: string): void => {
     setAnswers(prev => ({ ...prev, paymentType: choice }));
     setShowLeaseHelp(false);
     setTimeout(() => handleNext(), 300);
@@ -187,7 +204,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
   const question = questions[currentQuestion];
   const progress = ((currentQuestion + 1) / questions.length) * 100;
   const isMultiSelect = question.multiSelect;
-  const selectedOptions = isMultiSelect ? (answers[question.id] || []) : [answers[question.id]];
+  const selectedOptions: string[] = isMultiSelect ? ((answers[question.id] as string[]) || []) : [answers[question.id] as string];
 
   // Lease vs Buy Helper Modal
   if (showLeaseHelp) {
@@ -195,7 +212,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
       <div style={styles.container}>
         <div style={styles.leaseModal}>
           <h2 style={styles.leaseTitle}>Lease vs. Finance: Which is Right for You?</h2>
-          
+
           <div style={styles.leaseComparison}>
             <div style={styles.leaseCard}>
               <div style={styles.leaseCardHeader}>
@@ -213,7 +230,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
               <div style={styles.leaseBestFor}>
                 <strong>Best if:</strong> You drive under 15K miles/year and like having a new car regularly
               </div>
-              <button 
+              <button
                 style={styles.leaseChoiceButton}
                 onClick={() => handleLeaseDecision('lease')}
               >
@@ -237,7 +254,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
               <div style={styles.leaseBestFor}>
                 <strong>Best if:</strong> You drive a lot, want to keep it long-term, or plan to customize
               </div>
-              <button 
+              <button
                 style={styles.leaseChoiceButton}
                 onClick={() => handleLeaseDecision('finance')}
               >
@@ -251,10 +268,10 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
             <div style={styles.aiRecommendation}>
               <div style={styles.aiIcon}>🤖</div>
               <div style={styles.aiText}>
-                <strong>AI Recommendation:</strong> Based on your driving habits 
-                ({answers.mileage === 'under10k' || answers.mileage === '10-15k' 
-                  ? 'under 15K miles/year' 
-                  : 'over 15K miles/year'}), 
+                <strong>AI Recommendation:</strong> Based on your driving habits
+                ({answers.mileage === 'under10k' || answers.mileage === '10-15k'
+                  ? 'under 15K miles/year'
+                  : 'over 15K miles/year'}),
                 {answers.mileage === 'under10k' || answers.mileage === '10-15k'
                   ? ' leasing could save you money with lower monthly payments!'
                   : ' financing might be better to avoid mileage penalties.'}
@@ -262,7 +279,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
             </div>
           )}
 
-          <button 
+          <button
             style={styles.backToQuiz}
             onClick={() => setShowLeaseHelp(false)}
           >
@@ -286,7 +303,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
       </div>
 
       {/* Question Content */}
-      <div 
+      <div
         style={{
           ...styles.questionContent,
           opacity: isAnimating ? 0 : 1,
@@ -301,8 +318,8 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
         {/* Options Grid */}
         <div style={{
           ...styles.optionsGrid,
-          gridTemplateColumns: question.options.length <= 4 
-            ? 'repeat(auto-fit, minmax(240px, 1fr))' 
+          gridTemplateColumns: question.options.length <= 4
+            ? 'repeat(auto-fit, minmax(240px, 1fr))'
             : 'repeat(auto-fit, minmax(180px, 1fr))',
         }}>
           {question.options.map((option) => {
@@ -313,8 +330,8 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
                 style={{
                   ...styles.optionCard,
                   borderColor: isSelected ? '#22c55e' : 'rgba(255,255,255,0.1)',
-                  background: isSelected 
-                    ? 'rgba(27, 115, 64, 0.2)' 
+                  background: isSelected
+                    ? 'rgba(27, 115, 64, 0.2)'
                     : 'rgba(255,255,255,0.05)',
                   transform: isSelected ? 'scale(1.02)' : 'scale(1)',
                 }}
@@ -345,7 +362,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
 
       {/* Navigation */}
       <div style={styles.navigation}>
-        <button 
+        <button
           style={{
             ...styles.navButton,
             opacity: currentQuestion === 0 ? 0.3 : 1,
@@ -360,7 +377,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
         </button>
 
         {isMultiSelect && (
-          <button 
+          <button
             style={styles.continueButton}
             onClick={handleNext}
           >
@@ -372,7 +389,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
         )}
 
         {currentQuestion === questions.length - 1 && !isMultiSelect && answers[question.id] && (
-          <button 
+          <button
             style={styles.continueButton}
             onClick={handleComplete}
           >
@@ -387,7 +404,7 @@ const GuidedQuiz = ({ navigateTo, updateCustomerData, customerData }) => {
   );
 };
 
-const styles = {
+const styles: StyleObject = {
   container: {
     flex: 1,
     display: 'flex',

@@ -1,9 +1,10 @@
 import React from 'react';
+import type { Vehicle } from '../types';
 
 // Professional gradient backgrounds based on vehicle type
-const getVehicleGradient = (bodyStyle, model) => {
+const getVehicleGradient = (bodyStyle: string | undefined, model: string | undefined): string => {
   const modelLower = (model || '').toLowerCase();
-  
+
   if (modelLower.includes('corvette')) {
     return 'linear-gradient(135deg, #c41e3a 0%, #8b0000 100%)';
   }
@@ -25,13 +26,13 @@ const getVehicleGradient = (bodyStyle, model) => {
   if (modelLower.includes('express') || modelLower.includes('van')) {
     return 'linear-gradient(135deg, #636e72 0%, #2d3436 100%)';
   }
-  
+
   return 'linear-gradient(135deg, #2c3e50 0%, #1a252f 100%)';
 };
 
-const getVehicleIcon = (bodyStyle) => {
+const getVehicleIcon = (bodyStyle: string | undefined): React.ReactElement => {
   const style = (bodyStyle || '').toLowerCase();
-  
+
   if (style.includes('truck')) {
     return (
       <svg viewBox="0 0 64 32" fill="white" opacity="0.25" style={{ width: '160px', height: '80px' }}>
@@ -67,19 +68,26 @@ const getVehicleIcon = (bodyStyle) => {
   );
 };
 
-const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDealer }) => {
-  const formatPrice = (price) => {
+interface VehicleDetailPageProps {
+  vehicle: Vehicle | null;
+  onBack: () => void;
+  onScheduleTestDrive?: (vehicle: Vehicle) => void;
+  onContactDealer?: (vehicle: Vehicle) => void;
+}
+
+const VehicleDetailPage: React.FC<VehicleDetailPageProps> = ({ vehicle, onBack, onScheduleTestDrive, onContactDealer }) => {
+  const formatPrice = (price: number | undefined): string => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(price);
+    }).format(price || 0);
   };
 
   if (!vehicle) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
+      <div style={{ padding: '40px', textAlign: 'center' as const }}>
         <p>Vehicle not found</p>
         <button onClick={onBack} style={{ marginTop: '20px', padding: '10px 20px' }}>
           Back to Inventory
@@ -88,14 +96,14 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     );
   }
 
-  const containerStyle = {
+  const containerStyle: React.CSSProperties = {
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '20px',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   };
 
-  const backButtonStyle = {
+  const backButtonStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '8px',
@@ -110,14 +118,14 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     transition: 'background 0.2s',
   };
 
-  const mainContentStyle = {
+  const mainContentStyle: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     gap: '40px',
     alignItems: 'start',
   };
 
-  const imageContainerStyle = {
+  const imageContainerStyle: React.CSSProperties = {
     width: '100%',
     height: '400px',
     borderRadius: '16px',
@@ -130,7 +138,7 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     position: 'relative',
   };
 
-  const chevyLogoStyle = {
+  const chevyLogoStyle: React.CSSProperties = {
     position: 'absolute',
     top: '20px',
     left: '20px',
@@ -139,7 +147,7 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     opacity: 0.5,
   };
 
-  const modelTextStyle = {
+  const modelTextStyle: React.CSSProperties = {
     color: 'white',
     fontSize: '42px',
     fontWeight: '700',
@@ -148,7 +156,7 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     marginTop: '16px',
   };
 
-  const yearTrimStyle = {
+  const yearTrimStyle: React.CSSProperties = {
     color: 'rgba(255,255,255,0.85)',
     fontSize: '20px',
     fontWeight: '500',
@@ -156,40 +164,40 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     marginTop: '8px',
   };
 
-  const detailsPanelStyle = {
+  const detailsPanelStyle: React.CSSProperties = {
     background: '#fff',
     borderRadius: '16px',
     padding: '24px',
     boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
   };
 
-  const titleStyle = {
+  const titleStyle: React.CSSProperties = {
     fontSize: '28px',
     fontWeight: '700',
     color: '#1a1a1a',
     marginBottom: '8px',
   };
 
-  const priceRowStyle = {
+  const priceRowStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: '16px',
     marginBottom: '24px',
   };
 
-  const priceStyle = {
+  const priceStyle: React.CSSProperties = {
     fontSize: '32px',
     fontWeight: '700',
     color: '#cc0000',
   };
 
-  const msrpStyle = {
+  const msrpStyle: React.CSSProperties = {
     fontSize: '16px',
     color: '#888',
     textDecoration: 'line-through',
   };
 
-  const statusBadgeStyle = {
+  const statusBadgeStyle: React.CSSProperties = {
     display: 'inline-block',
     padding: '6px 12px',
     borderRadius: '6px',
@@ -199,20 +207,20 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     color: vehicle.status === 'In Stock' ? '#2e7d32' : '#e65100',
   };
 
-  const specsGridStyle = {
+  const specsGridStyle: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '16px',
     marginBottom: '24px',
   };
 
-  const specItemStyle = {
+  const specItemStyle: React.CSSProperties = {
     background: '#f8f9fa',
     padding: '12px 16px',
     borderRadius: '8px',
   };
 
-  const specLabelStyle = {
+  const specLabelStyle: React.CSSProperties = {
     fontSize: '12px',
     color: '#666',
     textTransform: 'uppercase',
@@ -220,19 +228,19 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     marginBottom: '4px',
   };
 
-  const specValueStyle = {
+  const specValueStyle: React.CSSProperties = {
     fontSize: '15px',
     fontWeight: '600',
     color: '#1a1a1a',
   };
 
-  const buttonContainerStyle = {
+  const buttonContainerStyle: React.CSSProperties = {
     display: 'flex',
     gap: '12px',
     marginTop: '24px',
   };
 
-  const primaryButtonStyle = {
+  const primaryButtonStyle: React.CSSProperties = {
     flex: 1,
     padding: '14px 24px',
     background: '#cc0000',
@@ -245,7 +253,7 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     transition: 'background 0.2s',
   };
 
-  const secondaryButtonStyle = {
+  const secondaryButtonStyle: React.CSSProperties = {
     flex: 1,
     padding: '14px 24px',
     background: '#f5f5f5',
@@ -258,13 +266,13 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
     transition: 'background 0.2s',
   };
 
-  const featuresStyle = {
+  const featuresStyle: React.CSSProperties = {
     marginTop: '24px',
     paddingTop: '24px',
     borderTop: '1px solid #eee',
   };
 
-  const featureTagStyle = {
+  const featureTagStyle: React.CSSProperties = {
     display: 'inline-block',
     padding: '6px 12px',
     background: '#e3f2fd',
@@ -280,8 +288,8 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
       <button
         style={backButtonStyle}
         onClick={onBack}
-        onMouseEnter={(e) => e.target.style.background = '#e8e8e8'}
-        onMouseLeave={(e) => e.target.style.background = '#f5f5f5'}
+        onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { (e.target as HTMLButtonElement).style.background = '#e8e8e8'; }}
+        onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { (e.target as HTMLButtonElement).style.background = '#f5f5f5'; }}
       >
         ← Back to Inventory
       </button>
@@ -305,7 +313,7 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
 
           <div style={priceRowStyle}>
             <span style={priceStyle}>{formatPrice(vehicle.price)}</span>
-            {vehicle.msrp > vehicle.price && (
+            {(vehicle.msrp || 0) > (vehicle.price || 0) && (
               <span style={msrpStyle}>MSRP {formatPrice(vehicle.msrp)}</span>
             )}
             <span style={statusBadgeStyle}>{vehicle.status}</span>
@@ -335,8 +343,8 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
             <div style={specItemStyle}>
               <div style={specLabelStyle}>Fuel Economy</div>
               <div style={specValueStyle}>
-                {vehicle.fuelType === 'Electric' 
-                  ? `${vehicle.evRange} mi range` 
+                {vehicle.fuelType === 'Electric'
+                  ? `${vehicle.evRange} mi range`
                   : `${vehicle.mpgCity} city / ${vehicle.mpgHighway} hwy`}
               </div>
             </div>
@@ -354,16 +362,16 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
             <button
               style={primaryButtonStyle}
               onClick={() => onScheduleTestDrive && onScheduleTestDrive(vehicle)}
-              onMouseEnter={(e) => e.target.style.background = '#aa0000'}
-              onMouseLeave={(e) => e.target.style.background = '#cc0000'}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { (e.target as HTMLButtonElement).style.background = '#aa0000'; }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { (e.target as HTMLButtonElement).style.background = '#cc0000'; }}
             >
               Schedule Test Drive
             </button>
             <button
               style={secondaryButtonStyle}
               onClick={() => onContactDealer && onContactDealer(vehicle)}
-              onMouseEnter={(e) => e.target.style.background = '#e8e8e8'}
-              onMouseLeave={(e) => e.target.style.background = '#f5f5f5'}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { (e.target as HTMLButtonElement).style.background = '#e8e8e8'; }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { (e.target as HTMLButtonElement).style.background = '#f5f5f5'; }}
             >
               Contact Dealer
             </button>
@@ -375,7 +383,7 @@ const VehicleDetailPage = ({ vehicle, onBack, onScheduleTestDrive, onContactDeal
                 KEY FEATURES
               </div>
               <div>
-                {vehicle.features.map((feature, index) => (
+                {vehicle.features.map((feature: string, index: number) => (
                   <span key={index} style={featureTagStyle}>{feature}</span>
                 ))}
               </div>

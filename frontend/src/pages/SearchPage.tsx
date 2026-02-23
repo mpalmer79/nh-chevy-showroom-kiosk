@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { inventoryAPI } from '../services/api';
+import api from '../components/api';
 import VehicleCard from '../components/VehicleCard';
+import type { Vehicle } from '../types';
 
-function SearchPage() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+interface Suggestion {
+  label: string;
+  query: string;
+}
 
-  const suggestions = [
+const SearchPage: React.FC = () => {
+  const [query, setQuery] = useState<string>('');
+  const [results, setResults] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [hasSearched, setHasSearched] = useState<boolean>(false);
+
+  const suggestions: Suggestion[] = [
     { label: 'Corvette', query: 'corvette' },
     { label: 'Silverado', query: 'silverado' },
     { label: 'Tahoe', query: 'tahoe' },
@@ -20,7 +26,7 @@ function SearchPage() {
     { label: 'Colorado', query: 'colorado' },
   ];
 
-  const performSearch = useCallback(async (searchQuery) => {
+  const performSearch = useCallback(async (searchQuery: string): Promise<void> => {
     if (!searchQuery.trim()) {
       setResults([]);
       setHasSearched(false);
@@ -30,8 +36,9 @@ function SearchPage() {
     try {
       setLoading(true);
       setHasSearched(true);
-      const response = await inventoryAPI.search(searchQuery);
-      setResults(response.data.vehicles || []);
+      const response = await api.getInventory({ model: searchQuery });
+      const vehicleList: Vehicle[] = Array.isArray(response) ? response : (response as { vehicles?: Vehicle[] })?.vehicles || [];
+      setResults(vehicleList);
     } catch (err) {
       console.error('Search error:', err);
       setResults([]);
@@ -53,12 +60,12 @@ function SearchPage() {
     return () => clearTimeout(debounce);
   }, [query, performSearch]);
 
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = (suggestion: Suggestion): void => {
     setQuery(suggestion.query);
     performSearch(suggestion.query);
   };
 
-  const handleClear = () => {
+  const handleClear = (): void => {
     setQuery('');
     setResults([]);
     setHasSearched(false);
@@ -83,7 +90,7 @@ function SearchPage() {
             style={styles.searchInput}
             placeholder="Search vehicles..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
             autoFocus
           />
           {query && (
@@ -157,9 +164,9 @@ function SearchPage() {
       </div>
     </motion.div>
   );
-}
+};
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: '100%',
     display: 'flex',

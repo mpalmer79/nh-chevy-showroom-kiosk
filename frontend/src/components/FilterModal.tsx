@@ -1,15 +1,45 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-function FilterModal({ isOpen, onClose, onApply, currentFilters = {} }) {
-  const [filters, setFilters] = useState({
+interface FilterState {
+  bodyStyle: string;
+  fuelType: string;
+  priceRange: string;
+  drivetrain: string;
+}
+
+interface FilterOption {
+  value: string;
+  label: string;
+  icon?: string;
+}
+
+interface PriceRange extends FilterOption {
+  min: number | null;
+  max: number | null;
+}
+
+interface AppliedFilters extends FilterState {
+  minPrice?: number | null;
+  maxPrice?: number | null;
+}
+
+interface FilterModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onApply: (filters: AppliedFilters) => void;
+  currentFilters?: Partial<FilterState>;
+}
+
+const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply, currentFilters = {} }) => {
+  const [filters, setFilters] = useState<FilterState>({
     bodyStyle: currentFilters.bodyStyle || '',
     fuelType: currentFilters.fuelType || '',
     priceRange: currentFilters.priceRange || '',
     drivetrain: currentFilters.drivetrain || '',
   });
 
-  const bodyStyles = [
+  const bodyStyles: FilterOption[] = [
     { value: '', label: 'All Types', icon: '🚗' },
     { value: 'SUV', label: 'SUV', icon: '🚙' },
     { value: 'Truck', label: 'Truck', icon: '🛻' },
@@ -19,14 +49,14 @@ function FilterModal({ isOpen, onClose, onApply, currentFilters = {} }) {
     { value: 'Convertible', label: 'Convertible', icon: '🚗' },
   ];
 
-  const fuelTypes = [
+  const fuelTypes: FilterOption[] = [
     { value: '', label: 'All Fuel Types', icon: '⛽' },
     { value: 'Gasoline', label: 'Gasoline', icon: '⛽' },
     { value: 'Electric', label: 'Electric', icon: '⚡' },
     { value: 'Hybrid', label: 'Hybrid', icon: '🔋' },
   ];
 
-  const priceRanges = [
+  const priceRanges: PriceRange[] = [
     { value: '', label: 'Any Price', min: null, max: null },
     { value: 'under40', label: 'Under $40,000', min: null, max: 40000 },
     { value: '40to60', label: '$40,000 - $60,000', min: 40000, max: 60000 },
@@ -34,7 +64,7 @@ function FilterModal({ isOpen, onClose, onApply, currentFilters = {} }) {
     { value: 'over80', label: 'Over $80,000', min: 80000, max: null },
   ];
 
-  const drivetrains = [
+  const drivetrains: FilterOption[] = [
     { value: '', label: 'All Drivetrains' },
     { value: '4WD', label: '4WD' },
     { value: 'AWD', label: 'AWD' },
@@ -42,11 +72,11 @@ function FilterModal({ isOpen, onClose, onApply, currentFilters = {} }) {
     { value: 'RWD', label: 'RWD' },
   ];
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = (key: keyof FilterState, value: string): void => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleApply = () => {
+  const handleApply = (): void => {
     const priceRange = priceRanges.find((p) => p.value === filters.priceRange);
     onApply({
       ...filters,
@@ -56,7 +86,7 @@ function FilterModal({ isOpen, onClose, onApply, currentFilters = {} }) {
     onClose();
   };
 
-  const handleClear = () => {
+  const handleClear = (): void => {
     setFilters({
       bodyStyle: '',
       fuelType: '',
@@ -81,7 +111,7 @@ function FilterModal({ isOpen, onClose, onApply, currentFilters = {} }) {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
         >
           <div style={styles.header}>
             <h2 style={styles.title}>Filter Vehicles</h2>
@@ -178,9 +208,9 @@ function FilterModal({ isOpen, onClose, onApply, currentFilters = {} }) {
       </motion.div>
     </AnimatePresence>
   );
-}
+};
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   overlay: {
     position: 'fixed',
     inset: 0,

@@ -1,15 +1,56 @@
 import React, { useState } from 'react';
 import api from './api';
+import type { KioskComponentProps, Vehicle, CustomerData } from '../types';
 
-const CustomerHandoff = ({ navigateTo, updateCustomerData, customerData }) => {
-  const [phone, setPhone] = useState('');
+// ============================================
+// TYPE DEFINITIONS
+// ============================================
+
+interface LeadSubmitPayload {
+  phone: string;
+  name: string | null;
+  vehicle: {
+    stockNumber?: string;
+    year?: number;
+    make?: string;
+    model?: string;
+    trim?: string;
+    salePrice?: number;
+  } | null;
+  payment_preference: {
+    type?: string;
+    monthly?: number;
+    term?: number;
+    downPayment?: number;
+  } | null;
+  trade_in: {
+    year?: number;
+    make?: string;
+    model?: string;
+    estimatedValue?: number;
+  } | null;
+  quiz_answers: Record<string, string> | null;
+}
+
+interface LeadSubmitResult {
+  leadId?: string;
+  estimatedWait?: number;
+  [key: string]: unknown;
+}
+
+// ============================================
+// COMPONENT
+// ============================================
+
+const CustomerHandoff: React.FC<KioskComponentProps> = ({ navigateTo, updateCustomerData, customerData }) => {
+  const [phone, setPhone] = useState<string>('');
   // Pre-fill name from customerData if available
-  const [name, setName] = useState(customerData?.customerName || '');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
-  const [error, setError] = useState(null);
-  const [waitTime, setWaitTime] = useState(null);
-  const [leadId, setLeadId] = useState(null);
+  const [name, setName] = useState<string>(customerData?.customerName || '');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isComplete, setIsComplete] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [waitTime, setWaitTime] = useState<number | null>(null);
+  const [leadId, setLeadId] = useState<string | null>(null);
 
   // Get customer name for personalization
   const customerName = customerData?.customerName;
@@ -18,20 +59,20 @@ const CustomerHandoff = ({ navigateTo, updateCustomerData, customerData }) => {
   const payment = customerData.paymentPreference;
   const tradeIn = customerData.tradeIn;
 
-  const formatPhone = (value) => {
+  const formatPhone = (value: string): string => {
     const numbers = value.replace(/\D/g, '');
     if (numbers.length <= 3) return numbers;
     if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
     return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
   };
 
-  const handlePhoneChange = (e) => {
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const formatted = formatPhone(e.target.value);
     setPhone(formatted);
     setError(null);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     const phoneDigits = phone.replace(/\D/g, '');
     if (phoneDigits.length < 10) {
       setError('Please enter a valid phone number');
@@ -67,9 +108,9 @@ const CustomerHandoff = ({ navigateTo, updateCustomerData, customerData }) => {
           estimatedValue: tradeIn.estimatedValue,
         } : null,
         quiz_answers: customerData.quizAnswers || null,
-      });
+      } as unknown as Parameters<typeof api.submitLead>[0]) as unknown as LeadSubmitResult;
       
-      setLeadId(result.leadId);
+      setLeadId(result.leadId || null);
       setWaitTime(result.estimatedWait || 3);
       
       updateCustomerData({
@@ -90,7 +131,7 @@ const CustomerHandoff = ({ navigateTo, updateCustomerData, customerData }) => {
       });
       
       setIsComplete(true);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to submit lead:', err);
       setError('Unable to submit. Please try again or speak with a team member.');
     } finally {
@@ -272,7 +313,7 @@ const CustomerHandoff = ({ navigateTo, updateCustomerData, customerData }) => {
               style={styles.input}
               placeholder="First name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
             />
           </div>
 
@@ -342,7 +383,11 @@ const CustomerHandoff = ({ navigateTo, updateCustomerData, customerData }) => {
   );
 };
 
-const styles = {
+// ============================================
+// STYLES
+// ============================================
+
+const styles: Record<string, React.CSSProperties> = {
   container: {
     flex: 1,
     display: 'flex',

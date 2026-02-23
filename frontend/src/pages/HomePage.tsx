@@ -3,32 +3,56 @@ import { motion } from 'framer-motion';
 import VehicleCard from '../components/VehicleCard';
 import FilterModal from '../components/FilterModal';
 import api from '../components/api';
+import type { Vehicle } from '../types';
 
-function HomePage() {
-  const [vehicles, setVehicles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({});
-  const [stats, setStats] = useState(null);
+interface Filters {
+  bodyStyle?: string;
+  fuelType?: string;
+  priceRange?: string;
+  drivetrain?: string;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  [key: string]: string | number | null | undefined;
+}
+
+interface InventoryParams {
+  bodyType?: string;
+  fuelType?: string;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
+interface InventoryStats {
+  total: number;
+  byBodyStyle?: Record<string, number>;
+  priceRange?: { min: number; max: number };
+}
+
+const HomePage: React.FC = () => {
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [filters, setFilters] = useState<Filters>({});
+  const [stats, setStats] = useState<InventoryStats | null>(null);
 
   useEffect(() => {
     loadInventory();
     loadStats();
   }, []);
 
-  const loadInventory = async (appliedFilters = {}) => {
+  const loadInventory = async (appliedFilters: Filters = {}): Promise<void> => {
     try {
       setLoading(true);
-      
-      const params = {};
+
+      const params: InventoryParams = {};
       if (appliedFilters.bodyStyle) params.bodyType = appliedFilters.bodyStyle;
       if (appliedFilters.fuelType) params.fuelType = appliedFilters.fuelType;
       if (appliedFilters.minPrice) params.minPrice = appliedFilters.minPrice;
       if (appliedFilters.maxPrice) params.maxPrice = appliedFilters.maxPrice;
 
       const data = await api.getInventory(params);
-      const vehicleList = Array.isArray(data) ? data : data?.vehicles || [];
+      const vehicleList: Vehicle[] = Array.isArray(data) ? data : (data as { vehicles?: Vehicle[] })?.vehicles || [];
       setVehicles(vehicleList);
       setError(null);
     } catch (err) {
@@ -39,16 +63,16 @@ function HomePage() {
     }
   };
 
-  const loadStats = async () => {
+  const loadStats = async (): Promise<void> => {
     try {
       const data = await api.getInventoryStats();
-      setStats(data);
+      setStats(data as unknown as InventoryStats);
     } catch (err) {
       console.error('Error loading stats:', err);
     }
   };
 
-  const handleApplyFilters = (newFilters) => {
+  const handleApplyFilters = (newFilters: Filters): void => {
     setFilters(newFilters);
     loadInventory(newFilters);
   };
@@ -160,9 +184,9 @@ function HomePage() {
       />
     </div>
   );
-}
+};
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     paddingBottom: '48px',
   },

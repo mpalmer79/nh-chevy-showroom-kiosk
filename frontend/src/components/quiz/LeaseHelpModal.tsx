@@ -1,7 +1,14 @@
 import React from 'react';
 import { LEASE_FINANCE_COMPARISON, getLeaseRecommendation } from '../../data/quizQuestions';
+import { StyleObject } from '../../types';
 
-const LeaseHelpModal = ({ mileageAnswer, onSelect, onBack }) => {
+interface LeaseHelpModalProps {
+  mileageAnswer?: string;
+  onSelect: (choice: string) => void;
+  onBack: () => void;
+}
+
+const LeaseHelpModal: React.FC<LeaseHelpModalProps> = ({ mileageAnswer, onSelect, onBack }) => {
   const recommendation = getLeaseRecommendation(mileageAnswer);
   const { lease, finance } = LEASE_FINANCE_COMPARISON;
 
@@ -9,7 +16,7 @@ const LeaseHelpModal = ({ mileageAnswer, onSelect, onBack }) => {
     <div style={styles.container}>
       <div style={styles.leaseModal}>
         <h2 style={styles.leaseTitle}>Lease vs. Finance: Which is Right for You?</h2>
-        
+
         <div style={styles.leaseComparison}>
           {/* Lease Card */}
           <div style={styles.leaseCard}>
@@ -18,17 +25,17 @@ const LeaseHelpModal = ({ mileageAnswer, onSelect, onBack }) => {
               <h3 style={styles.leaseCardTitle}>{lease.title}</h3>
             </div>
             <ul style={styles.leaseFeatures}>
-              {lease.pros.map((pro, idx) => (
+              {lease.pros.map((pro: string, idx: number) => (
                 <li key={idx}>✓ {pro}</li>
               ))}
-              {lease.cons.map((con, idx) => (
+              {lease.cons.map((con: string, idx: number) => (
                 <li key={`con-${idx}`}>✗ {con}</li>
               ))}
             </ul>
             <div style={styles.leaseBestFor}>
               <strong>Best if:</strong> {lease.bestFor}
             </div>
-            <button 
+            <button
               style={styles.leaseChoiceButton}
               onClick={() => onSelect('lease')}
               type="button"
@@ -44,17 +51,17 @@ const LeaseHelpModal = ({ mileageAnswer, onSelect, onBack }) => {
               <h3 style={styles.leaseCardTitle}>{finance.title}</h3>
             </div>
             <ul style={styles.leaseFeatures}>
-              {finance.pros.map((pro, idx) => (
+              {finance.pros.map((pro: string, idx: number) => (
                 <li key={idx}>✓ {pro}</li>
               ))}
-              {finance.cons.map((con, idx) => (
+              {finance.cons.map((con: string, idx: number) => (
                 <li key={`con-${idx}`}>✗ {con}</li>
               ))}
             </ul>
             <div style={styles.leaseBestFor}>
               <strong>Best if:</strong> {finance.bestFor}
             </div>
-            <button 
+            <button
               style={styles.leaseChoiceButton}
               onClick={() => onSelect('finance')}
               type="button"
@@ -68,14 +75,14 @@ const LeaseHelpModal = ({ mileageAnswer, onSelect, onBack }) => {
           <div style={styles.aiRecommendation}>
             <div style={styles.aiIcon}>🤖</div>
             <div style={styles.aiText}>
-              <strong>AI Recommendation:</strong> Based on your driving habits 
-              ({recommendation.mileageDescription}), 
+              <strong>AI Recommendation:</strong> Based on your driving habits
+              ({recommendation.mileageDescription}),
               {recommendation.message}
             </div>
           </div>
         )}
 
-        <button 
+        <button
           style={styles.backToQuiz}
           onClick={onBack}
           type="button"
@@ -87,7 +94,7 @@ const LeaseHelpModal = ({ mileageAnswer, onSelect, onBack }) => {
   );
 };
 
-const styles = {
+const styles: StyleObject = {
   container: {
     flex: 1,
     display: 'flex',

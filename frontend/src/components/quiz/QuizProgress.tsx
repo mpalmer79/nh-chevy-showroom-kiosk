@@ -1,6 +1,13 @@
 import React from 'react';
+import { StyleObject } from '../../types';
 
-const QuizProgress = ({ currentQuestion, totalQuestions, progress }) => {
+interface QuizProgressProps {
+  currentQuestion: number;
+  totalQuestions: number;
+  progress: number;
+}
+
+const QuizProgress: React.FC<QuizProgressProps> = ({ currentQuestion, totalQuestions, progress }) => {
   return (
     <div style={styles.progressSection}>
       <div style={styles.progressBar}>
@@ -13,7 +20,7 @@ const QuizProgress = ({ currentQuestion, totalQuestions, progress }) => {
   );
 };
 
-const styles = {
+const styles: StyleObject = {
   progressSection: {
     display: 'flex',
     alignItems: 'center',

@@ -1,7 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-function Screensaver({ onTouch }) {
+interface ScreensaverProps {
+  onTouch: () => void;
+}
+
+const Screensaver: React.FC<ScreensaverProps> = ({ onTouch }) => {
   return (
     <motion.div
       style={styles.container}
@@ -45,14 +49,14 @@ function Screensaver({ onTouch }) {
 
       <div style={styles.footer}>
         <span style={styles.dealership}>Quirk Chevrolet</span>
-        <span style={styles.divider}>•</span>
+        <span style={styles.divider}>&bull;</span>
         <span style={styles.tagline}>New England's #1 Dealer</span>
       </div>
     </motion.div>
   );
-}
+};
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     position: 'fixed',
     inset: 0,

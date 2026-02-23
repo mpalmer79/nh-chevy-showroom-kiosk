@@ -1,13 +1,28 @@
 import React from 'react';
+import { StyleObject } from '../../types';
 
-const QuestionCard = ({ option, isSelected, onClick, showCheckmark = true }) => {
+interface QuizOption {
+  value: string;
+  label: string;
+  icon: string;
+  desc: string;
+}
+
+interface QuestionCardProps {
+  option: QuizOption;
+  isSelected: boolean;
+  onClick: () => void;
+  showCheckmark?: boolean;
+}
+
+const QuestionCard: React.FC<QuestionCardProps> = ({ option, isSelected, onClick, showCheckmark = true }) => {
   return (
     <button
       style={{
         ...styles.optionCard,
         borderColor: isSelected ? '#22c55e' : 'rgba(255,255,255,0.1)',
-        background: isSelected 
-          ? 'rgba(27, 115, 64, 0.2)' 
+        background: isSelected
+          ? 'rgba(27, 115, 64, 0.2)'
           : 'rgba(255,255,255,0.05)',
         transform: isSelected ? 'scale(1.02)' : 'scale(1)',
       }}
@@ -28,7 +43,7 @@ const QuestionCard = ({ option, isSelected, onClick, showCheckmark = true }) => 
   );
 };
 
-const styles = {
+const styles: StyleObject = {
   optionCard: {
     display: 'flex',
     flexDirection: 'column',

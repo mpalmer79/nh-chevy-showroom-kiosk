@@ -1,9 +1,49 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { leadsAPI } from '../services/api';
+import { submitLead, scheduleTestDrive } from './api';
+import type { Vehicle } from '../types';
 
-function LeadForm({ isOpen, onClose, vehicle, formType = 'general' }) {
-  const [formData, setFormData] = useState({
+// ============================================
+// TYPE DEFINITIONS
+// ============================================
+
+type FormType = 'general' | 'test-drive' | 'info';
+
+interface LeadFormData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  preferred_date: string;
+  preferred_time: string;
+  questions: string;
+}
+
+interface LeadPayload {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string | null;
+  vehicle_id?: string | number;
+  context_vin?: string;
+  preferred_date?: string;
+  preferred_time?: string;
+  questions?: string;
+}
+
+interface LeadFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  vehicle?: Vehicle;
+  formType?: FormType;
+}
+
+// ============================================
+// COMPONENT
+// ============================================
+
+const LeadForm: React.FC<LeadFormProps> = ({ isOpen, onClose, vehicle, formType = 'general' }) => {
+  const [formData, setFormData] = useState<LeadFormData>({
     first_name: '',
     last_name: '',
     email: '',
@@ -12,22 +52,22 @@ function LeadForm({ isOpen, onClose, vehicle, formType = 'general' }) {
     preferred_time: '',
     questions: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const payload = {
+      const payload: LeadPayload = {
         first_name: formData.first_name,
         last_name: formData.last_name,
         email: formData.email,
@@ -39,12 +79,12 @@ function LeadForm({ isOpen, onClose, vehicle, formType = 'general' }) {
       if (formType === 'test-drive') {
         payload.preferred_date = formData.preferred_date;
         payload.preferred_time = formData.preferred_time;
-        await leadsAPI.scheduleTestDrive(payload);
+        await scheduleTestDrive(payload as Parameters<typeof scheduleTestDrive>[0]);
       } else if (formType === 'info') {
         payload.questions = formData.questions;
-        await leadsAPI.requestInfo(payload);
+        await submitLead(payload as Parameters<typeof submitLead>[0]);
       } else {
-        await leadsAPI.submit(payload);
+        await submitLead(payload as Parameters<typeof submitLead>[0]);
       }
 
       setIsSuccess(true);
@@ -69,7 +109,7 @@ function LeadForm({ isOpen, onClose, vehicle, formType = 'general' }) {
     }
   };
 
-  const getTitle = () => {
+  const getTitle = (): string => {
     switch (formType) {
       case 'test-drive':
         return 'Schedule a Test Drive';
@@ -96,7 +136,7 @@ function LeadForm({ isOpen, onClose, vehicle, formType = 'general' }) {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
         >
           {isSuccess ? (
             <motion.div
@@ -247,9 +287,13 @@ function LeadForm({ isOpen, onClose, vehicle, formType = 'general' }) {
       </motion.div>
     </AnimatePresence>
   );
-}
+};
 
-const styles = {
+// ============================================
+// STYLES
+// ============================================
+
+const styles: Record<string, React.CSSProperties> = {
   overlay: {
     position: 'fixed',
     inset: 0,

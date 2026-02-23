@@ -1,31 +1,59 @@
 import React from 'react';
+import { StyleObject } from '../../types';
 
-const FinanceCalculator = ({ 
-  term, 
-  setTerm, 
-  down, 
-  setDown, 
-  apr, 
-  setApr, 
-  calc, 
-  terms, 
-  aprRange, 
+interface RangeConfig {
+  min: number;
+  max: number;
+  step: number;
+}
+
+interface LeaseCalcResult {
+  monthly: number;
+  dueAtSigning: number;
+  totalCost: number;
+  residual: number;
+}
+
+interface LeaseCalculatorProps {
+  term: number;
+  setTerm: (term: number) => void;
+  miles: number;
+  setMiles: (miles: number) => void;
+  down: number;
+  setDown: (down: number) => void;
+  calc: LeaseCalcResult;
+  terms: number[];
+  milesOptions: number[];
+  downRange: RangeConfig;
+  onSelect: () => void;
+}
+
+const LeaseCalculator: React.FC<LeaseCalculatorProps> = ({
+  term,
+  setTerm,
+  miles,
+  setMiles,
+  down,
+  setDown,
+  calc,
+  terms,
+  milesOptions,
   downRange,
-  onSelect 
+  onSelect
 }) => {
   return (
     <div style={styles.calculatorCard}>
       <div style={styles.cardHeader}>
-        <span style={styles.cardIcon}>🏦</span>
-        <h2 style={styles.cardTitle}>Finance</h2>
+        <span style={styles.cardIcon}>📅</span>
+        <h2 style={styles.cardTitle}>Lease</h2>
       </div>
       <p style={styles.cardDescription}>
-        Build equity, own it when paid off
+        Lower payments, new car every few years
       </p>
 
-      {/* Finance Term */}
+      {/* Lease Term */}
       <div style={styles.inputGroup}>
-        <label style={styles.inputLabel}>Loan Term</label>
+        <label style={styles.inputLabel}>Lease Term</label>
         <div style={styles.buttonGroup}>
           {terms.map((t) => (
             <button
@@ -44,20 +72,24 @@ const FinanceCalculator = ({
         </div>
       </div>
 
-      {/* APR */}
+      {/* Miles Per Year */}
       <div style={styles.inputGroup}>
-        <label style={styles.inputLabel}>Est. APR</label>
-        <div style={styles.sliderContainer}>
-          <input
-            type="range"
-            min={aprRange.min}
-            max={aprRange.max}
-            step={aprRange.step}
-            value={apr}
-            onChange={(e) => setApr(Number(e.target.value))}
-            style={styles.slider}
-          />
-          <span style={styles.sliderValue}>{apr.toFixed(1)}%</span>
+        <label style={styles.inputLabel}>Miles Per Year</label>
+        <div style={styles.buttonGroup}>
+          {milesOptions.map((m) => (
+            <button
+              key={m}
+              type="button"
+              style={{
+                ...styles.termButton,
+                background: miles === m ? '#22c55e' : 'transparent',
+                borderColor: miles === m ? '#22c55e' : 'rgba(255,255,255,0.2)',
+              }}
+              onClick={() => setMiles(m)}
+            >
+              {(m / 1000)}K
+            </button>
+          ))}
         </div>
       </div>
 
@@ -71,14 +103,14 @@ const FinanceCalculator = ({
             max={downRange.max}
             step={downRange.step}
             value={down}
-            onChange={(e) => setDown(Number(e.target.value))}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDown(Number(e.target.value))}
             style={styles.slider}
           />
           <span style={styles.sliderValue}>${down.toLocaleString()}</span>
         </div>
       </div>
 
-      {/* Finance Results */}
+      {/* Lease Results */}
       <div style={styles.resultsSection}>
         <div style={styles.mainPayment}>
           <span style={styles.paymentLabel}>Monthly Payment</span>
@@ -88,28 +120,32 @@ const FinanceCalculator = ({
 
         <div style={styles.resultDetails}>
           <div style={styles.resultRow}>
-            <span>Total Interest</span>
-            <span>${calc.totalInterest.toLocaleString()}</span>
+            <span>Due at Signing</span>
+            <span>${calc.dueAtSigning.toLocaleString()}</span>
           </div>
           <div style={styles.resultRow}>
-            <span>Total Cost</span>
+            <span>Residual Value</span>
+            <span>${calc.residual.toLocaleString()}</span>
+          </div>
+          <div style={styles.resultRow}>
+            <span>Total Lease Cost</span>
             <span>${calc.totalCost.toLocaleString()}</span>
           </div>
         </div>
       </div>
 
-      <button 
+      <button
         type="button"
         style={styles.selectButton}
         onClick={onSelect}
       >
-        Select Finance
+        Select Lease
       </button>
     </div>
   );
 };
 
-const styles = {
+const styles: StyleObject = {
   calculatorCard: {
     padding: '24px',
     background: 'rgba(255,255,255,0.05)',
@@ -231,4 +267,4 @@ const styles = {
   },
 };
 
-export default FinanceCalculator;
+export default LeaseCalculator;

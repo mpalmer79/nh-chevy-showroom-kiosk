@@ -1,5 +1,7 @@
+import { GMColor } from '../types';
+
 // GM Official Color Library by Model (2025 Model Year)
-const GM_COLORS = {
+const GM_COLORS: Record<string, GMColor[]> = {
   'Silverado 1500': [
     { name: 'Summit White', code: 'GAZ', hex: '#f5f5f5', premium: false },
     { name: 'Black', code: 'GBA', hex: '#1a1a1a', premium: false },

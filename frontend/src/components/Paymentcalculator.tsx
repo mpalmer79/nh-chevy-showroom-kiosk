@@ -1,6 +1,20 @@
 import React, { useState } from 'react';
+import { KioskComponentProps, StyleObject } from '../types';
 
-const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => {
+interface LeaseCalcResult {
+  monthly: number;
+  dueAtSigning: number;
+  totalCost: number;
+  residual: number;
+}
+
+interface FinanceCalcResult {
+  monthly: number;
+  totalCost: number;
+  totalInterest: number;
+}
+
+const PaymentCalculator: React.FC<KioskComponentProps> = ({ navigateTo, updateCustomerData, customerData }) => {
   const vehicle = customerData.selectedVehicle || {
     salePrice: 47495,
     msrp: 52995,
@@ -9,33 +23,35 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
   };
 
   // Lease State
-  const [leaseTerm, setLeaseTerm] = useState(39);
-  const [leaseMiles, setLeaseMiles] = useState(12000);
-  const [leaseDown, setLeaseDown] = useState(3000);
+  const [leaseTerm, setLeaseTerm] = useState<number>(39);
+  const [leaseMiles, setLeaseMiles] = useState<number>(12000);
+  const [leaseDown, setLeaseDown] = useState<number>(3000);
 
   // Finance State
-  const [financeTerm, setFinanceTerm] = useState(72);
-  const [financeDown, setFinanceDown] = useState(3000);
-  const [apr, setApr] = useState(6.9);
+  const [financeTerm, setFinanceTerm] = useState<number>(72);
+  const [financeDown, setFinanceDown] = useState<number>(3000);
+  const [apr, setApr] = useState<number>(6.9);
 
   // Trade-in (read-only from customerData)
   const tradeValue = customerData.tradeIn?.estimatedValue || 0;
   const tradeOwed = customerData.tradeIn?.amountOwed || 0;
 
   // Calculate Lease Payment
-  const calculateLease = () => {
-    const capitalizedCost = vehicle.salePrice - leaseDown - Math.max(0, tradeValue - tradeOwed);
+  const calculateLease = (): LeaseCalcResult => {
+    const salePrice = vehicle.salePrice || vehicle.price || 47495;
+    const msrp = vehicle.msrp || salePrice;
+    const capitalizedCost = salePrice - leaseDown - Math.max(0, tradeValue - tradeOwed);
     const residualPercent = leaseTerm === 24 ? 0.72 : leaseTerm === 36 ? 0.65 : 0.58;
-    const residualValue = vehicle.msrp * residualPercent;
+    const residualValue = msrp * residualPercent;
     const moneyFactor = 0.00125; // ~3% APR equivalent
-    
+
     const depreciation = (capitalizedCost - residualValue) / leaseTerm;
     const rentCharge = (capitalizedCost + residualValue) * moneyFactor;
     const monthlyPayment = depreciation + rentCharge;
-    
+
     const taxRate = 0.0625; // MA sales tax
     const monthlyWithTax = monthlyPayment * (1 + taxRate);
-    
+
     return {
       monthly: Math.round(monthlyWithTax),
       dueAtSigning: leaseDown + Math.round(monthlyWithTax) + 895, // first payment + acq fee
@@ -45,19 +61,20 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
   };
 
   // Calculate Finance Payment
-  const calculateFinance = () => {
-    const principal = vehicle.salePrice - financeDown - Math.max(0, tradeValue - tradeOwed);
+  const calculateFinance = (): FinanceCalcResult => {
+    const salePrice = vehicle.salePrice || vehicle.price || 47495;
+    const principal = salePrice - financeDown - Math.max(0, tradeValue - tradeOwed);
     const taxRate = 0.0625;
-    const taxAmount = vehicle.salePrice * taxRate;
+    const taxAmount = salePrice * taxRate;
     const totalPrincipal = principal + taxAmount;
-    
+
     const monthlyRate = apr / 100 / 12;
-    const payment = totalPrincipal * (monthlyRate * Math.pow(1 + monthlyRate, financeTerm)) / 
+    const payment = totalPrincipal * (monthlyRate * Math.pow(1 + monthlyRate, financeTerm)) /
                    (Math.pow(1 + monthlyRate, financeTerm) - 1);
-    
+
     const totalCost = payment * financeTerm + financeDown;
-    const totalInterest = totalCost - vehicle.salePrice - taxAmount;
-    
+    const totalInterest = totalCost - salePrice - taxAmount;
+
     return {
       monthly: Math.round(payment),
       totalCost: Math.round(totalCost),
@@ -69,17 +86,19 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
   const financeCalc = calculateFinance();
   const monthlyDifference = financeCalc.monthly - leaseCalc.monthly;
 
-  const handleApplyDeal = (type) => {
-    const paymentData = type === 'lease' 
-      ? { type: 'lease', ...leaseCalc, term: leaseTerm, milesPerYear: leaseMiles, downPayment: leaseDown }
-      : { type: 'finance', ...financeCalc, term: financeTerm, apr, downPayment: financeDown };
-    
-    updateCustomerData({ 
+  const handleApplyDeal = (type: 'lease' | 'finance'): void => {
+    const paymentData = type === 'lease'
+      ? { type: 'lease' as const, ...leaseCalc, term: leaseTerm, milesPerYear: leaseMiles, downPayment: leaseDown }
+      : { type: 'finance' as const, ...financeCalc, term: financeTerm, apr, downPayment: financeDown };
+
+    updateCustomerData({
       paymentPreference: paymentData,
-      tradeIn: tradeValue > 0 ? { estimatedValue: tradeValue, amountOwed: tradeOwed } : null,
+      tradeIn: tradeValue > 0 ? { estimatedValue: tradeValue, amountOwed: tradeOwed } : undefined,
     });
     navigateTo('handoff');
   };
+
+  const vehicleSalePrice = vehicle.salePrice || vehicle.price || 47495;
 
   return (
     <div style={styles.container}>
@@ -95,7 +114,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
       <div style={styles.header}>
         <h1 style={styles.title}>Payment Calculator</h1>
         <p style={styles.subtitle}>
-          {vehicle.year} {vehicle.model} • ${vehicle.salePrice.toLocaleString()}
+          {vehicle.year} {vehicle.model} &bull; ${vehicleSalePrice.toLocaleString()}
         </p>
       </div>
 
@@ -111,7 +130,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
               </span>
             </div>
           </div>
-          <button 
+          <button
             style={styles.editTradeButton}
             onClick={() => navigateTo('tradeIn')}
           >
@@ -182,7 +201,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
                 max={10000}
                 step={500}
                 value={leaseDown}
-                onChange={(e) => setLeaseDown(Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLeaseDown(Number(e.target.value))}
                 style={styles.slider}
               />
               <span style={styles.sliderValue}>${leaseDown.toLocaleString()}</span>
@@ -213,7 +232,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
             </div>
           </div>
 
-          <button 
+          <button
             style={styles.selectButton}
             onClick={() => handleApplyDeal('lease')}
           >
@@ -261,7 +280,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
                 max={12.9}
                 step={0.1}
                 value={apr}
-                onChange={(e) => setApr(Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApr(Number(e.target.value))}
                 style={styles.slider}
               />
               <span style={styles.sliderValue}>{apr.toFixed(1)}%</span>
@@ -278,7 +297,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
                 max={15000}
                 step={500}
                 value={financeDown}
-                onChange={(e) => setFinanceDown(Number(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFinanceDown(Number(e.target.value))}
                 style={styles.slider}
               />
               <span style={styles.sliderValue}>${financeDown.toLocaleString()}</span>
@@ -309,7 +328,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
             </div>
           </div>
 
-          <button 
+          <button
             style={styles.selectButton}
             onClick={() => handleApplyDeal('finance')}
           >
@@ -329,7 +348,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
 
       {/* Trade-In CTA */}
       {!tradeValue && (
-        <button 
+        <button
           style={styles.tradeInCTA}
           onClick={() => navigateTo('tradeIn')}
         >
@@ -365,7 +384,7 @@ const PaymentCalculator = ({ navigateTo, updateCustomerData, customerData }) => 
   );
 };
 
-const styles = {
+const styles: StyleObject = {
   container: {
     flex: 1,
     padding: '24px 40px',

@@ -5,35 +5,37 @@ import '@testing-library/jest-dom';
 // =============================================================================
 
 // Mock scrollTo
-window.scrollTo = jest.fn();
+window.scrollTo = jest.fn() as unknown as typeof window.scrollTo;
 
 // Mock scrollIntoView
 Element.prototype.scrollIntoView = jest.fn();
 
 // Mock IntersectionObserver
 class MockIntersectionObserver {
-  constructor(callback) {
+  callback: IntersectionObserverCallback;
+  constructor(callback: IntersectionObserverCallback) {
     this.callback = callback;
   }
   observe() { return null; }
   unobserve() { return null; }
   disconnect() { return null; }
 }
-window.IntersectionObserver = MockIntersectionObserver;
+window.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
 
 // Mock ResizeObserver
 class MockResizeObserver {
-  constructor(callback) {
+  callback: ResizeObserverCallback;
+  constructor(callback: ResizeObserverCallback) {
     this.callback = callback;
   }
   observe() { return null; }
   unobserve() { return null; }
   disconnect() { return null; }
 }
-window.ResizeObserver = MockResizeObserver;
+window.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
 // Mock matchMedia
-window.matchMedia = window.matchMedia || function(query) {
+window.matchMedia = window.matchMedia || function(query: string) {
   return {
     matches: false,
     media: query,
@@ -43,7 +45,7 @@ window.matchMedia = window.matchMedia || function(query) {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
-  };
+  } as unknown as MediaQueryList;
 };
 
 // Mock HTMLMediaElement methods (for video/audio elements in tests)
@@ -88,8 +90,18 @@ Object.defineProperty(window, 'speechSynthesis', {
 
 // Mock SpeechSynthesisUtterance
 class MockSpeechSynthesisUtterance {
-  constructor(text) {
-    this.text = text;
+  text: string;
+  lang: string;
+  voice: SpeechSynthesisVoice | null;
+  volume: number;
+  rate: number;
+  pitch: number;
+  onend: ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void) | null;
+  onerror: ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisErrorEvent) => void) | null;
+  onstart: ((this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void) | null;
+  
+  constructor(text?: string) {
+    this.text = text || '';
     this.lang = 'en-US';
     this.voice = null;
     this.volume = 1;
@@ -101,14 +113,18 @@ class MockSpeechSynthesisUtterance {
   }
 }
 
-window.SpeechSynthesisUtterance = MockSpeechSynthesisUtterance;
+window.SpeechSynthesisUtterance = MockSpeechSynthesisUtterance as unknown as typeof SpeechSynthesisUtterance;
 
 // =============================================================================
 // FETCH MOCK HELPER
 // =============================================================================
 
+declare global {
+  function createMockResponse(data: unknown, status?: number): Promise<Partial<Response>>;
+}
+
 // Helper to create mock fetch responses
-global.createMockResponse = (data, status = 200) => {
+(global as Record<string, unknown>).createMockResponse = (data: unknown, status = 200) => {
   return Promise.resolve({
     ok: status >= 200 && status < 300,
     status,
@@ -125,7 +141,7 @@ global.createMockResponse = (data, status = 200) => {
 // Suppress console.error for expected errors in tests
 const originalError = console.error;
 beforeAll(() => {
-  console.error = (...args) => {
+  console.error = (...args: unknown[]) => {
     // Filter out React act() warnings and expected test errors
     const message = typeof args[0] === 'string' ? args[0] : JSON.stringify(args[0]);
     if (
