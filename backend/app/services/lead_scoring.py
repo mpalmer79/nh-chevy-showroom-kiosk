@@ -2,6 +2,27 @@
 Lead Scoring Service
 Calculates lead quality scores based on conversation signals and worksheet engagement.
 Used by worksheet service and sales manager dashboard.
+
+Scoring Overview
+================
+Each lead is scored on a 0-100 scale across five categories:
+
+- **Engagement Signals** (0-25 pts): Message count and session duration.
+- **Qualification Signals** (0-35 pts): Budget, down payment, trade-in info.
+- **Contact Information** (0-20 pts): Phone, email, name captured.
+- **Intent Signals** (0-20 pts): AI-detected interest level, test drive
+  or appraisal requests, financing/warranty questions.
+- **Worksheet Engagement** (0-20 bonus pts): Worksheet created, adjusted,
+  or marked "I'm Ready".
+
+Scores are capped at 100. They map to three tiers:
+
+- **HOT** (70+): Approach immediately, customer is ready to deal.
+- **WARM** (40-69): Follow up within 5 minutes, qualified buyer.
+- **COLD** (0-39): Monitor, still in discovery phase.
+
+The ``LeadScorer`` is instantiated as a singleton via ``get_lead_scorer()``.
+It is stateless -- all scoring inputs are passed as arguments.
 """
 
 from dataclasses import dataclass, field
@@ -21,7 +42,20 @@ class LeadTier(str, Enum):
 
 @dataclass
 class LeadScore:
-    """Complete lead score breakdown"""
+    """
+    Complete lead score breakdown.
+
+    Attributes:
+        total: Composite score (0-100, capped).
+        tier: Derived tier (HOT / WARM / COLD).
+        factors: Dict mapping factor name -> points awarded. Only factors
+                 that contributed points are included. Use
+                 ``get_scoring_factors_description()`` for human-readable
+                 descriptions.
+        recommended_action: Human-readable action string for the dashboard.
+        priority_rank: Rank among active leads (1 = highest). Assigned by
+                       ``calculate_priority_rank()`` after scoring a batch.
+    """
     total: int
     tier: LeadTier
     factors: Dict[str, int] = field(default_factory=dict)
@@ -59,43 +93,47 @@ class LeadScorer:
     HOT_THRESHOLD = 70
     WARM_THRESHOLD = 40
     
-    # Scoring weights
+    # Scoring weights -- each key maps to a point value.
+    # Points within a category are additive (e.g., has_down_payment + strong_down_payment).
+    # The total across all factors is capped at 100.
     WEIGHTS = {
-        # Engagement signals
-        "high_engagement": 15,      # 15+ messages
-        "medium_engagement": 10,    # 8-14 messages
-        "some_engagement": 5,       # 3-7 messages
-        "long_session": 10,         # 10+ minutes
-        "medium_session": 5,        # 5-10 minutes
-        "specific_vehicle_interest": 5,  # Asked about specific vehicle
-        
-        # Qualification signals
-        "budget_qualified": 15,     # Has budget info
-        "has_down_payment": 10,     # Any down payment
-        "strong_down_payment": 10,  # $10k+ down
-        "very_strong_down": 5,      # $20k+ down (bonus)
-        "has_trade": 10,            # Has trade-in
-        "knows_payoff": 5,          # Knows trade payoff
-        "trade_appraised": 5,       # Trade already appraised
-        
-        # Contact information
-        "has_phone": 15,            # Can follow up
-        "has_email": 5,             # Secondary contact
-        "has_name": 5,              # Personalization
-        
-        # Intent signals
-        "high_interest": 15,        # AI detected high interest
-        "medium_interest": 5,       # AI detected medium interest
+        # --- Engagement signals (max ~25 pts) ---
+        # Only ONE of high/medium/some engagement is awarded per lead.
+        "high_engagement": 15,      # 15+ messages exchanged
+        "medium_engagement": 10,    # 8-14 messages exchanged
+        "some_engagement": 5,       # 3-7 messages exchanged
+        "long_session": 10,         # Session lasted 10+ minutes
+        "medium_session": 5,        # Session lasted 5-10 minutes
+        "specific_vehicle_interest": 5,  # Asked about a specific vehicle
+
+        # --- Qualification signals (max ~35 pts) ---
+        "budget_qualified": 15,     # Revealed budget or monthly payment target
+        "has_down_payment": 10,     # Any down payment mentioned
+        "strong_down_payment": 10,  # $10k+ down payment (stacks with has_down_payment)
+        "very_strong_down": 5,      # $20k+ down payment (stacks further)
+        "has_trade": 10,            # Has a vehicle to trade in
+        "knows_payoff": 5,          # Knows their trade payoff amount
+        "trade_appraised": 5,       # Trade has been appraised (from worksheet)
+
+        # --- Contact information (max 20 pts) ---
+        "has_phone": 15,            # Phone number captured -- highest weight
+        "has_email": 5,             # Email captured
+        "has_name": 5,              # Customer name captured
+
+        # --- Intent signals (max ~20 pts) ---
+        # Only ONE of high/medium interest is awarded.
+        "high_interest": 15,        # AI ConversationState.interest_level == HOT
+        "medium_interest": 5,       # AI ConversationState.interest_level == WARM
         "test_drive_requested": 10, # Strong buying signal
-        "appraisal_requested": 10,  # Ready to deal on trade
-        "asked_about_financing": 5, # Thinking seriously
-        "asked_about_warranty": 5,  # Post-purchase thinking
-        
-        # Worksheet engagement (bonus)
-        "worksheet_created": 10,    # Started deal process
-        "worksheet_adjustments": 5, # Engaged with numbers
-        "marked_ready": 20,         # Ready to deal!
-        "in_negotiation": 15,       # Active negotiation
+        "appraisal_requested": 10,  # Ready to deal on trade-in
+        "asked_about_financing": 5, # Mentioned financing/APR/loan keywords
+        "asked_about_warranty": 5,  # Mentioned warranty/protection keywords
+
+        # --- Worksheet engagement (bonus, max ~20 pts) ---
+        "worksheet_created": 10,    # Digital Worksheet was created
+        "worksheet_adjustments": 5, # Made 3+ adjustments to the worksheet
+        "marked_ready": 20,         # Clicked "I'm Ready" -- strongest signal
+        "in_negotiation": 15,       # Active negotiation with sales manager
     }
     
     def calculate_score(
@@ -105,15 +143,26 @@ class LeadScorer:
         conversation_history: Optional[List[Dict]] = None,
     ) -> LeadScore:
         """
-        Calculate comprehensive lead score.
-        
+        Calculate comprehensive lead score from all available data sources.
+
+        All three inputs are optional; the scorer extracts as much signal as
+        possible from whatever is provided. When the same signal appears in
+        multiple sources (e.g., down_payment in both ``state`` and
+        ``worksheet_data``), it is only counted once.
+
         Args:
-            state: ConversationState object
-            worksheet_data: Dict with worksheet fields
-            conversation_history: List of message dicts
-            
+            state: ``ConversationState`` object (from conversation_state.py).
+                   Provides engagement, qualification, contact, and intent
+                   signals.
+            worksheet_data: Dict with worksheet fields (from WorksheetService).
+                   Provides down_payment, trade-in, status, and adjustments.
+            conversation_history: List of ``{"role": "user"|"assistant",
+                   "content": str}`` dicts. Used as a fallback for engagement
+                   counting and keyword-based intent detection.
+
         Returns:
-            LeadScore with total, tier, factors breakdown
+            ``LeadScore`` with total (0-100), tier, factors breakdown, and
+            recommended action string.
         """
         factors: Dict[str, int] = {}
         

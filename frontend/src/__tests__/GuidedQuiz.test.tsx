@@ -1,6 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, RenderResult } from '@testing-library/react';
-import GuidedQuiz from '../components/Guidedquiz';
+import GuidedQuiz from '../components/GuidedQuiz';
 
 const mockNavigateTo = jest.fn();
 const mockUpdateCustomerData = jest.fn();

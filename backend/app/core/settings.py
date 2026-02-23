@@ -102,6 +102,15 @@ class Settings(BaseSettings):
     )
     sql_echo: bool = Field(default=False)
     
+    redis_url: Optional[str] = Field(
+        default=None,
+        description="Redis connection URL"
+    )
+
+    @property
+    def is_redis_configured(self) -> bool:
+        return bool(self.redis_url)
+
     @property
     def database_url_async(self) -> Optional[str]:
         """Convert DATABASE_URL to async-compatible format"""

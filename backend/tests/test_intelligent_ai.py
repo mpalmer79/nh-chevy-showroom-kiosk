@@ -23,6 +23,19 @@ from app.services.outcome_tracker import (
     ConversationOutcome,
     InteractionQuality,
 )
+from app.core import cache as cache_module
+
+
+@pytest.fixture(autouse=True)
+async def reset_cache_between_tests():
+    """Reset the global cache singleton between tests to prevent state leakage."""
+    if cache_module._cache_service is not None:
+        await cache_module._cache_service.shutdown()
+        cache_module._cache_service = None
+    yield
+    if cache_module._cache_service is not None:
+        await cache_module._cache_service.shutdown()
+        cache_module._cache_service = None
 
 
 # ---
@@ -94,156 +107,167 @@ SAMPLE_INVENTORY = [
 
 class TestConversationStateManager:
     """Tests for ConversationStateManager"""
-    
+
     @pytest.fixture
     def manager(self):
         return ConversationStateManager()
-    
-    def test_create_new_state(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_create_new_state(self, manager):
         """Test creating a new conversation state"""
-        state = manager.get_or_create_state("session-123", "John")
-        
+        state = await manager.get_or_create_state("session-123", "John")
+
         assert state.session_id == "session-123"
         assert state.customer_name == "John"
         assert state.stage == ConversationStage.GREETING
         assert state.interest_level == InterestLevel.COLD
         assert state.message_count == 0
-    
-    def test_get_existing_state(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_get_existing_state(self, manager):
         """Test retrieving existing state"""
-        manager.get_or_create_state("session-123", "John")
-        state = manager.get_or_create_state("session-123")
-        
+        await manager.get_or_create_state("session-123", "John")
+        state = await manager.get_or_create_state("session-123")
+
         assert state.customer_name == "John"
-    
-    def test_update_state_budget(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_update_state_budget(self, manager):
         """Test budget extraction from messages"""
-        state = manager.update_state(
+        state = await manager.update_state(
             session_id="session-123",
             user_message="I'm looking for something under $50,000",
             assistant_response="Great! We have many options in that range."
         )
-        
+
         assert state.budget_max == 50000
         assert state.message_count == 1
-    
-    def test_update_state_vehicle_type(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_update_state_vehicle_type(self, manager):
         """Test vehicle type preference extraction"""
-        state = manager.update_state(
+        state = await manager.update_state(
             session_id="session-123",
             user_message="I need a truck for towing my boat",
             assistant_response="Perfect! Our trucks have great towing capacity."
         )
-        
+
         assert "truck" in state.preferred_types
         assert "towing" in state.use_cases
-    
-    def test_update_state_trade_in(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_update_state_trade_in(self, manager):
         """Test trade-in info extraction"""
-        state = manager.update_state(
+        state = await manager.update_state(
             session_id="session-123",
             user_message="I'm trading in my 2019 Ford F-150, paying about $450/month",
             assistant_response="Got it! Let me factor that in."
         )
-        
+
         assert state.has_trade_in
         assert state.trade_year == 2019
         assert state.trade_make == "Ford"
         # Note: Monthly payment may be extracted as general budget monthly payment
         # The important thing is that trade-in was detected
         assert state.monthly_payment_target == 450 or state.trade_monthly_payment == 450
-    
-    def test_update_state_spouse_objection(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_update_state_spouse_objection(self, manager):
         """Test spouse objection detection"""
-        state = manager.update_state(
+        state = await manager.update_state(
             session_id="session-123",
             user_message="I need to talk to my wife first before deciding",
             assistant_response="I completely understand."
         )
-        
+
         assert state.needs_spouse_approval
         assert state.spouse_reference == "wife"
         assert len(state.objections) > 0
         assert state.objections[0].category == "spouse"
-    
-    def test_stage_progression(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_stage_progression(self, manager):
         """Test conversation stage progression"""
         # Greeting
-        state = manager.get_or_create_state("session-123")
+        state = await manager.get_or_create_state("session-123")
         assert state.stage == ConversationStage.GREETING
-        
+
         # Discovery
-        state = manager.update_state(
+        state = await manager.update_state(
             "session-123",
             "I'm looking for a family vehicle",
             "What size family?"
         )
         assert state.stage == ConversationStage.DISCOVERY
-        
+
         # Browsing
-        state = manager.update_state(
-            "session-123", 
+        state = await manager.update_state(
+            "session-123",
             "Show me what you have in SUVs",
             "Here are our SUVs..."
         )
         assert state.stage == ConversationStage.BROWSING
-    
-    def test_interest_level_updates(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_interest_level_updates(self, manager):
         """Test interest level detection"""
-        state = manager.update_state(
+        state = await manager.update_state(
             "session-123",
             "This is perfect! Exactly what I was looking for!",
             "Great! Shall I get the keys?"
         )
-        
+
         assert state.interest_level == InterestLevel.HOT
-    
-    def test_vehicle_discussion_tracking(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_vehicle_discussion_tracking(self, manager):
         """Test that discussed vehicles are tracked"""
         vehicles = [
             {"Stock Number": "M12345", "Model": "Silverado"},
             {"Stock Number": "M12346", "Model": "Equinox"},
         ]
-        
-        state = manager.update_state(
+
+        state = await manager.update_state(
             "session-123",
             "Tell me about those trucks",
             "Here are two options...",
             mentioned_vehicles=vehicles
         )
-        
+
         assert len(state.discussed_vehicles) == 2
         assert "M12345" in state.discussed_vehicles
         assert state.discussed_vehicles["M12345"].model == "Silverado"
-    
-    def test_mark_favorite(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_mark_favorite(self, manager):
         """Test marking vehicle as favorite"""
-        manager.get_or_create_state("session-123")
-        manager.update_state(
+        await manager.get_or_create_state("session-123")
+        await manager.update_state(
             "session-123",
             "Tell me about M12345",
             "Here's the Silverado...",
             mentioned_vehicles=[{"Stock Number": "M12345", "Model": "Silverado"}]
         )
-        
+
         manager.mark_vehicle_favorite("session-123", "M12345")
         state = manager.get_state("session-123")
-        
+
         assert state.discussed_vehicles["M12345"].is_favorite
         assert "M12345" in state.favorite_vehicles
-    
-    def test_context_summary(self, manager):
+
+    @pytest.mark.asyncio
+    async def test_context_summary(self, manager):
         """Test context summary generation"""
-        state = manager.get_or_create_state("session-123", "John")
+        state = await manager.get_or_create_state("session-123", "John")
         state.budget_max = 50000
         state.preferred_types.add("truck")
         state.use_cases.add("towing")
         state.has_trade_in = True
         state.trade_year = 2019
         state.trade_make = "Ford"
-        
+
         summary = state.to_context_summary()
-        
+
         assert "John" in summary
         assert "50,000" in summary
         assert "truck" in summary
@@ -526,7 +550,7 @@ class TestOutcomeTracker:
 
 class TestIntelligentAIIntegration:
     """Integration tests for the intelligent AI system"""
-    
+
     @pytest.fixture
     def setup_services(self):
         """Setup all services for integration testing"""
@@ -534,66 +558,67 @@ class TestIntelligentAIIntegration:
         retriever = SemanticVehicleRetriever()
         retriever.fit(SAMPLE_INVENTORY)
         outcome_tracker = OutcomeTracker(storage_path="/tmp/test_outcomes")
-        
+
         return state_manager, retriever, outcome_tracker
-    
-    def test_full_conversation_flow(self, setup_services):
+
+    @pytest.mark.asyncio
+    async def test_full_conversation_flow(self, setup_services):
         """Test a complete conversation flow"""
         state_manager, retriever, outcome_tracker = setup_services
         session_id = "integration-test"
-        
+
         # Turn 1: Initial greeting
-        state = state_manager.get_or_create_state(session_id, "Mike")
+        state = await state_manager.get_or_create_state(session_id, "Mike")
         assert state.stage == ConversationStage.GREETING
-        
+
         # Turn 2: Customer states need
-        state = state_manager.update_state(
+        state = await state_manager.update_state(
             session_id,
             "I'm looking for a truck to tow my boat, around $50k",
             "Great! Let me find some trucks in that range."
         )
-        
+
         # Budget extraction creates a range around stated price (typically ±15%)
         # So "around $50k" becomes roughly $42,500 - $57,500
         assert state.budget_max is not None
         assert 50000 <= state.budget_max <= 60000  # Allow for range expansion
         assert "truck" in state.preferred_types
         assert state.stage == ConversationStage.DISCOVERY
-        
+
         # Turn 3: Search inventory
         results = retriever.retrieve(
             "truck for towing",
             conversation_state=state
         )
-        
+
         assert len(results) > 0
-        
+
         # Update state with vehicles
-        state = state_manager.update_state(
+        state = await state_manager.update_state(
             session_id,
             "Tell me more about the first one",
             "Here's the Silverado...",
             mentioned_vehicles=[r.vehicle for r in results[:2]]
         )
-        
+
         assert len(state.discussed_vehicles) > 0
-        
+
         # Turn 4: Customer likes one
         state_manager.mark_vehicle_favorite(session_id, results[0].vehicle.get('Stock Number'))
-        state = state_manager.update_state(
+        state = await state_manager.update_state(
             session_id,
             "I love that one! Can I see it?",
             "Absolutely! Let me notify our team."
         )
-        
+
         state.test_drive_requested = True
-        
+
         # Interest level is WARM from "love" signal; HOT requires test_drive before update_state
         assert state.interest_level in [InterestLevel.WARM, InterestLevel.HOT]
-        
+
         # Finalize conversation
         record = outcome_tracker.finalize_conversation(state)
-        
+
         assert record.outcome == ConversationOutcome.TEST_DRIVE_SCHEDULED
         assert record.vehicles_discussed > 0
         assert record.favorites_count > 0

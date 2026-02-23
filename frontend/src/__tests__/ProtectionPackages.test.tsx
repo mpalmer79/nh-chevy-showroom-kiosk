@@ -1,6 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, RenderResult } from '@testing-library/react';
-import ProtectionPackages from '../components/Protectionpackages';
+import ProtectionPackages from '../components/ProtectionPackages';
 
 const mockNavigateTo = jest.fn();
 const mockUpdateCustomerData = jest.fn();
@@ -27,18 +26,17 @@ const defaultVehicle: MockVehicle = {
   gradient: 'linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%)',
 };
 
-interface CustomerData {
+interface MockCustomerData {
   selectedVehicle: MockVehicle;
-  customerName: string | null;
+  customerName?: string;
 }
 
-const defaultCustomerData: CustomerData = {
+const defaultCustomerData: MockCustomerData = {
   selectedVehicle: defaultVehicle,
-  customerName: null,
 };
 
 interface RenderProps {
-  customerData?: Partial<CustomerData>;
+  customerData?: Partial<MockCustomerData>;
 }
 
 const renderProtectionPackages = (props: RenderProps = {}): RenderResult => {

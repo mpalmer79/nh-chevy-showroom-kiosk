@@ -4,12 +4,11 @@
  * Tests navigation, browser history integration, customer data management, and screen transitions
  */
 
-import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import KioskApp from '../components/Kioskapp';
+import KioskApp from '../components/KioskApp';
 
 // Mock all child components to isolate KioskApp testing
-jest.mock('../components/Welcomescreen', () => {
+jest.mock('../components/WelcomeScreen', () => {
   return function MockWelcomeScreen({ navigateTo, updateCustomerData }: any) {
     return (
       <div data-testid="welcome-screen">
@@ -38,7 +37,7 @@ jest.mock('../components/ModelBudgetSelector', () => {
   };
 });
 
-jest.mock('../components/Inventoryresults', () => {
+jest.mock('../components/InventoryResults', () => {
   return function MockInventoryResults({ navigateTo, updateCustomerData }: any) {
     return (
       <div data-testid="inventory-screen">
@@ -63,7 +62,7 @@ jest.mock('../components/AIAssistant', () => {
   };
 });
 
-jest.mock('../components/Vehicledetail', () => {
+jest.mock('../components/VehicleDetail', () => {
   return function MockVehicleDetail({ navigateTo }: any) {
     return (
       <div data-testid="vehicle-detail-screen">
@@ -88,7 +87,7 @@ jest.mock('../components/TradeInEstimator', () => {
   };
 });
 
-jest.mock('../components/Paymentcalculator', () => {
+jest.mock('../components/PaymentCalculator', () => {
   return function MockPaymentCalculator({ navigateTo }: any) {
     return (
       <div data-testid="payment-screen">
@@ -99,7 +98,7 @@ jest.mock('../components/Paymentcalculator', () => {
   };
 });
 
-jest.mock('../components/Customerhandoff', () => {
+jest.mock('../components/CustomerHandoff', () => {
   return function MockCustomerHandoff({ navigateTo }: any) {
     return (
       <div data-testid="handoff-screen">
@@ -110,7 +109,7 @@ jest.mock('../components/Customerhandoff', () => {
   };
 });
 
-jest.mock('../components/Stocklookup', () => {
+jest.mock('../components/StockLookup', () => {
   return function MockStockLookup({ navigateTo }: any) {
     return (
       <div data-testid="stock-lookup-screen">
@@ -121,7 +120,7 @@ jest.mock('../components/Stocklookup', () => {
   };
 });
 
-jest.mock('../components/Trafficlog', () => {
+jest.mock('../components/TrafficLog', () => {
   return function MockTrafficLog({ navigateTo }: any) {
     return (
       <div data-testid="traffic-log-screen">
@@ -143,7 +142,7 @@ jest.mock('../components/SalesManagerDashboard', () => {
   };
 });
 
-jest.mock('../components/Guidedquiz', () => {
+jest.mock('../components/GuidedQuiz', () => {
   return function MockGuidedQuiz({ navigateTo }: any) {
     return (
       <div data-testid="guided-quiz-screen">

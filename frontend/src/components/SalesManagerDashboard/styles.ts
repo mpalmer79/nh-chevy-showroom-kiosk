@@ -3,13 +3,14 @@
  */
 
 import { CSSProperties } from 'react';
+import { colors, spacing, typography, borderRadius, shadows } from '../../styles/tokens';
 
 export const styles: Record<string, CSSProperties> = {
   // Layout
   container: {
     minHeight: '100vh',
     background: '#f5f7fa',
-    color: '#1a1a2e',
+    color: colors.dark,
     display: 'flex',
     flexDirection: 'column',
     fontFamily: '"Montserrat", sans-serif',
@@ -19,40 +20,40 @@ export const styles: Record<string, CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px 32px',
-    background: '#ffffff',
+    background: colors.white,
     borderBottom: '1px solid #e2e8f0',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    boxShadow: shadows.sm,
   },
   title: {
     fontSize: '24px',
-    fontWeight: 700,
-    color: '#1a1a2e',
+    fontWeight: typography.fontWeight.bold,
+    color: colors.dark,
     margin: 0,
   },
   headerControls: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: spacing.md,
   },
   mainContent: {
     flex: 1,
     display: 'grid',
     gridTemplateColumns: '320px 1fr',
-    gap: '24px',
+    gap: spacing.lg,
     padding: '24px 32px',
   },
-  
+
   // Tabs
   tabContainer: {
     display: 'flex',
-    gap: '4px',
-    marginRight: '16px',
+    gap: spacing.xs,
+    marginRight: spacing.md,
   },
   tabButton: {
-    padding: '8px 16px',
+    padding: `${spacing.sm} ${spacing.md}`,
     border: 'none',
     fontSize: '13px',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
     cursor: 'pointer',
   },
   tabButtonLeft: {
@@ -63,76 +64,76 @@ export const styles: Record<string, CSSProperties> = {
   },
   tabButtonActive: {
     background: '#10b981',
-    color: '#ffffff',
+    color: colors.white,
   },
   tabButtonInactive: {
     background: '#f1f5f9',
-    color: '#1a1a2e',
+    color: colors.dark,
   },
-  
+
   // Controls
   lastUpdate: {
     fontSize: '13px',
-    color: '#1a1a2e',
+    color: colors.dark,
   },
   autoRefreshLabel: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: spacing.sm,
     fontSize: '13px',
-    color: '#1a1a2e',
+    color: colors.dark,
     cursor: 'pointer',
   },
   checkbox: {
-    width: '16px',
-    height: '16px',
+    width: spacing.md,
+    height: spacing.md,
     cursor: 'pointer',
   },
   refreshBtn: {
-    padding: '8px 16px',
+    padding: `${spacing.sm} ${spacing.md}`,
     background: '#10b981',
     border: 'none',
     borderRadius: '6px',
-    color: '#ffffff',
+    color: colors.white,
     fontSize: '13px',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
     cursor: 'pointer',
   },
   backBtn: {
-    padding: '8px 16px',
+    padding: `${spacing.sm} ${spacing.md}`,
     background: '#3b4c6b',
     border: 'none',
     borderRadius: '6px',
-    color: '#ffffff',
+    color: colors.white,
     fontSize: '13px',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
     cursor: 'pointer',
   },
-  
+
   // Session List
   sessionList: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: spacing.md,
   },
   sessionListTitle: {
-    fontSize: '12px',
-    fontWeight: 700,
-    color: '#1a1a2e',
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.dark,
     textTransform: 'uppercase',
     letterSpacing: '1px',
     margin: 0,
   },
-  
+
   // Cards
   card: {
-    padding: '16px',
-    background: '#ffffff',
+    padding: spacing.md,
+    background: colors.white,
     border: '1px solid #e2e8f0',
-    borderRadius: '12px',
+    borderRadius: borderRadius.lg,
     cursor: 'pointer',
     transition: 'all 0.2s ease',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    boxShadow: shadows.sm,
   },
   cardActive: {
     background: '#f0fdf4',
@@ -142,49 +143,49 @@ export const styles: Record<string, CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '8px',
+    marginBottom: spacing.sm,
   },
   cardTitle: {
     fontSize: '15px',
-    fontWeight: 600,
-    color: '#1a1a2e',
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.dark,
   },
   cardMeta: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    gap: spacing.xs,
   },
   cardTime: {
-    fontSize: '12px',
+    fontSize: typography.fontSize.xs,
     color: '#64748b',
   },
   cardStep: {
-    fontSize: '12px',
+    fontSize: typography.fontSize.xs,
     color: '#64748b',
   },
   cardVehicle: {
-    fontSize: '12px',
+    fontSize: typography.fontSize.xs,
     color: '#10b981',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
   },
-  
+
   // Badges
   badge: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '4px',
+    gap: spacing.xs,
     padding: '2px 8px',
-    borderRadius: '4px',
+    borderRadius: borderRadius.sm,
     fontSize: '11px',
-    fontWeight: 700,
+    fontWeight: typography.fontWeight.bold,
   },
   badgeSmall: {
     padding: '2px 8px',
-    borderRadius: '4px',
+    borderRadius: borderRadius.sm,
     fontSize: '10px',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
   },
-  
+
   // States
   loadingState: {
     display: 'flex',
@@ -192,7 +193,7 @@ export const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: '40px 20px',
-    gap: '12px',
+    gap: spacing.md,
     color: '#64748b',
   },
   spinner: {
@@ -208,7 +209,7 @@ export const styles: Record<string, CSSProperties> = {
     flexDirection: 'column',
     alignItems: 'center',
     padding: '40px 20px',
-    gap: '12px',
+    gap: spacing.md,
     color: '#64748b',
   },
   emptyIcon: {
@@ -224,143 +225,143 @@ export const styles: Record<string, CSSProperties> = {
   },
   placeholderIcon: {
     fontSize: '64px',
-    marginBottom: '16px',
+    marginBottom: spacing.md,
   },
   placeholderTitle: {
     fontSize: '20px',
-    fontWeight: 600,
-    color: '#1a1a2e',
-    margin: '0 0 8px 0',
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.dark,
+    margin: `0 0 ${spacing.sm} 0`,
   },
   placeholderText: {
-    fontSize: '14px',
+    fontSize: typography.fontSize.sm,
     margin: 0,
   },
-  
+
   // Detail Panel
   detailPanel: {
     minHeight: '600px',
   },
-  
+
   // Worksheet
   worksheet: {
-    background: '#ffffff',
-    borderRadius: '16px',
+    background: colors.white,
+    borderRadius: borderRadius.xl,
     border: '1px solid #e2e8f0',
-    padding: '24px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    padding: spacing.lg,
+    boxShadow: shadows.sm,
   },
   worksheetHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '24px',
-    paddingBottom: '16px',
+    marginBottom: spacing.lg,
+    paddingBottom: spacing.md,
     borderBottom: '1px solid #e2e8f0',
   },
   worksheetTitle: {
     fontSize: '20px',
-    fontWeight: 700,
-    color: '#1a1a2e',
+    fontWeight: typography.fontWeight.bold,
+    color: colors.dark,
     margin: 0,
   },
   worksheetCustomer: {
-    fontSize: '14px',
+    fontSize: typography.fontSize.sm,
     color: '#64748b',
     margin: '4px 0 0 0',
   },
   worksheetActions: {
     display: 'flex',
-    gap: '8px',
+    gap: spacing.sm,
   },
   worksheetGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '20px',
-    marginBottom: '24px',
+    marginBottom: spacing.lg,
   },
-  
+
   // Sections
   section: {
-    background: '#f8fafc',
-    borderRadius: '12px',
+    background: colors.bgSecondary,
+    borderRadius: borderRadius.lg,
     border: '1px solid #e2e8f0',
     padding: '20px',
   },
   sectionTitle: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '12px',
-    fontWeight: 700,
-    color: '#1a1a2e',
+    gap: spacing.sm,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.dark,
     textTransform: 'uppercase',
     letterSpacing: '1px',
-    margin: '0 0 16px 0',
+    margin: `0 0 ${spacing.md} 0`,
   },
   sectionIcon: {
-    fontSize: '16px',
+    fontSize: typography.fontSize.base,
   },
   sectionContent: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: spacing.md,
   },
-  
+
   // Form Elements
   editableRow: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    gap: spacing.xs,
   },
   editableLabel: {
-    fontSize: '12px',
+    fontSize: typography.fontSize.xs,
     color: '#64748b',
   },
   editableInput: {
     padding: '10px 12px',
-    background: '#ffffff',
+    background: colors.white,
     border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    color: '#1a1a2e',
-    fontSize: '16px',
-    fontWeight: 600,
+    borderRadius: borderRadius.md,
+    color: colors.dark,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.semibold,
     width: '100%',
     boxSizing: 'border-box',
   },
-  
+
   // Price Rows
   priceRow: {
     display: 'flex',
     justifyContent: 'space-between',
-    fontSize: '14px',
-    color: '#1a1a2e',
+    fontSize: typography.fontSize.sm,
+    color: colors.dark,
   },
   equityRow: {
     display: 'flex',
     justifyContent: 'space-between',
     fontSize: '15px',
-    fontWeight: 600,
-    paddingTop: '12px',
+    fontWeight: typography.fontWeight.semibold,
+    paddingTop: spacing.md,
     borderTop: '1px solid #e2e8f0',
-    marginTop: '8px',
+    marginTop: spacing.sm,
   },
   positiveValue: {
     color: '#10b981',
   },
   negativeValue: {
-    color: '#ef4444',
+    color: colors.error,
   },
-  
+
   // Buttons
   actionBtn: {
     padding: '8px 14px',
-    background: '#f8fafc',
+    background: colors.bgSecondary,
     border: '1px solid #e2e8f0',
     borderRadius: '6px',
-    color: '#1a1a2e',
+    color: colors.dark,
     fontSize: '13px',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
     cursor: 'pointer',
   },
   actionBtnPrimary: {
@@ -368,19 +369,19 @@ export const styles: Record<string, CSSProperties> = {
     background: '#10b981',
     border: 'none',
     borderRadius: '6px',
-    color: '#ffffff',
+    color: colors.white,
     fontSize: '13px',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
     cursor: 'pointer',
   },
   actionBtnBlue: {
     padding: '8px 14px',
-    background: '#3b82f6',
+    background: colors.info,
     border: 'none',
     borderRadius: '6px',
-    color: '#ffffff',
+    color: colors.white,
     fontSize: '13px',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
     cursor: 'pointer',
   },
   viewChatBtn: {
@@ -388,27 +389,27 @@ export const styles: Record<string, CSSProperties> = {
     background: '#eff6ff',
     border: '1px solid #bfdbfe',
     borderRadius: '6px',
-    color: '#3b82f6',
+    color: colors.info,
     fontSize: '13px',
-    fontWeight: 600,
+    fontWeight: typography.fontWeight.semibold,
     cursor: 'pointer',
   },
-  
+
   // Payment
   paymentToggle: {
     display: 'flex',
-    gap: '8px',
-    marginBottom: '16px',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   toggleBtn: {
     flex: 1,
     padding: '10px',
-    background: '#f8fafc',
+    background: colors.bgSecondary,
     border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    color: '#1a1a2e',
-    fontSize: '14px',
-    fontWeight: 600,
+    borderRadius: borderRadius.md,
+    color: colors.dark,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.semibold,
     cursor: 'pointer',
   },
   toggleBtnActive: {
@@ -423,11 +424,11 @@ export const styles: Record<string, CSSProperties> = {
   },
   termBtn: {
     flex: 1,
-    padding: '8px',
-    background: '#f8fafc',
+    padding: spacing.sm,
+    background: colors.bgSecondary,
     border: '1px solid #e2e8f0',
     borderRadius: '6px',
-    color: '#1a1a2e',
+    color: colors.dark,
     fontSize: '13px',
     cursor: 'pointer',
   },
@@ -438,22 +439,22 @@ export const styles: Record<string, CSSProperties> = {
   },
   paymentResult: {
     textAlign: 'center',
-    padding: '16px',
+    padding: spacing.md,
     background: '#f0fdf4',
-    borderRadius: '12px',
-    marginBottom: '12px',
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.md,
     border: '1px solid #bbf7d0',
   },
   paymentLabel: {
     display: 'block',
-    fontSize: '12px',
+    fontSize: typography.fontSize.xs,
     color: '#64748b',
     textTransform: 'uppercase',
   },
   paymentAmount: {
     display: 'block',
     fontSize: '32px',
-    fontWeight: 700,
+    fontWeight: typography.fontWeight.bold,
     color: '#10b981',
     margin: '4px 0',
   },
@@ -462,18 +463,18 @@ export const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     color: '#64748b',
   },
-  
+
   // Deal Summary
   dealSummary: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '16px',
+    gap: spacing.md,
     padding: '20px',
     background: '#f0fdf4',
-    borderRadius: '12px',
+    borderRadius: borderRadius.lg,
     border: '1px solid #bbf7d0',
-    marginBottom: '24px',
+    marginBottom: spacing.lg,
     flexWrap: 'wrap',
   },
   summaryItem: {
@@ -487,13 +488,13 @@ export const styles: Record<string, CSSProperties> = {
     textTransform: 'uppercase',
   },
   summaryValue: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#1a1a2e',
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.dark,
   },
   summaryValueLarge: {
     fontSize: '20px',
-    fontWeight: 700,
+    fontWeight: typography.fontWeight.bold,
     color: '#10b981',
   },
   summaryDivider: {
@@ -501,54 +502,54 @@ export const styles: Record<string, CSSProperties> = {
     color: '#cbd5e1',
     fontWeight: 300,
   },
-  
+
   // Notes
   notesBox: {
-    background: '#f8fafc',
-    borderRadius: '12px',
+    background: colors.bgSecondary,
+    borderRadius: borderRadius.lg,
     border: '1px solid #e2e8f0',
-    padding: '16px',
+    padding: spacing.md,
   },
   boxTitle: {
-    fontSize: '12px',
-    fontWeight: 700,
-    color: '#1a1a2e',
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.dark,
     textTransform: 'uppercase',
-    margin: '0 0 12px 0',
+    margin: `0 0 ${spacing.md} 0`,
   },
   notesTextarea: {
     width: '100%',
     minHeight: '80px',
-    padding: '12px',
-    background: '#ffffff',
+    padding: spacing.md,
+    background: colors.white,
     border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    color: '#1a1a2e',
+    borderRadius: borderRadius.md,
+    color: colors.dark,
     fontSize: '13px',
     resize: 'vertical',
     boxSizing: 'border-box',
   },
-  
+
   // Chat
   chatPanel: {
-    background: '#ffffff',
-    borderRadius: '16px',
+    background: colors.white,
+    borderRadius: borderRadius.xl,
     border: '1px solid #e2e8f0',
     overflow: 'hidden',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    boxShadow: shadows.sm,
   },
   chatHeader: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
-    padding: '16px 20px',
+    gap: spacing.md,
+    padding: `${spacing.md} 20px`,
     borderBottom: '1px solid #e2e8f0',
-    background: '#f8fafc',
+    background: colors.bgSecondary,
   },
   chatTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#1a1a2e',
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.dark,
     margin: 0,
   },
   chatMessages: {
@@ -557,9 +558,9 @@ export const styles: Record<string, CSSProperties> = {
     overflowY: 'auto',
   },
   message: {
-    padding: '12px 16px',
-    borderRadius: '12px',
-    marginBottom: '12px',
+    padding: `${spacing.md} ${spacing.md}`,
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.md,
     maxWidth: '80%',
   },
   messageUser: {
@@ -568,22 +569,22 @@ export const styles: Record<string, CSSProperties> = {
     marginLeft: 'auto',
   },
   messageAssistant: {
-    background: '#f8fafc',
+    background: colors.bgSecondary,
     border: '1px solid #e2e8f0',
     marginRight: 'auto',
   },
   messageRole: {
     fontSize: '11px',
-    fontWeight: 700,
+    fontWeight: typography.fontWeight.bold,
     color: '#64748b',
     textTransform: 'uppercase',
     display: 'block',
-    marginBottom: '4px',
+    marginBottom: spacing.xs,
   },
   messageContent: {
-    fontSize: '14px',
+    fontSize: typography.fontSize.sm,
     lineHeight: 1.5,
     margin: 0,
-    color: '#1a1a2e',
+    color: colors.dark,
   },
 };

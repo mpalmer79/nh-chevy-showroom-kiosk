@@ -74,11 +74,11 @@ async def get_worksheet(worksheet_id: str):
         WorksheetResponse with worksheet details
     """
     service = get_worksheet_service()
-    worksheet = service.get_worksheet(worksheet_id)
-    
+    worksheet = await service.get_worksheet(worksheet_id)
+
     if not worksheet:
         raise HTTPException(status_code=404, detail="Worksheet not found")
-    
+
     return WorksheetResponse(
         success=True,
         worksheet=worksheet
@@ -199,11 +199,11 @@ async def send_worksheet(worksheet_id: str, request: WorksheetSendRequest):
         WorksheetResponse confirming send
     """
     service = get_worksheet_service()
-    worksheet = service.get_worksheet(worksheet_id)
-    
+    worksheet = await service.get_worksheet(worksheet_id)
+
     if not worksheet:
         raise HTTPException(status_code=404, detail="Worksheet not found")
-    
+
     if request.method not in ["sms", "email"]:
         raise HTTPException(
             status_code=400,
@@ -278,8 +278,8 @@ async def get_session_worksheets(session_id: str):
         WorksheetListResponse with all session worksheets
     """
     service = get_worksheet_service()
-    worksheets = service.get_session_worksheets(session_id)
-    
+    worksheets = await service.get_session_worksheets(session_id)
+
     return WorksheetListResponse(
         success=True,
         worksheets=worksheets,
@@ -556,7 +556,7 @@ async def worksheet_websocket(websocket: WebSocket, worksheet_id: str):
     try:
         # Send current worksheet state
         service = get_worksheet_service()
-        worksheet = service.get_worksheet(worksheet_id)
+        worksheet = await service.get_worksheet(worksheet_id)
         if worksheet:
             await websocket.send_json({
                 "type": "worksheet_updated",

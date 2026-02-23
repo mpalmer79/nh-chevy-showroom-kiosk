@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import VirtualTestDrive from '../components/VirtualTestDrive';
@@ -25,7 +24,7 @@ const mockCustomerData = {
   selectedVehicle: mockVehicle,
 };
 
-const renderVirtualTestDrive = (props = {}) => {
+const renderVirtualTestDrive = (props: { customerData?: Record<string, unknown> } = {}) => {
   return render(
     <VirtualTestDrive
       navigateTo={mockNavigateTo}

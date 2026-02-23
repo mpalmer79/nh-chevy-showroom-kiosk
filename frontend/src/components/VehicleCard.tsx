@@ -9,7 +9,7 @@ interface VehicleCardProps {
 }
 
 // Professional gradient backgrounds based on vehicle type
-const getVehicleGradient = (bodyStyle?: string, model?: string): string => {
+const getVehicleGradient = (_bodyStyle?: string, model?: string): string => {
   const modelLower = (model || '').toLowerCase();
   
   if (modelLower.includes('corvette')) {

@@ -14,6 +14,7 @@ export default defineConfig({
     baseURL: process.env.E2E_BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    viewport: { width: 1920, height: 1080 }, // Kiosk resolution
   },
 
   projects: [

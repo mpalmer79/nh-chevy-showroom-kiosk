@@ -57,3 +57,6 @@ lib64/
 .pytest_cache/
 htmlcov/
 .coverage
+
+# Test-generated data files
+backend/data/traffic_log.json

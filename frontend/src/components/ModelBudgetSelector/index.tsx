@@ -20,10 +20,10 @@ interface ModelBudgetSelectorProps extends KioskComponentProps {
   subRoute?: string; // e.g., "category", "model/trucks", "cab/silverado-1500"
 }
 
-const ModelBudgetSelector: React.FC<ModelBudgetSelectorProps> = ({ 
-  navigateTo, 
-  updateCustomerData, 
-  customerData,
+const ModelBudgetSelector: React.FC<ModelBudgetSelectorProps> = ({
+  navigateTo,
+  updateCustomerData,
+  customerData: _customerData,
   resetJourney,
   subRoute = 'category',
 }) => {

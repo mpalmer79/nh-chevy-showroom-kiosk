@@ -351,7 +351,7 @@ const AIAssistant: React.FC<KioskComponentProps> = ({
   };
 
   // Handle worksheet ready (customer clicked "I'm Ready")
-  const handleWorksheetReady = (worksheetId: string) => {
+  const handleWorksheetReady = (_worksheetId: string) => {
     // Add confirmation message to chat
     const confirmMessage: Message = {
       id: `worksheet-ready-${Date.now()}`,

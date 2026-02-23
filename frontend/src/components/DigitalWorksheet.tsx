@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import './DigitalWorksheet.css';
+import { worksheetStyles as ws } from './DigitalWorksheet.styles';
 
 // =============================================================================
 // TYPES
@@ -263,8 +264,8 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
 
   if (loading) {
     return (
-      <div className="worksheet-container worksheet-loading">
-        <div className="loading-spinner"></div>
+      <div className="worksheet-container" style={{ ...ws.container, ...ws.loadingError }}>
+        <div className="worksheet-spinner" style={ws.spinner}></div>
         <p>Loading your worksheet...</p>
       </div>
     );
@@ -272,11 +273,11 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
 
   if (error) {
     return (
-      <div className="worksheet-container worksheet-error">
-        <div className="error-icon">⚠️</div>
-        <h3>Something went wrong</h3>
-        <p>{error}</p>
-        <button onClick={fetchWorksheet} className="btn-retry">
+      <div className="worksheet-container" style={{ ...ws.container, ...ws.loadingError }}>
+        <div style={ws.errorIcon}>&#9888;&#65039;</div>
+        <h3 style={ws.errorTitle}>Something went wrong</h3>
+        <p style={ws.errorText}>{error}</p>
+        <button onClick={fetchWorksheet} style={ws.btnRetry}>
           Try Again
         </button>
       </div>
@@ -285,7 +286,7 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
 
   if (!worksheet) {
     return (
-      <div className="worksheet-container worksheet-error">
+      <div className="worksheet-container" style={{ ...ws.container, ...ws.loadingError }}>
         <p>Worksheet not found</p>
       </div>
     );
@@ -293,34 +294,34 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
 
   if (showConfirmation) {
     return (
-      <div className="worksheet-container worksheet-confirmation">
-        <div className="confirmation-content">
-          <div className="confirmation-icon">✅</div>
-          <h2>You're All Set!</h2>
-          <p>A sales manager has been notified and will be with you shortly.</p>
-          <div className="confirmation-summary">
-            <div className="summary-item">
-              <span className="label">Vehicle</span>
-              <span className="value">
+      <div className="worksheet-container" style={{ ...ws.container, ...ws.confirmationWrapper }}>
+        <div style={ws.confirmationContent}>
+          <div style={ws.confirmationIcon}>&#10004;&#65039;</div>
+          <h2 style={ws.confirmationTitle}>You're All Set!</h2>
+          <p style={ws.confirmationText}>A sales manager has been notified and will be with you shortly.</p>
+          <div style={ws.confirmationSummary}>
+            <div style={ws.summaryItem}>
+              <span style={ws.summaryItemLabel}>Vehicle</span>
+              <span style={ws.summaryItemValue}>
                 {worksheet.vehicle.year} {worksheet.vehicle.model} {worksheet.vehicle.trim}
               </span>
             </div>
-            <div className="summary-item">
-              <span className="label">Monthly Payment</span>
-              <span className="value highlight">
+            <div style={ws.summaryItem}>
+              <span style={ws.summaryItemLabel}>Monthly Payment</span>
+              <span style={ws.summaryItemValueHighlight}>
                 {formatCurrency(getSelectedTermOption()?.monthly_payment || worksheet.monthly_payment)}/mo
               </span>
             </div>
-            <div className="summary-item">
-              <span className="label">Due at Signing</span>
-              <span className="value">{formatCurrency(worksheet.total_due_at_signing)}</span>
+            <div style={ws.summaryItem}>
+              <span style={ws.summaryItemLabel}>Due at Signing</span>
+              <span style={ws.summaryItemValue}>{formatCurrency(worksheet.total_due_at_signing)}</span>
             </div>
           </div>
-          <p className="confirmation-note">
+          <p style={ws.confirmationNote}>
             Feel free to continue browsing while you wait!
           </p>
           {onClose && (
-            <button onClick={onClose} className="btn-continue">
+            <button onClick={onClose} className="btn-continue-ws" style={ws.btnContinue}>
               Continue Browsing
             </button>
           )}
@@ -332,38 +333,38 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
   const selectedOption = getSelectedTermOption();
 
   return (
-    <div className="worksheet-container">
+    <div className="worksheet-container worksheet-container-responsive" style={ws.container}>
       {/* Header */}
-      <div className="worksheet-header">
-        <h2>Digital Worksheet</h2>
-        <p className="worksheet-subtitle">
+      <div className="worksheet-header-responsive" style={ws.header}>
+        <h2 style={ws.headerTitle}>Digital Worksheet</h2>
+        <p style={ws.subtitle}>
           Adjust the numbers below to find the perfect payment for you
         </p>
         {onClose && (
-          <button className="btn-close" onClick={onClose} aria-label="Close">
-            ×
+          <button className="btn-close-ws" style={ws.btnClose} onClick={onClose} aria-label="Close">
+            &#215;
           </button>
         )}
       </div>
 
       {/* Vehicle Info */}
-      <div className="worksheet-section vehicle-section">
-        <div className="vehicle-info">
-          <h3>
+      <div className="vehicle-section-responsive" style={ws.vehicleSection}>
+        <div>
+          <h3 style={ws.vehicleInfoTitle}>
             {worksheet.vehicle.year} {worksheet.vehicle.make} {worksheet.vehicle.model}
             {worksheet.vehicle.trim && ` ${worksheet.vehicle.trim}`}
           </h3>
-          <p className="vehicle-details">
+          <p style={ws.vehicleDetails}>
             Stock #{worksheet.vehicle.stock_number}
-            {worksheet.vehicle.exterior_color && ` • ${worksheet.vehicle.exterior_color}`}
+            {worksheet.vehicle.exterior_color && ` \u2022 ${worksheet.vehicle.exterior_color}`}
           </p>
         </div>
-        <div className="vehicle-price">
-          <span className="price-label">Selling Price</span>
-          <span className="price-value">
+        <div className="vehicle-price-responsive" style={ws.vehiclePrice}>
+          <span style={ws.priceLabel}>Selling Price</span>
+          <span style={ws.priceValue}>
             {formatCurrency(worksheet.selling_price)}
             {worksheet.manager_adjustment && worksheet.manager_adjustment < 0 && (
-              <span className="price-discount">
+              <span style={ws.priceDiscount}>
                 Save {formatCurrency(Math.abs(worksheet.manager_adjustment))}!
               </span>
             )}
@@ -373,21 +374,24 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
 
       {/* Trade-In Section */}
       {worksheet.has_trade && worksheet.trade_in && (
-        <div className="worksheet-section trade-section">
-          <h4>Your Trade-In</h4>
-          <div className="trade-info">
-            <span className="trade-vehicle">
+        <div style={ws.tradeSection}>
+          <h4 style={ws.sectionTitle}>Your Trade-In</h4>
+          <div style={ws.tradeInfo}>
+            <span style={ws.tradeVehicle}>
               {worksheet.trade_in.year} {worksheet.trade_in.make} {worksheet.trade_in.model}
             </span>
-            <div className="trade-equity">
-              <span className="equity-label">Estimated Equity</span>
-              <span className={`equity-value ${worksheet.trade_equity >= 0 ? 'positive' : 'negative'}`}>
+            <div style={ws.tradeEquity}>
+              <span style={ws.equityLabel}>Estimated Equity</span>
+              <span style={{
+                ...ws.equityValue,
+                ...(worksheet.trade_equity >= 0 ? ws.equityPositive : ws.equityNegative),
+              }}>
                 {worksheet.trade_equity >= 0 ? '+' : ''}{formatCurrency(worksheet.trade_equity)}
               </span>
             </div>
           </div>
           {worksheet.trade_in.appraisal_status !== 'appraised' && (
-            <p className="trade-note">
+            <p style={ws.tradeNote}>
               * Final trade value pending professional appraisal
             </p>
           )}
@@ -395,16 +399,16 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
       )}
 
       {/* Down Payment Adjuster */}
-      <div className="worksheet-section downpayment-section">
-        <h4>Down Payment</h4>
-        <div className="downpayment-controls">
-          <div className="downpayment-input-group">
-            <span className="currency-symbol">$</span>
+      <div style={ws.section}>
+        <h4 style={ws.sectionTitle}>Down Payment</h4>
+        <div style={ws.downpaymentControls}>
+          <div className="downpayment-input-group" style={ws.downpaymentInputGroup}>
+            <span style={ws.currencySymbol}>$</span>
             <input
               type="text"
               value={downPayment.toLocaleString()}
               onChange={handleDownPaymentInput}
-              className="downpayment-input"
+              style={ws.downpaymentInput}
               aria-label="Down payment amount"
             />
           </div>
@@ -418,7 +422,7 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
             className="downpayment-slider"
             aria-label="Adjust down payment"
           />
-          <div className="slider-labels">
+          <div style={ws.sliderLabels}>
             <span>$0</span>
             <span>{formatCurrency(Math.min(worksheet.selling_price, 100000))}</span>
           </div>
@@ -426,110 +430,123 @@ const DigitalWorksheet: React.FC<DigitalWorksheetProps> = ({
       </div>
 
       {/* Term Options */}
-      <div className="worksheet-section terms-section">
-        <h4>Select Your Term</h4>
-        <div className="term-options">
+      <div style={ws.section}>
+        <h4 style={ws.sectionTitle}>Select Your Term</h4>
+        <div className="term-options-responsive" style={ws.termOptions}>
           {worksheet.term_options.map((option) => (
             <button
               key={option.term_months}
-              className={`term-option ${selectedTerm === option.term_months ? 'selected' : ''}`}
+              className="term-option-ws term-option-responsive"
+              style={{
+                ...ws.termOption,
+                ...(selectedTerm === option.term_months ? ws.termOptionSelected : {}),
+              }}
               onClick={() => handleTermSelect(option.term_months)}
               disabled={isUpdating}
             >
-              <span className="term-months">{option.term_months} mo</span>
-              <span className="term-payment">{formatCurrency(option.monthly_payment)}</span>
-              <span className="term-apr">{option.apr}% APR</span>
+              <span style={ws.termMonths}>{option.term_months} mo</span>
+              <span style={{
+                ...ws.termPayment,
+                ...(selectedTerm === option.term_months ? ws.termPaymentSelected : {}),
+              }}>
+                {formatCurrency(option.monthly_payment)}
+              </span>
+              <span style={ws.termApr}>{option.apr}% APR</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Payment Summary */}
-      <div className="worksheet-section summary-section">
-        <div className="payment-summary">
-          <div className="summary-row">
+      <div style={ws.summarySection}>
+        <div style={ws.paymentSummary}>
+          <div style={ws.summaryRow}>
             <span>Vehicle Price</span>
             <span>{formatCurrency(worksheet.selling_price)}</span>
           </div>
           {worksheet.trade_equity !== 0 && (
-            <div className="summary-row">
+            <div style={ws.summaryRow}>
               <span>Trade-In Equity</span>
-              <span className={worksheet.trade_equity >= 0 ? 'positive' : 'negative'}>
+              <span style={worksheet.trade_equity >= 0 ? ws.summaryPositive : ws.summaryNegative}>
                 {worksheet.trade_equity >= 0 ? '-' : '+'}{formatCurrency(Math.abs(worksheet.trade_equity))}
               </span>
             </div>
           )}
-          <div className="summary-row">
+          <div style={ws.summaryRow}>
             <span>Down Payment</span>
             <span>-{formatCurrency(downPayment)}</span>
           </div>
-          <div className="summary-row total">
+          <div style={{ ...ws.summaryRow, ...ws.summaryRowTotal }}>
             <span>Amount Financed</span>
             <span>{formatCurrency(worksheet.amount_financed)}</span>
           </div>
-          <div className="summary-divider"></div>
-          <div className="summary-row">
+          <div style={ws.summaryDivider}></div>
+          <div style={ws.summaryRow}>
             <span>Doc Fee</span>
             <span>{formatCurrency(worksheet.doc_fee)}</span>
           </div>
-          <div className="summary-row">
+          <div style={ws.summaryRow}>
             <span>Title Fee</span>
             <span>{formatCurrency(worksheet.title_fee)}</span>
           </div>
-          <div className="summary-row highlight">
+          <div style={{ ...ws.summaryRow, ...ws.summaryRowHighlight }}>
             <span>Due at Signing</span>
             <span>{formatCurrency(worksheet.total_due_at_signing)}</span>
           </div>
         </div>
 
         {/* Monthly Payment Highlight */}
-        <div className="monthly-highlight">
-          <span className="monthly-label">Your Monthly Payment</span>
-          <span className="monthly-amount">
+        <div style={ws.monthlyHighlight}>
+          <span style={ws.monthlyLabel}>Your Monthly Payment</span>
+          <span className="monthly-amount-responsive" style={ws.monthlyAmount}>
             {formatCurrency(selectedOption?.monthly_payment || worksheet.monthly_payment)}
-            <span className="per-month">/mo</span>
+            <span style={ws.perMonth}>/mo</span>
           </span>
           {selectedOption && (
-            <span className="monthly-details">
+            <span style={ws.monthlyDetails}>
               for {selectedOption.term_months} months @ {selectedOption.apr}% APR
             </span>
           )}
         </div>
 
-        <p className="tax-disclosure">
-          💡 New Hampshire has no sales tax on vehicles! Other states may add tax to your payment.
+        <p style={ws.taxDisclosure}>
+          New Hampshire has no sales tax on vehicles! Other states may add tax to your payment.
         </p>
       </div>
 
       {/* Counter Offer Banner */}
       {worksheet.counter_offer_sent && worksheet.manager_notes && (
-        <div className="counter-offer-banner">
-          <span className="counter-icon">💬</span>
-          <div className="counter-content">
-            <strong>Message from Sales Manager:</strong>
-            <p>{worksheet.manager_notes}</p>
+        <div style={ws.counterOfferBanner}>
+          <span style={ws.counterIcon}>&#128172;</span>
+          <div>
+            <strong style={ws.counterContentStrong}>Message from Sales Manager:</strong>
+            <p style={ws.counterContentText}>{worksheet.manager_notes}</p>
           </div>
         </div>
       )}
 
       {/* Action Buttons */}
-      <div className="worksheet-actions">
+      <div style={ws.worksheetActions}>
         <button
-          className="btn-ready"
+          className="btn-ready-ws btn-ready-responsive"
+          style={{
+            ...ws.btnReady,
+            ...((isUpdating || isReady) ? ws.btnReadyDisabled : {}),
+          }}
           onClick={markReady}
           disabled={isUpdating || isReady}
         >
           {isUpdating ? 'Please wait...' : isReady ? 'Manager Notified!' : "I'm Ready - Get a Manager"}
         </button>
-        <p className="action-note">
+        <p style={ws.actionNote}>
           A sales manager will come to finalize the details with you
         </p>
       </div>
 
       {/* Loading Overlay */}
       {isUpdating && (
-        <div className="updating-overlay">
-          <div className="updating-spinner"></div>
+        <div style={ws.updatingOverlay}>
+          <div className="worksheet-spinner" style={ws.spinner}></div>
         </div>
       )}
     </div>

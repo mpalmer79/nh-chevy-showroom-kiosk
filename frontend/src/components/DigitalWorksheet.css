@@ -1,232 +1,64 @@
 /**
- * Digital Worksheet Styles
- * Kiosk-optimized styling for the deal structuring interface
+ * Digital Worksheet — CSS-only features
+ * This minimal CSS file handles pseudo-classes, pseudo-elements,
+ * @keyframes, and @media queries that cannot be expressed as
+ * inline React CSSProperties. All other styles are in
+ * DigitalWorksheet.styles.ts using design tokens.
  */
 
-/* =============================================================================
-   CONTAINER & LAYOUT
-   ============================================================================= */
-
-.worksheet-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 24px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-  position: relative;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-}
-
+/* Global box-sizing for worksheet */
 .worksheet-container * {
   box-sizing: border-box;
 }
 
 /* =============================================================================
-   HEADER
+   ANIMATIONS
    ============================================================================= */
 
-.worksheet-header {
-  text-align: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e9ecef;
-  position: relative;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.worksheet-header h2 {
-  margin: 0 0 8px 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a2e;
+.worksheet-spinner {
+  animation: spin 1s linear infinite;
 }
 
-.worksheet-subtitle {
-  margin: 0;
-  font-size: 16px;
-  color: #6c757d;
-}
+/* =============================================================================
+   PSEUDO-CLASSES (hover, focus, active, disabled)
+   ============================================================================= */
 
-.btn-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: #f8f9fa;
-  border-radius: 50%;
-  font-size: 24px;
-  color: #6c757d;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.btn-close:hover {
+.btn-close-ws:hover {
   background: #e9ecef;
   color: #1a1a2e;
-}
-
-/* =============================================================================
-   SECTIONS
-   ============================================================================= */
-
-.worksheet-section {
-  margin-bottom: 24px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
-}
-
-.worksheet-section h4 {
-  margin: 0 0 16px 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #6c757d;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* =============================================================================
-   VEHICLE SECTION
-   ============================================================================= */
-
-.vehicle-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
-  color: white;
-}
-
-.vehicle-info h3 {
-  margin: 0 0 4px 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.vehicle-details {
-  margin: 0;
-  font-size: 14px;
-  opacity: 0.8;
-}
-
-.vehicle-price {
-  text-align: right;
-}
-
-.price-label {
-  display: block;
-  font-size: 12px;
-  opacity: 0.8;
-  margin-bottom: 4px;
-}
-
-.price-value {
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.price-discount {
-  display: block;
-  font-size: 12px;
-  color: #00bf63;
-  margin-top: 4px;
-}
-
-/* =============================================================================
-   TRADE-IN SECTION
-   ============================================================================= */
-
-.trade-section {
-  background: #fff3cd;
-  border: 1px solid #ffc107;
-}
-
-.trade-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.trade-vehicle {
-  font-weight: 500;
-  color: #1a1a2e;
-}
-
-.trade-equity {
-  text-align: right;
-}
-
-.equity-label {
-  display: block;
-  font-size: 12px;
-  color: #6c757d;
-}
-
-.equity-value {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.equity-value.positive {
-  color: #00bf63;
-}
-
-.equity-value.negative {
-  color: #e94560;
-}
-
-.trade-note {
-  margin: 12px 0 0 0;
-  font-size: 12px;
-  color: #856404;
-  font-style: italic;
-}
-
-/* =============================================================================
-   DOWN PAYMENT SECTION
-   ============================================================================= */
-
-.downpayment-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.downpayment-input-group {
-  display: flex;
-  align-items: center;
-  background: white;
-  border: 2px solid #dee2e6;
-  border-radius: 8px;
-  padding: 12px 16px;
-  transition: border-color 0.2s;
 }
 
 .downpayment-input-group:focus-within {
   border-color: #e94560;
 }
 
-.currency-symbol {
-  font-size: 24px;
-  font-weight: 600;
-  color: #6c757d;
-  margin-right: 8px;
+.term-option-ws:hover {
+  border-color: #e94560;
+  transform: translateY(-2px);
 }
 
-.downpayment-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a2e;
-  background: transparent;
+.btn-ready-ws:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
 }
+
+.btn-ready-ws:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-continue-ws:hover {
+  border-color: #1a1a2e;
+  background: #f8f9fa;
+}
+
+/* =============================================================================
+   SLIDER PSEUDO-ELEMENTS
+   ============================================================================= */
 
 .downpayment-slider {
   -webkit-appearance: none;
@@ -264,437 +96,46 @@
   box-shadow: 0 2px 8px rgba(233, 69, 96, 0.4);
 }
 
-.slider-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #6c757d;
-}
-
-/* =============================================================================
-   TERM OPTIONS
-   ============================================================================= */
-
-.term-options {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.term-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 12px;
-  background: white;
-  border: 2px solid #dee2e6;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.term-option:hover {
-  border-color: #e94560;
-  transform: translateY(-2px);
-}
-
-.term-option.selected {
-  border-color: #e94560;
-  background: linear-gradient(135deg, #fff5f7 0%, #ffffff 100%);
-  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.2);
-}
-
-.term-months {
-  font-size: 14px;
-  font-weight: 600;
-  color: #6c757d;
-  margin-bottom: 4px;
-}
-
-.term-payment {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1a1a2e;
-}
-
-.term-option.selected .term-payment {
-  color: #e94560;
-}
-
-.term-apr {
-  font-size: 12px;
-  color: #6c757d;
-  margin-top: 4px;
-}
-
-/* =============================================================================
-   SUMMARY SECTION
-   ============================================================================= */
-
-.summary-section {
-  background: white;
-  border: 1px solid #dee2e6;
-}
-
-.payment-summary {
-  margin-bottom: 20px;
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 14px;
-  color: #495057;
-}
-
-.summary-row.total {
-  font-weight: 600;
-  font-size: 16px;
-  color: #1a1a2e;
-  padding-top: 12px;
-}
-
-.summary-row.highlight {
-  font-weight: 700;
-  font-size: 16px;
-  color: #1a1a2e;
-  background: #f8f9fa;
-  margin: 0 -20px;
-  padding: 12px 20px;
-}
-
-.summary-row .positive {
-  color: #00bf63;
-}
-
-.summary-row .negative {
-  color: #e94560;
-}
-
-.summary-divider {
-  height: 1px;
-  background: #dee2e6;
-  margin: 12px 0;
-}
-
-/* =============================================================================
-   MONTHLY HIGHLIGHT
-   ============================================================================= */
-
-.monthly-highlight {
-  text-align: center;
-  padding: 24px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
-  border-radius: 12px;
-  color: white;
-  margin-bottom: 16px;
-}
-
-.monthly-label {
-  display: block;
-  font-size: 14px;
-  opacity: 0.8;
-  margin-bottom: 8px;
-}
-
-.monthly-amount {
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.per-month {
-  font-size: 20px;
-  font-weight: 400;
-  opacity: 0.8;
-}
-
-.monthly-details {
-  display: block;
-  font-size: 14px;
-  opacity: 0.7;
-  margin-top: 8px;
-}
-
-.tax-disclosure {
-  margin: 0;
-  font-size: 13px;
-  color: #6c757d;
-  text-align: center;
-}
-
-/* =============================================================================
-   COUNTER OFFER BANNER
-   ============================================================================= */
-
-.counter-offer-banner {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-  border: 1px solid #28a745;
-  border-radius: 12px;
-  margin-bottom: 24px;
-}
-
-.counter-icon {
-  font-size: 24px;
-}
-
-.counter-content strong {
-  display: block;
-  color: #155724;
-  margin-bottom: 4px;
-}
-
-.counter-content p {
-  margin: 0;
-  color: #155724;
-}
-
-/* =============================================================================
-   ACTION BUTTONS
-   ============================================================================= */
-
-.worksheet-actions {
-  text-align: center;
-}
-
-.btn-ready {
-  width: 100%;
-  padding: 20px 32px;
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
-  background: linear-gradient(135deg, #e94560 0%, #d63850 100%);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(233, 69, 96, 0.4);
-}
-
-.btn-ready:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
-}
-
-.btn-ready:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn-ready:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.action-note {
-  margin: 12px 0 0 0;
-  font-size: 14px;
-  color: #6c757d;
-}
-
-/* =============================================================================
-   LOADING & ERROR STATES
-   ============================================================================= */
-
-.worksheet-loading,
-.worksheet-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  text-align: center;
-}
-
-.loading-spinner,
-.updating-spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #e94560;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.error-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.worksheet-error h3 {
-  margin: 0 0 8px 0;
-  color: #1a1a2e;
-}
-
-.worksheet-error p {
-  color: #6c757d;
-  margin-bottom: 16px;
-}
-
-.btn-retry {
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  background: #e94560;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.updating-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  z-index: 10;
-}
-
-/* =============================================================================
-   CONFIRMATION STATE
-   ============================================================================= */
-
-.worksheet-confirmation {
-  min-height: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.confirmation-content {
-  text-align: center;
-  padding: 40px;
-}
-
-.confirmation-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-}
-
-.confirmation-content h2 {
-  margin: 0 0 8px 0;
-  font-size: 32px;
-  color: #1a1a2e;
-}
-
-.confirmation-content > p {
-  color: #6c757d;
-  font-size: 16px;
-  margin-bottom: 24px;
-}
-
-.confirmation-summary {
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-}
-
-.confirmation-summary .summary-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-}
-
-.confirmation-summary .label {
-  color: #6c757d;
-}
-
-.confirmation-summary .value {
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.confirmation-summary .value.highlight {
-  color: #e94560;
-  font-size: 20px;
-}
-
-.confirmation-note {
-  color: #6c757d;
-  font-size: 14px;
-  margin-bottom: 20px !important;
-}
-
-.btn-continue {
-  padding: 14px 28px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a2e;
-  background: white;
-  border: 2px solid #dee2e6;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-continue:hover {
-  border-color: #1a1a2e;
-  background: #f8f9fa;
-}
-
 /* =============================================================================
    RESPONSIVE
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .worksheet-container {
+  .worksheet-container-responsive {
     padding: 16px;
     border-radius: 0;
     min-height: 100vh;
   }
 
-  .worksheet-header h2 {
+  .worksheet-header-responsive h2 {
     font-size: 24px;
   }
 
-  .vehicle-section {
+  .vehicle-section-responsive {
     flex-direction: column;
     text-align: center;
     gap: 16px;
   }
 
-  .vehicle-price {
+  .vehicle-price-responsive {
     text-align: center;
   }
 
-  .term-options {
+  .term-options-responsive {
     grid-template-columns: 1fr;
   }
 
-  .term-option {
+  .term-option-responsive {
     flex-direction: row;
     justify-content: space-between;
     padding: 16px;
   }
 
-  .term-option .term-months {
-    margin-bottom: 0;
-  }
-
-  .term-option .term-apr {
-    margin-top: 0;
-  }
-
-  .monthly-amount {
+  .monthly-amount-responsive {
     font-size: 36px;
   }
 
-  .btn-ready {
+  .btn-ready-responsive {
     padding: 16px 24px;
     font-size: 18px;
   }

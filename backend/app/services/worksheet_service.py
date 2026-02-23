@@ -25,6 +25,7 @@ from app.services.payment_calculator import get_payment_calculator
 from app.services.vehicle_retriever import get_vehicle_retriever
 from app.services.conversation_state import get_state_manager, ConversationState
 from app.services.notifications import get_notification_service
+from app.core.cache import get_cache
 
 logger = logging.getLogger("quirk_ai.worksheet")
 
@@ -37,20 +38,74 @@ class WorksheetService:
     
     # Worksheet expiration (24 hours)
     EXPIRATION_HOURS = 24
-    
+
     # Lead score thresholds
     HOT_LEAD_THRESHOLD = 70
     WARM_LEAD_THRESHOLD = 40
-    
+
+    # Redis key prefixes and TTL
+    WS_KEY_PREFIX = "ws:"
+    SESSION_WS_KEY_PREFIX = "session_ws:"
+    WS_TTL = 86400  # 24 hours
+
     def __init__(self):
         self.calculator = get_payment_calculator()
         self.retriever = get_vehicle_retriever()
         self.state_manager = get_state_manager()
         self.notifications = get_notification_service()
-        
-        # In-memory store (replace with database in production)
+
+        # In-memory store (L1 cache — replace with database in production)
         self._worksheets: Dict[str, Worksheet] = {}
         self._session_worksheets: Dict[str, List[str]] = {}  # session_id -> [worksheet_ids]
+
+    async def _persist_worksheet(self, worksheet: Worksheet) -> bool:
+        """Persist a worksheet to the L2 cache (Redis)."""
+        try:
+            cache = await get_cache()
+            ws_key = f"{self.WS_KEY_PREFIX}{worksheet.id}"
+            ws_data = worksheet.model_dump(mode="json")
+            await cache.set(ws_key, ws_data, ttl=self.WS_TTL)
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to persist worksheet {worksheet.id} to cache: {e}")
+            return False
+
+    async def _persist_session_worksheets(self, session_id: str, worksheet_ids: List[str]) -> bool:
+        """Persist the session -> worksheet_ids mapping to the L2 cache."""
+        try:
+            cache = await get_cache()
+            session_key = f"{self.SESSION_WS_KEY_PREFIX}{session_id}"
+            await cache.set(session_key, worksheet_ids, ttl=self.WS_TTL)
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to persist session worksheets for {session_id} to cache: {e}")
+            return False
+
+    async def _load_worksheet_from_cache(self, worksheet_id: str) -> Optional[Worksheet]:
+        """Load a worksheet from the L2 cache (Redis)."""
+        try:
+            cache = await get_cache()
+            ws_key = f"{self.WS_KEY_PREFIX}{worksheet_id}"
+            data = await cache.get(ws_key)
+            if data:
+                worksheet = Worksheet.model_validate(data)
+                logger.info(f"Loaded worksheet {worksheet_id} from cache")
+                return worksheet
+        except Exception as e:
+            logger.warning(f"Failed to load worksheet {worksheet_id} from cache: {e}")
+        return None
+
+    async def _load_session_worksheets_from_cache(self, session_id: str) -> Optional[List[str]]:
+        """Load session -> worksheet_ids mapping from the L2 cache."""
+        try:
+            cache = await get_cache()
+            session_key = f"{self.SESSION_WS_KEY_PREFIX}{session_id}"
+            data = await cache.get(session_key)
+            if data and isinstance(data, list):
+                return data
+        except Exception as e:
+            logger.warning(f"Failed to load session worksheets for {session_id} from cache: {e}")
+        return None
     
     async def create_worksheet(
         self,
@@ -229,37 +284,66 @@ class WorksheetService:
             lead_score=lead_score,
         )
         
-        # Store worksheet
+        # Store worksheet (L1)
         self._worksheets[worksheet.id] = worksheet
-        
-        # Track by session
+
+        # Track by session (L1)
         if request.session_id not in self._session_worksheets:
             self._session_worksheets[request.session_id] = []
         self._session_worksheets[request.session_id].append(worksheet.id)
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self._persist_worksheet(worksheet)
+        await self._persist_session_worksheets(
+            request.session_id,
+            self._session_worksheets[request.session_id]
+        )
+
         # Notify sales floor if lead score is decent
         await self._notify_new_worksheet(worksheet)
-        
+
         logger.info(
             f"Created worksheet {worksheet.id} for {vehicle.year} {vehicle.model} "
             f"@ ${selling_price:,.0f}, down=${down_payment:,.0f}, "
             f"monthly=${monthly:,.0f}, lead_score={lead_score}"
         )
-        
+
         return worksheet
-    
-    def get_worksheet(self, worksheet_id: str) -> Optional[Worksheet]:
-        """Get worksheet by ID"""
-        return self._worksheets.get(worksheet_id)
-    
-    def get_session_worksheets(self, session_id: str) -> List[Worksheet]:
-        """Get all worksheets for a session"""
-        worksheet_ids = self._session_worksheets.get(session_id, [])
-        return [
-            self._worksheets[wid] 
-            for wid in worksheet_ids 
-            if wid in self._worksheets
-        ]
+
+    async def get_worksheet(self, worksheet_id: str) -> Optional[Worksheet]:
+        """Get worksheet by ID. Checks L1 (in-memory) then L2 (Redis)."""
+        # Check L1
+        worksheet = self._worksheets.get(worksheet_id)
+        if worksheet:
+            return worksheet
+
+        # Check L2 (Redis/cache)
+        loaded = await self._load_worksheet_from_cache(worksheet_id)
+        if loaded:
+            self._worksheets[worksheet_id] = loaded
+            return loaded
+
+        return None
+
+    async def get_session_worksheets(self, session_id: str) -> List[Worksheet]:
+        """Get all worksheets for a session. Checks L1 then L2."""
+        worksheet_ids = self._session_worksheets.get(session_id)
+
+        # If not in L1, check L2
+        if worksheet_ids is None:
+            cached_ids = await self._load_session_worksheets_from_cache(session_id)
+            if cached_ids:
+                self._session_worksheets[session_id] = cached_ids
+                worksheet_ids = cached_ids
+            else:
+                worksheet_ids = []
+
+        worksheets = []
+        for wid in worksheet_ids:
+            ws = await self.get_worksheet(wid)
+            if ws:
+                worksheets.append(ws)
+        return worksheets
     
     def get_active_worksheets(self) -> List[WorksheetSummary]:
         """
@@ -348,9 +432,12 @@ class WorksheetService:
         worksheet.lead_score = min(100, worksheet.lead_score + 2)
         
         logger.info(f"Updated worksheet {worksheet_id} by {actor}, adjustments={worksheet.adjustments_made}")
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self._persist_worksheet(worksheet)
+
         return worksheet
-    
+
     async def select_term(self, worksheet_id: str, term_months: int) -> Worksheet:
         """Select a financing term"""
         updates = WorksheetUpdateRequest(selected_term=term_months)
@@ -412,9 +499,12 @@ class WorksheetService:
             f"Worksheet {worksheet_id} marked READY - "
             f"lead_score={worksheet.lead_score}, notifying sales"
         )
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self._persist_worksheet(worksheet)
+
         return worksheet
-    
+
     async def manager_review(self, worksheet_id: str, manager_id: str, manager_name: str = None) -> Worksheet:
         """Manager starts reviewing a worksheet"""
         worksheet = self._worksheets.get(worksheet_id)
@@ -437,9 +527,12 @@ class WorksheetService:
         worksheet.updated_at = now
         
         logger.info(f"Worksheet {worksheet_id} under manager review by {manager_name or manager_id}")
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self._persist_worksheet(worksheet)
+
         return worksheet
-    
+
     async def manager_counter_offer(
         self,
         worksheet_id: str,
@@ -485,9 +578,12 @@ class WorksheetService:
         )
         
         # TODO: Push to customer via WebSocket
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self._persist_worksheet(worksheet)
+
         return worksheet
-    
+
     async def manager_update(
         self,
         worksheet_id: str,
@@ -522,17 +618,20 @@ class WorksheetService:
             )
         
         worksheet.updated_at = now
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self._persist_worksheet(worksheet)
+
         return worksheet
-    
+
     async def accept_deal(self, worksheet_id: str, manager_id: str) -> Worksheet:
         """Manager accepts the deal"""
         worksheet = self._worksheets.get(worksheet_id)
         if not worksheet:
             raise ValueError(f"Worksheet {worksheet_id} not found")
-        
+
         now = datetime.utcnow()
-        
+
         worksheet.status = WorksheetStatus.ACCEPTED
         worksheet.status_history.append(
             StatusHistoryEntry(
@@ -543,21 +642,24 @@ class WorksheetService:
             )
         )
         worksheet.updated_at = now
-        
+
         logger.info(f"Worksheet {worksheet_id} ACCEPTED by manager {manager_id}")
-        
+
         # TODO: Trigger CRM integration
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self._persist_worksheet(worksheet)
+
         return worksheet
-    
+
     async def decline_worksheet(self, worksheet_id: str, actor: str, reason: str = None) -> Worksheet:
         """Mark worksheet as declined"""
         worksheet = self._worksheets.get(worksheet_id)
         if not worksheet:
             raise ValueError(f"Worksheet {worksheet_id} not found")
-        
+
         now = datetime.utcnow()
-        
+
         worksheet.status = WorksheetStatus.DECLINED
         worksheet.status_history.append(
             StatusHistoryEntry(
@@ -568,7 +670,10 @@ class WorksheetService:
             )
         )
         worksheet.updated_at = now
-        
+
+        # Write-through to L2 (Redis/cache)
+        await self._persist_worksheet(worksheet)
+
         return worksheet
     
     def _recalculate_worksheet(self, worksheet: Worksheet):

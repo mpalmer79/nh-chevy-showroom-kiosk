@@ -40,8 +40,33 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: 🧪 Run Tests
-        run: pytest tests/ -v --tb=short
+      - name: 🔄 Check Alembic Migrations
+        run: |
+          python -c "
+          import importlib, os, sys
+          sys.path.insert(0, '.')
+          # Verify alembic config is importable
+          import alembic.config
+          print('Alembic config OK')
+          # Verify migration scripts parse correctly
+          from alembic.config import Config
+          from alembic.script import ScriptDirectory
+          cfg = Config('alembic.ini')
+          scripts = ScriptDirectory.from_config(cfg)
+          revisions = list(scripts.walk_revisions())
+          print(f'Found {len(revisions)} migration(s)')
+          for rev in reversed(revisions):
+              print(f'  {rev.revision}: {rev.doc}')
+          # Verify migration chain is unbroken
+          head = scripts.get_current_head()
+          print(f'Head revision: {head}')
+          print('Migration chain OK')
+          "
+        env:
+          DATABASE_URL: sqlite:///test.db
+
+      - name: 🧪 Run Tests with Coverage
+        run: pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-fail-under=70
         env:
           ENVIRONMENT: test
           ANTHROPIC_API_KEY: test-key-for-ci
