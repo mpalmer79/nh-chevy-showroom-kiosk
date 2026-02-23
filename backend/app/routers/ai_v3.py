@@ -71,7 +71,7 @@ logger = logging.getLogger("quirk_ai.intelligent")
 # ---
 
 ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
-PROMPT_VERSION = "3.7.0"  # Added Digital Worksheet tool
+PROMPT_VERSION = "4.0.0"  # Major upgrade: TS migration, streaming, Redis caching, prompt caching
 MODEL_NAME = "claude-sonnet-4-5-20250929"  # Sonnet 4.5
 MAX_CONTEXT_TOKENS = 4000
 
@@ -282,24 +282,43 @@ async def intelligent_chat(
                 headers={
                     "Content-Type": "application/json",
                     "x-api-key": api_key,
-                    "anthropic-version": "2023-06-01"  # FIXED: Updated API version
+                    "anthropic-version": "2023-06-01",
+                    "anthropic-beta": "prompt-caching-2024-07-31",
                 },
                 json={
                     "model": MODEL_NAME,
                     "max_tokens": 2048,
-                    "system": system_prompt,
+                    "system": [
+                        {
+                            "type": "text",
+                            "text": system_prompt,
+                            "cache_control": {"type": "ephemeral"}
+                        }
+                    ],
                     "messages": messages,
                     "tools": TOOLS,
                 },
                 timeout=45.0
             )
-            
+
             if response.status_code != 200:
                 error_body = response.text
                 logger.error(f"Anthropic API error: {response.status_code} - {error_body}")
                 raise Exception(f"API error: {response.status_code} - {error_body[:200]}")
-            
+
             result = response.json()
+
+            # Log token usage including prompt cache metrics
+            usage = result.get("usage", {})
+            cache_creation = usage.get("cache_creation_input_tokens", 0)
+            cache_read = usage.get("cache_read_input_tokens", 0)
+            input_tokens = usage.get("input_tokens", 0)
+            logger.info(
+                f"AI Token Usage - Input: {input_tokens}, "
+                f"Cache Created: {cache_creation}, Cache Read: {cache_read}, "
+                f"Output: {usage.get('output_tokens', 0)}, "
+                f"Session: {chat_request.session_id}"
+            )
         
         # Process response - handle tool use loop
         max_tool_iterations = 5
@@ -374,24 +393,43 @@ async def intelligent_chat(
                     headers={
                         "Content-Type": "application/json",
                         "x-api-key": api_key,
-                        "anthropic-version": "2023-06-01"  # FIXED: Updated API version
+                        "anthropic-version": "2023-06-01",
+                        "anthropic-beta": "prompt-caching-2024-07-31",
                     },
                     json={
                         "model": MODEL_NAME,
                         "max_tokens": 2048,
-                        "system": system_prompt,
+                        "system": [
+                            {
+                                "type": "text",
+                                "text": system_prompt,
+                                "cache_control": {"type": "ephemeral"}
+                            }
+                        ],
                         "messages": messages,
                         "tools": TOOLS,
                     },
                     timeout=45.0
                 )
-                
+
                 if response.status_code != 200:
                     error_body = response.text
                     logger.error(f"Anthropic API error in tool loop: {response.status_code} - {error_body}")
                     break
-                
+
                 result = response.json()
+
+                # Log token usage including prompt cache metrics (tool loop)
+                usage = result.get("usage", {})
+                cache_creation = usage.get("cache_creation_input_tokens", 0)
+                cache_read = usage.get("cache_read_input_tokens", 0)
+                input_tokens = usage.get("input_tokens", 0)
+                logger.info(
+                    f"AI Token Usage (tool loop) - Input: {input_tokens}, "
+                    f"Cache Created: {cache_creation}, Cache Read: {cache_read}, "
+                    f"Output: {usage.get('output_tokens', 0)}, "
+                    f"Session: {chat_request.session_id}"
+                )
         
         # Update conversation state
         mentioned_vehicles = [sv.vehicle for sv in all_vehicles] if all_vehicles else None
@@ -587,11 +625,18 @@ async def intelligent_chat_stream(
                             "Content-Type": "application/json",
                             "x-api-key": api_key,
                             "anthropic-version": "2023-06-01",
+                            "anthropic-beta": "prompt-caching-2024-07-31",
                         },
                         json={
                             "model": MODEL_NAME,
                             "max_tokens": 2048,
-                            "system": system_prompt,
+                            "system": [
+                                {
+                                    "type": "text",
+                                    "text": system_prompt,
+                                    "cache_control": {"type": "ephemeral"}
+                                }
+                            ],
                             "messages": messages,
                             "tools": TOOLS,
                             "stream": True,
@@ -617,6 +662,7 @@ async def intelligent_chat_stream(
                         current_tool_input = ""
                         stop_reason = None
                         content_blocks = []
+                        stream_usage = {}  # Track token usage from streaming events
 
                         async for line in response.aiter_lines():
                             if not line.startswith("data: "):
@@ -633,7 +679,13 @@ async def intelligent_chat_stream(
 
                             event_type = event_data.get("type", "")
 
-                            if event_type == "content_block_start":
+                            if event_type == "message_start":
+                                # Capture initial usage (input tokens, cache metrics)
+                                msg = event_data.get("message", {})
+                                msg_usage = msg.get("usage", {})
+                                stream_usage.update(msg_usage)
+
+                            elif event_type == "content_block_start":
                                 block = event_data.get("content_block", {})
                                 if block.get("type") == "tool_use":
                                     current_tool = {
@@ -683,10 +735,25 @@ async def intelligent_chat_stream(
                             elif event_type == "message_delta":
                                 delta = event_data.get("delta", {})
                                 stop_reason = delta.get("stop_reason")
+                                # Capture output token usage from message_delta
+                                delta_usage = event_data.get("usage", {})
+                                if delta_usage:
+                                    stream_usage.update(delta_usage)
 
                             elif event_type == "message_stop":
                                 # End of message stream
                                 pass
+
+                        # Log token usage including prompt cache metrics (streaming)
+                        cache_creation = stream_usage.get("cache_creation_input_tokens", 0)
+                        cache_read = stream_usage.get("cache_read_input_tokens", 0)
+                        input_tokens = stream_usage.get("input_tokens", 0)
+                        logger.info(
+                            f"AI Token Usage (stream) - Input: {input_tokens}, "
+                            f"Cache Created: {cache_creation}, Cache Read: {cache_read}, "
+                            f"Output: {stream_usage.get('output_tokens', 0)}, "
+                            f"Session: {chat_request.session_id}"
+                        )
 
                 # Finalize text content block if we accumulated text
                 if text_content:

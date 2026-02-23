@@ -65,8 +65,8 @@ jobs:
         env:
           DATABASE_URL: sqlite:///test.db
 
-      - name: 🧪 Run Tests
-        run: pytest tests/ -v --tb=short
+      - name: 🧪 Run Tests with Coverage
+        run: pytest tests/ -v --tb=short --cov=app --cov-report=term-missing --cov-fail-under=70
         env:
           ENVIRONMENT: test
           ANTHROPIC_API_KEY: test-key-for-ci

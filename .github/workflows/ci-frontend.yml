@@ -36,8 +36,8 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm install
 
-      - name: 🔬 Run Unit and Integration Tests
-        run: npm run test -- --ci --watchAll=false --passWithNoTests
+      - name: 🔬 Run Tests with Coverage
+        run: npm run test:coverage -- --ci
         env:
           CI: true
 

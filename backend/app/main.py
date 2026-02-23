@@ -137,7 +137,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Quirk AI Kiosk API",
     description="AI-powered vehicle recommendation and customer interaction system for Quirk Auto Dealers",
-    version="3.0.0",
+    version="4.0.0",
     docs_url="/docs" if settings.is_development else None,
     redoc_url="/redoc" if settings.is_development else None,
     openapi_url="/openapi.json" if settings.is_development else None,
@@ -262,7 +262,7 @@ async def root():
     return {
         "service": "Quirk AI Kiosk API",
         "status": "running",
-        "version": "3.0.0",
+        "version": "4.0.0",
         "environment": settings.environment,
         "docs": "/docs" if settings.is_development else "disabled",
         "features": {
@@ -284,7 +284,7 @@ async def health_check():
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "service": "quirk-kiosk-api",
-        "version": "3.0.0",
+        "version": "4.0.0",
         "environment": settings.environment,
         "checks": {}
     }

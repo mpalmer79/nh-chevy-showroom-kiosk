@@ -23,6 +23,19 @@ from app.services.outcome_tracker import (
     ConversationOutcome,
     InteractionQuality,
 )
+from app.core import cache as cache_module
+
+
+@pytest.fixture(autouse=True)
+async def reset_cache_between_tests():
+    """Reset the global cache singleton between tests to prevent state leakage."""
+    if cache_module._cache_service is not None:
+        await cache_module._cache_service.shutdown()
+        cache_module._cache_service = None
+    yield
+    if cache_module._cache_service is not None:
+        await cache_module._cache_service.shutdown()
+        cache_module._cache_service = None
 
 
 # ---
