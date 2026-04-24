@@ -14,7 +14,7 @@ from app.services.smart_recommendations import get_smart_recommendation_service
 from app.services.entity_extraction import get_entity_extractor
 
 router = APIRouter()
-logger = logging.getLogger("quirk_ai.smart_recs")
+logger = logging.getLogger("showroom_kiosk.ai.smart_recs")
 
 
 def load_inventory_data() -> List[Dict[str, Any]]:

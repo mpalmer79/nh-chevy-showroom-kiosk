@@ -66,7 +66,7 @@ async def submit_lead(lead: LeadCreate):
         "phone": lead.phone,
         "context_vin": lead.context_vin,
         "context_page": lead.context_page,
-        "source": "QUIRK AI Kiosk",
+        "source": "NH Chevy Showroom Kiosk",
         "status": "new",
         "created_at": datetime.utcnow().isoformat(),
     }
@@ -99,7 +99,7 @@ async def schedule_test_drive(request: TestDriveRequest):
         "preferred_date": request.preferred_date,
         "preferred_time": request.preferred_time,
         "lead_type": "test_drive",
-        "source": "QUIRK AI Kiosk",
+        "source": "NH Chevy Showroom Kiosk",
         "status": "pending_confirmation",
         "created_at": datetime.utcnow().isoformat(),
     }
@@ -130,7 +130,7 @@ async def request_more_info(request: InfoRequest):
         "vehicle_id": request.vehicle_id,
         "questions": request.questions,
         "lead_type": "info_request",
-        "source": "QUIRK AI Kiosk",
+        "source": "NH Chevy Showroom Kiosk",
         "status": "new",
         "created_at": datetime.utcnow().isoformat(),
     }

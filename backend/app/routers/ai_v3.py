@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Intelligent AI Assistant Router (V3)
+NH Chevy Showroom Kiosk - Intelligent AI Assistant Router (V3)
 Production-grade AI with persistent memory, tool use, and smart vehicle retrieval.
 
 Key Features:
@@ -64,7 +64,7 @@ from app.ai.helpers import (
 )
 
 router = APIRouter()
-logger = logging.getLogger("quirk_ai.intelligent")
+logger = logging.getLogger("showroom_kiosk.ai.intelligent")
 
 # ---
 # CONFIGURATION
