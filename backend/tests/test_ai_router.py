@@ -6,9 +6,6 @@ Covers tool execution, fallback behavior, and system prompt configuration
 import pytest
 from unittest.mock import Mock, patch, AsyncMock
 import json
-import sys
-
-sys.path.insert(0, '/home/runner/work/quirk-ai-kiosk/quirk-ai-kiosk/backend')
 
 # Updated imports for refactored module structure
 from app.routers.ai_v3 import MODEL_NAME

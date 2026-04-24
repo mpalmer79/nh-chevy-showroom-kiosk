@@ -49,7 +49,7 @@ class TestHealthEndpoints:
         resp = await client.get("/")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["service"] == "Quirk AI Kiosk API"
+        assert data["service"] == "NH Chevy Showroom Kiosk API"
         assert data["status"] == "running"
         assert "version" in data
         assert "features" in data
