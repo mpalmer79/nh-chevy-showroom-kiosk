@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Budget Calculator Service
+NH Chevy Showroom Kiosk - Budget Calculator Service
 Single source of truth for all financing math.
 
 Consolidates budget calculations previously duplicated in:

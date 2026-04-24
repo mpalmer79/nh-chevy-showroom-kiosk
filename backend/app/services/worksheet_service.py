@@ -27,7 +27,7 @@ from app.services.conversation_state import get_state_manager, ConversationState
 from app.services.notifications import get_notification_service
 from app.core.cache import get_cache
 
-logger = logging.getLogger("quirk_ai.worksheet")
+logger = logging.getLogger("showroom_kiosk.ai.worksheet")
 
 
 class WorksheetService:

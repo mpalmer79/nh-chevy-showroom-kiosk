@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Services Module
+NH Chevy Showroom Kiosk - Services Module
 Business logic and AI/ML services
 
 Services:

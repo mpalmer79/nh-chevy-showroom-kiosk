@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Vehicle Data Normalizer
+NH Chevy Showroom Kiosk - Vehicle Data Normalizer
 Canonical field names for vehicle data across the entire codebase.
 
 PROBLEM:

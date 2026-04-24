@@ -8,7 +8,7 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass
 import logging
 
-logger = logging.getLogger("quirk_ai.payment_calculator")
+logger = logging.getLogger("showroom_kiosk.ai.payment_calculator")
 
 
 @dataclass
@@ -49,7 +49,7 @@ class PaymentCalculator:
         84: 7.49,   # Higher rate for longest term
     }
     
-    # Quirk standard fees
+    # Dealership standard fees
     DOC_FEE = 599
     TITLE_FEE = 25
     

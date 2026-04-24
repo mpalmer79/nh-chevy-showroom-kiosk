@@ -30,7 +30,7 @@ from typing import Optional, Dict, List, Any
 from enum import Enum
 import logging
 
-logger = logging.getLogger("quirk_ai.lead_scoring")
+logger = logging.getLogger("showroom_kiosk.ai.lead_scoring")
 
 
 class LeadTier(str, Enum):

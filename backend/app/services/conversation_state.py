@@ -58,7 +58,7 @@ from app.services.entity_extraction import (
 )
 from app.core.cache import get_cache
 
-logger = logging.getLogger("quirk_ai.conversation_state")
+logger = logging.getLogger("showroom_kiosk.ai.conversation_state")
 
 
 class ConversationStage(str, Enum):
@@ -959,7 +959,7 @@ class ConversationStateManager:
         Persist a session to disk as JSON (legacy fallback).
 
         Writes the session's ``to_dict()`` output to
-        ``/tmp/quirk_conversations/{phone}.json``. Only sessions with a
+        ``/tmp/showroom_kiosk_conversations/{phone}.json``. Only sessions with a
         customer phone number are persisted. This is the disk-based fallback
         used when Redis is unavailable. Prefer Redis persistence via
         ``persist_state()`` in production.
@@ -972,7 +972,7 @@ class ConversationStateManager:
         
         try:
             import json
-            persist_dir = "/tmp/quirk_conversations"
+            persist_dir = "/tmp/showroom_kiosk_conversations"
             os.makedirs(persist_dir, exist_ok=True)
             
             filename = f"{state.customer_phone}.json"
@@ -991,7 +991,7 @@ class ConversationStateManager:
         """Load a persisted session from disk"""
         try:
             import json
-            filepath = f"/tmp/quirk_conversations/{phone}.json"
+            filepath = f"/tmp/showroom_kiosk_conversations/{phone}.json"
             
             if not os.path.exists(filepath):
                 return None

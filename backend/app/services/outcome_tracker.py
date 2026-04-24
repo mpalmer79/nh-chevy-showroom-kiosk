@@ -20,7 +20,7 @@ import os
 
 from app.services.conversation_state import ConversationState, ConversationStage, InterestLevel
 
-logger = logging.getLogger("quirk_ai.outcome_tracker")
+logger = logging.getLogger("showroom_kiosk.ai.outcome_tracker")
 
 
 class ConversationOutcome(str, Enum):
@@ -135,7 +135,7 @@ class OutcomeTracker:
     }
     
     def __init__(self, storage_path: Optional[str] = None):
-        self.storage_path = storage_path or "/tmp/quirk_outcomes"
+        self.storage_path = storage_path or "/tmp/showroom_kiosk_outcomes"
         self._outcomes: List[OutcomeRecord] = []
         self._session_signals: Dict[str, List[InteractionSignal]] = defaultdict(list)
         os.makedirs(self.storage_path, exist_ok=True)

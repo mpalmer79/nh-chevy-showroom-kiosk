@@ -19,7 +19,7 @@ import logging
 from app.services.inventory_enrichment import enrich_vehicle
 from app.services.conversation_state import ConversationState
 
-logger = logging.getLogger("quirk_ai.vehicle_retriever")
+logger = logging.getLogger("showroom_kiosk.ai.vehicle_retriever")
 
 
 @dataclass
