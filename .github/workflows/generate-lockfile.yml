@@ -31,7 +31,9 @@ jobs:
         run: |
           # Remove existing lock file if present
           rm -f package-lock.json
-          # Generate fresh lock file
+          # Generate fresh lock file (legacy-peer-deps picked up from
+          # frontend/.npmrc — handles the react-scripts/TypeScript 5 peer
+          # conflict).
           npm install --package-lock-only
           
       - name: 📝 Check for changes
