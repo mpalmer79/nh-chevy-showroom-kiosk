@@ -9,8 +9,8 @@ test.describe('Kiosk Customer Journey', () => {
   // Welcome Screen Tests
   // ===========================================================================
   test.describe('Welcome Screen', () => {
-    test('renders with Quirk AI assistant greeting', async ({ page }) => {
-      await expect(page.getByText("I'm your Quirk AI assistant")).toBeVisible();
+    test('renders with Showroom AI assistant greeting', async ({ page }) => {
+      await expect(page.getByText("I'm your Showroom AI assistant")).toBeVisible();
     });
 
     test('displays name input field', async ({ page }) => {
@@ -31,7 +31,7 @@ test.describe('Kiosk Customer Journey', () => {
       await expect(page.getByText('How can I help you today?')).toBeVisible();
       await expect(page.getByText('I Have a Stock Number')).toBeVisible();
       await expect(page.getByText('I Know What I Want')).toBeVisible();
-      await expect(page.getByText('Chat with Quirk AI')).toBeVisible();
+      await expect(page.getByText('Chat with Showroom AI')).toBeVisible();
       await expect(page.getByText(/browse all inventory/i)).toBeVisible();
     });
 
@@ -54,7 +54,7 @@ test.describe('Kiosk Customer Journey', () => {
   test.describe('AI Assistant', () => {
     test('can navigate to AI assistant and see chat interface', async ({ page }) => {
       await page.getByText(/skip/i).click();
-      await page.getByText('Chat with Quirk AI').click();
+      await page.getByText('Chat with Showroom AI').click();
 
       // Should see the chat input
       await expect(page.locator('input[placeholder*="message" i], textarea[placeholder*="message" i]')).toBeVisible();
@@ -62,7 +62,7 @@ test.describe('Kiosk Customer Journey', () => {
 
     test('can type a message in the chat input', async ({ page }) => {
       await page.getByText(/skip/i).click();
-      await page.getByText('Chat with Quirk AI').click();
+      await page.getByText('Chat with Showroom AI').click();
 
       const chatInput = page.locator('input[placeholder*="message" i], textarea[placeholder*="message" i]');
       await chatInput.fill('Show me some trucks');
@@ -71,7 +71,7 @@ test.describe('Kiosk Customer Journey', () => {
 
     test('shows suggestion chips in the AI assistant', async ({ page }) => {
       await page.getByText(/skip/i).click();
-      await page.getByText('Chat with Quirk AI').click();
+      await page.getByText('Chat with Showroom AI').click();
 
       // AI assistant should show quick-action chips or welcome message
       // Wait for the interface to be fully loaded
@@ -207,7 +207,7 @@ test.describe('Kiosk Customer Journey', () => {
       await expect(page.getByText(/Hi TestUser/i)).toBeVisible();
 
       // Go to AI assistant
-      await page.getByText('Chat with Quirk AI').click();
+      await page.getByText('Chat with Showroom AI').click();
       await expect(page).toHaveURL(/#aiAssistant/);
 
       // Go back
@@ -227,11 +227,11 @@ test.describe('Kiosk Customer Journey', () => {
     test('header logo returns to welcome screen', async ({ page }) => {
       // Navigate away from welcome
       await page.getByText(/skip/i).click();
-      await page.getByText('Chat with Quirk AI').click();
+      await page.getByText('Chat with Showroom AI').click();
       await expect(page).toHaveURL(/#aiAssistant/);
 
       // Click logo to return
-      await page.locator('header').getByText('QUIRK').click();
+      await page.locator('header').getByText('NH CHEVY').click();
 
       // Should be back at welcome
       await expect(page.locator('input[placeholder*="first name" i]')).toBeVisible();
@@ -247,7 +247,7 @@ test.describe('Kiosk Error Resilience', () => {
     await page.goto('/');
 
     // Welcome screen should still render
-    await expect(page.getByText("I'm your Quirk AI assistant")).toBeVisible();
+    await expect(page.getByText("I'm your Showroom AI assistant")).toBeVisible();
   });
 
   test('inventory page handles API errors gracefully', async ({ page }) => {

@@ -250,10 +250,10 @@ describe('KioskApp Component', () => {
       });
     });
 
-    test('renders header with QUIRK logo', async () => {
+    test('renders header with NH CHEVY logo', async () => {
       renderKioskApp();
       await waitFor(() => {
-        expect(screen.getByText('QUIRK')).toBeInTheDocument();
+        expect(screen.getByText('NH CHEVY')).toBeInTheDocument();
         expect(screen.getByText('AI')).toBeInTheDocument();
       });
     });
@@ -261,7 +261,7 @@ describe('KioskApp Component', () => {
     test('renders footer with dealership info', async () => {
       renderKioskApp();
       await waitFor(() => {
-        expect(screen.getByText('Quirk Chevrolet')).toBeInTheDocument();
+        expect(screen.getByText('New Hampshire Chevrolet')).toBeInTheDocument();
         expect(screen.getByText("New England's #1 Dealer")).toBeInTheDocument();
       });
     });
@@ -715,7 +715,7 @@ describe('KioskApp Component', () => {
       });
 
       // Click logo to reset
-      fireEvent.click(screen.getByText('QUIRK'));
+      fireEvent.click(screen.getByText('NH CHEVY'));
       act(() => { jest.advanceTimersByTime(200); });
 
       await waitFor(() => {
@@ -744,7 +744,7 @@ describe('KioskApp Component', () => {
       fireEvent.click(screen.getByText('Select Vehicle Data'));
 
       // Reset by clicking logo
-      fireEvent.click(screen.getByText('QUIRK'));
+      fireEvent.click(screen.getByText('NH CHEVY'));
       act(() => { jest.advanceTimersByTime(200); });
 
       await waitFor(() => {
@@ -1058,14 +1058,14 @@ describe('KioskApp Component', () => {
   });
 
   describe('Header', () => {
-    test('header contains QUIRK AI branding', async () => {
+    test('header contains NH CHEVY branding', async () => {
       renderKioskApp();
       
       await waitFor(() => {
-        expect(screen.getByText('QUIRK')).toBeInTheDocument();
+        expect(screen.getByText('NH CHEVY')).toBeInTheDocument();
       });
       
-      const header = screen.getByText('QUIRK').closest('header');
+      const header = screen.getByText('NH CHEVY').closest('header');
       expect(header).toBeInTheDocument();
       expect(screen.getByText('AI')).toBeInTheDocument();
     });
@@ -1074,10 +1074,10 @@ describe('KioskApp Component', () => {
       renderKioskApp();
       
       await waitFor(() => {
-        expect(screen.getByText('QUIRK')).toBeInTheDocument();
+        expect(screen.getByText('NH CHEVY')).toBeInTheDocument();
       });
       
-      const logoText = screen.getByText('QUIRK');
+      const logoText = screen.getByText('NH CHEVY');
       const logoContainer = logoText.closest('div');
       expect(logoContainer).toHaveStyle({ cursor: 'pointer' });
     });
@@ -1087,7 +1087,7 @@ describe('KioskApp Component', () => {
     test('displays dealership name', async () => {
       renderKioskApp();
       await waitFor(() => {
-        expect(screen.getByText('Quirk Chevrolet')).toBeInTheDocument();
+        expect(screen.getByText('New Hampshire Chevrolet')).toBeInTheDocument();
       });
     });
 
@@ -1102,11 +1102,11 @@ describe('KioskApp Component', () => {
       renderKioskApp();
       
       await waitFor(() => {
-        expect(screen.getByText('Quirk Chevrolet')).toBeInTheDocument();
+        expect(screen.getByText('New Hampshire Chevrolet')).toBeInTheDocument();
       });
       
       // Footer should contain a time element (format varies)
-      const footer = screen.getByText('Quirk Chevrolet').closest('footer');
+      const footer = screen.getByText('New Hampshire Chevrolet').closest('footer');
       expect(footer).toBeInTheDocument();
       // Time format is HH:MM AM/PM - just verify footer exists
     });
