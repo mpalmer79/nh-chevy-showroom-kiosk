@@ -1,8 +1,8 @@
-# Quirk AI Kiosk -- System Architecture
+# NH Chevy Showroom Kiosk -- System Architecture
 
 ## System Overview
 
-The Quirk AI Kiosk is a physical showroom kiosk that helps customers browse inventory, chat with an AI sales assistant, build deal worksheets, and connect with sales staff. The customer is already in-store -- the AI acts as an in-person salesperson.
+The NH Chevy Showroom Kiosk is a physical showroom kiosk that helps customers browse inventory, chat with an AI sales assistant, build deal worksheets, and connect with sales staff. The customer is already in-store -- the AI acts as an in-person salesperson.
 
 ### High-Level System Diagram
 
@@ -250,7 +250,7 @@ Returns { slack_sent, sms_sent, email_sent, errors }
 | File | Purpose |
 |------|---------|
 | `app/ai/tools.py` | Tool definitions (JSON schema) for Claude's tool use: `calculate_budget`, `search_inventory`, `get_vehicle_details`, `find_similar_vehicles`, `notify_staff`, `mark_favorite`, `save_customer_phone`, `lookup_conversation`, `create_worksheet`, `check_vehicle_affordability`, plus Anthropic's built-in `web_search`. |
-| `app/ai/prompts.py` | System prompt template. Formats with dynamic conversation context and inventory context. Defines the AI's persona as Quirk Chevrolet's in-store assistant. |
+| `app/ai/prompts.py` | System prompt template. Formats with dynamic conversation context and inventory context. Defines the AI's persona as New Hampshire Chevrolet's in-store assistant. |
 | `app/ai/helpers.py` | Helper functions: builds dynamic context from ConversationState, formats inventory summaries, formats vehicle data for tool results, generates fallback responses when Claude is unavailable. |
 | `app/ai/tool_executor.py` | Dispatches tool calls to appropriate handler functions. Each tool returns (result_text, vehicles_list, staff_notified). |
 

@@ -1,6 +1,6 @@
-# Quirk AI Kiosk API Documentation
+# NH Chevy Showroom Kiosk API Documentation
 
-**Base URL**: `https://quirk-backend-production.up.railway.app`
+**Base URL**: `REPLACE_ME_BACKEND_URL`
 **API Version**: 3.0.0
 **Interactive Docs**: Available at `/docs` in development mode only
 
@@ -81,7 +81,7 @@ API root with service information.
 **Response:**
 ```json
 {
-  "service": "Quirk AI Kiosk API",
+  "service": "NH Chevy Showroom Kiosk API",
   "status": "running",
   "version": "3.0.0",
   "environment": "production",
@@ -104,7 +104,7 @@ Comprehensive health check. Returns status of all service dependencies.
 {
   "status": "healthy",
   "timestamp": "2026-02-23T12:00:00",
-  "service": "quirk-kiosk-api",
+  "service": "showroom-kiosk-api",
   "version": "3.0.0",
   "environment": "production",
   "checks": {
@@ -715,7 +715,7 @@ Convert text to speech. Returns an `audio/mpeg` stream.
 **Request Body:**
 ```json
 {
-  "text": "Welcome to Quirk Chevrolet! How can I help you today?",
+  "text": "Welcome to New Hampshire Chevrolet! How can I help you today?",
   "voice_id": "21m00Tcm4TlvDq8ikWAM",
   "stability": 0.5,
   "similarity_boost": 0.8,

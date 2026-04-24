@@ -1,4 +1,4 @@
-# Quirk AI Kiosk -- Development Setup Guide
+# NH Chevy Showroom Kiosk -- Development Setup Guide
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ The fastest way to get the full stack running locally.
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd quirk-ai-kiosk
+cd nh-chevy-showroom-kiosk
 
 # Copy environment files
 cp backend/.env.example backend/.env
@@ -104,7 +104,7 @@ The frontend will be available at `http://localhost:3000` with hot reloading.
 |----------|---------|-------------|
 | `REACT_APP_API_URL` | `http://localhost:8000/api/v1` | Backend API base URL (includes `/v1`) |
 | `REACT_APP_KIOSK_ID` | `DEV-KIOSK-001` | Kiosk identifier |
-| `REACT_APP_DEALERSHIP` | `Quirk Chevrolet` | Dealership name |
+| `REACT_APP_DEALERSHIP` | `New Hampshire Chevrolet` | Dealership name |
 
 **IMPORTANT**: `REACT_APP_API_URL` already includes `/v1`. Do not add `/v1/` to API endpoint paths in the frontend code, or it will produce a double `/v1/v1/` bug.
 
@@ -182,15 +182,15 @@ E2E tests require both frontend (`http://localhost:3000`) and backend (`http://l
 ```bash
 # With Docker (recommended)
 docker run -d \
-  --name quirk-postgres \
-  -e POSTGRES_USER=quirk \
-  -e POSTGRES_PASSWORD=quirk_dev \
-  -e POSTGRES_DB=quirk_kiosk \
+  --name showroom-postgres \
+  -e POSTGRES_USER=showroom \
+  -e POSTGRES_PASSWORD=showroom_dev \
+  -e POSTGRES_DB=showroom_kiosk \
   -p 5432:5432 \
   postgres:15-alpine
 
 # Set DATABASE_URL in backend/.env
-# DATABASE_URL=postgresql://quirk:quirk_dev@localhost:5432/quirk_kiosk
+# DATABASE_URL=postgresql://showroom:showroom_dev@localhost:5432/showroom_kiosk
 ```
 
 ### Without PostgreSQL
@@ -234,7 +234,7 @@ The Alembic configuration lives in:
 ```bash
 # With Docker
 docker run -d \
-  --name quirk-redis \
+  --name showroom-redis \
   -p 6379:6379 \
   redis:7-alpine
 
@@ -266,7 +266,7 @@ The Excel file expects these columns:
 ## Project Structure
 
 ```
-quirk-ai-kiosk/
+nh-chevy-showroom-kiosk/
   backend/
     app/
       ai/               # AI module: tools, prompts, helpers, executor
