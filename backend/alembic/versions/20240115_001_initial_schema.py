@@ -4,7 +4,7 @@ Revision ID: 001_initial
 Revises:
 Create Date: 2024-01-15
 
-This migration creates the initial database schema for the Quirk AI Kiosk.
+This migration creates the initial database schema for the NH Chevy Showroom Kiosk.
 Tables: traffic_sessions, admin_users, ai_conversation_outcomes, lead_submissions
 """
 from typing import Sequence, Union

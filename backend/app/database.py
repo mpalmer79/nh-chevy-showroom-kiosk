@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import text
 
-logger = logging.getLogger("quirk_kiosk.database")
+logger = logging.getLogger("showroom_kiosk.database")
 
 # Create async engine
 engine = None

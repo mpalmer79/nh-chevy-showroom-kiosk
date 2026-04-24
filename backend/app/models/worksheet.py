@@ -135,7 +135,7 @@ class Worksheet(BaseModel):
     selected_term: Optional[int] = None  # 60, 72, or 84
     
     # Taxes & fees (NH = no sales tax on vehicles)
-    doc_fee: float = 599  # Quirk standard
+    doc_fee: float = 599  # Dealership standard
     registration_estimate: float = 0
     title_fee: float = 25
     state: str = "NH"

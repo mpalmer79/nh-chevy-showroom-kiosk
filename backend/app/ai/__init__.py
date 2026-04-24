@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - AI Module
+NH Chevy Showroom Kiosk - AI Module
 Modular components for intelligent AI assistant functionality.
 """
 
