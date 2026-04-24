@@ -32,7 +32,11 @@ jobs:
           # Remove existing lock file if present
           rm -f package-lock.json
           # Generate fresh lock file
-          npm install --package-lock-only
+          # --legacy-peer-deps: react-scripts@5.0.1 declares a peerOptional
+          # on typescript ^3 || ^4, but the project is on typescript 5.x.
+          # This is a known-safe mismatch (CRA 5.0.1 works with TS 5); the
+          # flag lets npm resolve anyway rather than erroring.
+          npm install --package-lock-only --legacy-peer-deps
           
       - name: 📝 Check for changes
         id: check_changes
