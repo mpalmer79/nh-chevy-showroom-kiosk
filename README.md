@@ -1,11 +1,11 @@
-# QUIRK AI Kiosk
+# New Hampshire Chevrolet Sales Showroom Kiosk
 
-**AI-Powered Showroom Experience for Quirk Chevrolet NH**
+**AI-Powered Showroom Experience for a New Hampshire Chevrolet Dealership**
 
 An interactive in-store kiosk system that enables customers to browse inventory, compare vehicles, get AI-powered recommendations, estimate trade-in values, and calculate payments — all through a touchscreen interface designed for the dealership showroom floor.
 
-[![Backend CI](https://github.com/mpalmer79/quirk-ai-kiosk/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/mpalmer79/quirk-ai-kiosk/actions/workflows/ci-backend.yml)
-[![Frontend CI](https://github.com/mpalmer79/quirk-ai-kiosk/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/mpalmer79/quirk-ai-kiosk/actions/workflows/ci-frontend.yml)
+[![Backend CI](https://github.com/mpalmer79/nh-chevy-showroom-kiosk/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/mpalmer79/nh-chevy-showroom-kiosk/actions/workflows/ci-backend.yml)
+[![Frontend CI](https://github.com/mpalmer79/nh-chevy-showroom-kiosk/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/mpalmer79/nh-chevy-showroom-kiosk/actions/workflows/ci-frontend.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Node 18+](https://img.shields.io/badge/node-18+-green.svg)](https://nodejs.org/)
@@ -16,8 +16,8 @@ An interactive in-store kiosk system that enables customers to browse inventory,
 
 ```bash
 # Clone the repository
-git clone https://github.com/mpalmer79/quirk-ai-kiosk.git
-cd quirk-ai-kiosk
+git clone https://github.com/mpalmer79/nh-chevy-showroom-kiosk.git
+cd nh-chevy-showroom-kiosk
 
 # Option 1: Docker (Recommended)
 docker-compose up --build
