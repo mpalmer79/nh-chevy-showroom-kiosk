@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Application Settings
+NH Chevy Showroom Kiosk - Application Settings
 Pydantic-based configuration with validation and type safety.
 
 All environment variables are validated at startup.
@@ -138,17 +138,23 @@ class Settings(BaseSettings):
     
     @property
     def cors_origins_list(self) -> List[str]:
-        """Parse CORS origins into list"""
+        """Parse CORS origins into list.
+
+        Production deployments MUST supply CORS_ORIGINS via env var.
+        The built-in defaults only cover local development — old production
+        URLs have been removed to avoid leaking CORS access to infrastructure
+        that may no longer be under the dealership's control.
+        """
         if self.cors_origins:
             return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
-        
-        # Default origins for known deployments
+
+        # Default CORS origins — production origins must be supplied via
+        # CORS_ORIGINS env var.
         return [
-            "https://quirk-ai-kiosk.railway.app",
-            "https://quirk-ai-kiosk.netlify.app",
-            "https://quirk-ai-kiosk.vercel.app",
-            "https://quirk-frontend-production.up.railway.app",
-            "https://quirk-backend-production.up.railway.app",
+            "http://localhost:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:8000",
         ]
     
     #
@@ -280,11 +286,11 @@ class Settings(BaseSettings):
     
     # Email sender
     email_from_address: Optional[str] = Field(
-        default="kiosk@quirkchevrolet.com",
-        description="From address for notification emails"
+        default="kiosk@example.com",
+        description="From address for notification emails (configure per deployment)"
     )
     email_from_name: Optional[str] = Field(
-        default="Quirk AI Kiosk",
+        default="NH Chevy Showroom Kiosk",
         description="From name for notification emails"
     )
     

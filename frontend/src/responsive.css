@@ -1,5 +1,5 @@
 /* =============================================================================
-   QUIRK AI Kiosk - Responsive CSS Overrides
+   NH Chevy Showroom Kiosk - Responsive CSS Overrides
    
    Breakpoints:
    - Mobile:  0 - 767px
@@ -133,7 +133,7 @@ input, select, textarea {
     text-align: center !important;
   }
   
-  /* Hero title - "Hi, I'm your Quirk AI assistant" - allow wrapping */
+  /* Hero title - "Hi, I'm your Showroom AI assistant" - allow wrapping */
   h1[style*="fontSize: '28px'"],
   div[style*="fontSize: '28px'"] {
     font-size: 22px !important;

@@ -1,4 +1,4 @@
-# QUIRK AI Kiosk - Backend API Gateway
+# NH Chevy Showroom Kiosk - Backend API Gateway
 FROM python:3.10-slim
 
 # Set working directory

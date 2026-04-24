@@ -6,7 +6,7 @@ const REVIEWS = [
     id: 1,
     author: "Michael T.",
     rating: 5,
-    text: "Absolutely the best car buying experience I've ever had! The team at Quirk went above and beyond to find me the perfect Silverado. No pressure, no games, just great service.",
+    text: "Absolutely the best car buying experience I've ever had! The team at New Hampshire Chevrolet went above and beyond to find me the perfect Silverado. No pressure, no games, just great service.",
     date: "2 weeks ago"
   },
   {
@@ -20,7 +20,7 @@ const REVIEWS = [
     id: 3,
     author: "David R.",
     rating: 5,
-    text: "Third vehicle I've bought from Quirk. They always treat me like family. Fair prices, great selection, and the service department is top notch.",
+    text: "Third vehicle I've bought from New Hampshire Chevrolet. They always treat me like family. Fair prices, great selection, and the service department is top notch.",
     date: "3 days ago"
   },
   {
@@ -41,7 +41,7 @@ const REVIEWS = [
     id: 6,
     author: "Amanda W.",
     rating: 5,
-    text: "I was nervous about buying my first new car, but the team at Quirk made it so easy. They explained everything clearly and never made me feel rushed.",
+    text: "I was nervous about buying my first new car, but the team at New Hampshire Chevrolet made it so easy. They explained everything clearly and never made me feel rushed.",
     date: "5 days ago"
   },
   {
@@ -55,21 +55,21 @@ const REVIEWS = [
     id: 8,
     author: "Lisa H.",
     rating: 5,
-    text: "Quirk Chevy has earned a customer for life! From sales to service, everyone is professional and friendly. Best dealership in New Hampshire!",
+    text: "New Hampshire Chevrolet has earned a customer for life! From sales to service, everyone is professional and friendly. Best dealership in New Hampshire!",
     date: "1 week ago"
   },
   {
     id: 9,
     author: "James B.",
     rating: 5,
-    text: "Drove over an hour to buy from Quirk and it was worth every mile. Their prices beat everyone else and the customer service was outstanding.",
+    text: "Drove over an hour to buy from New Hampshire Chevrolet and it was worth every mile. Their prices beat everyone else and the customer service was outstanding.",
     date: "4 days ago"
   },
   {
     id: 10,
     author: "Michelle D.",
     rating: 5,
-    text: "The Quirk team went above and beyond to get me approved for financing. I thought I'd never get a new car but they made it happen!",
+    text: "The New Hampshire Chevrolet team went above and beyond to get me approved for financing. I thought I'd never get a new car but they made it happen!",
     date: "1 week ago"
   },
   {
@@ -83,7 +83,7 @@ const REVIEWS = [
     id: 12,
     author: "Karen S.",
     rating: 5,
-    text: "I've purchased three vehicles from Quirk over the years and they never disappoint. Honest, reliable, and always willing to work with you on price.",
+    text: "I've purchased three vehicles from New Hampshire Chevrolet over the years and they never disappoint. Honest, reliable, and always willing to work with you on price.",
     date: "6 days ago"
   },
   {
@@ -111,7 +111,7 @@ const REVIEWS = [
     id: 16,
     author: "Rachel C.",
     rating: 5,
-    text: "Finally found a dealership I can trust! Quirk gave me a great deal on my Equinox and the service department has been fantastic for maintenance.",
+    text: "Finally found a dealership I can trust! New Hampshire Chevrolet gave me a great deal on my Equinox and the service department has been fantastic for maintenance.",
     date: "1 week ago"
   },
   {
@@ -125,7 +125,7 @@ const REVIEWS = [
     id: 18,
     author: "Stephanie R.",
     rating: 5,
-    text: "The internet team responded within minutes and had everything ready when I arrived. Easiest car purchase I've ever made. Thank you Quirk!",
+    text: "The internet team responded within minutes and had everything ready when I arrived. Easiest car purchase I've ever made. Thank you NH Chevy!",
     date: "4 days ago"
   },
   {
@@ -139,7 +139,7 @@ const REVIEWS = [
     id: 20,
     author: "Emily N.",
     rating: 5,
-    text: "Can't say enough good things about Quirk Chevrolet! From the moment I walked in, I felt welcomed. My new Tahoe is everything I wanted and more.",
+    text: "Can't say enough good things about New Hampshire Chevrolet! From the moment I walked in, I felt welcomed. My new Tahoe is everything I wanted and more.",
     date: "2 days ago"
   },
 ];

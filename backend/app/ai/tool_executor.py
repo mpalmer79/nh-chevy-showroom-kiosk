@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Tool Executor
+NH Chevy Showroom Kiosk - Tool Executor
 Executes AI tools and returns results.
 
 Phase 1 improvements:
@@ -25,7 +25,7 @@ from app.ai.helpers import (
     format_worksheet_for_tool_result,
 )
 
-logger = logging.getLogger("quirk_ai.tool_executor")
+logger = logging.getLogger("showroom_kiosk.ai.tool_executor")
 
 
 async def execute_tool(

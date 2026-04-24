@@ -78,7 +78,7 @@ interface DigitalWorksheetProps {
 // CONSTANTS
 // =============================================================================
 
-const DEFAULT_API_URL = process.env.REACT_APP_API_URL || 'https://quirk-backend-production.up.railway.app';
+const DEFAULT_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
 
 // =============================================================================
 // COMPONENT

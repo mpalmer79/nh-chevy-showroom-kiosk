@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - AI Helper Functions
+NH Chevy Showroom Kiosk - AI Helper Functions
 Utility functions for context building, formatting, and fallback responses.
 """
 

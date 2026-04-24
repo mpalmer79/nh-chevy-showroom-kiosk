@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Structured Logging Configuration
+NH Chevy Showroom Kiosk - Structured Logging Configuration
 
 Provides:
 - JSON logging for production (machine-readable)
@@ -199,7 +199,7 @@ class AuditLogger:
     """
     
     def __init__(self):
-        self.logger = get_logger("quirk_kiosk.audit")
+        self.logger = get_logger("showroom_kiosk.audit")
     
     def log_lead_created(
         self,

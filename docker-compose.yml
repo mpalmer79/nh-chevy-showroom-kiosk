@@ -1,6 +1,6 @@
 version: '3.8'
 
-# QUIRK AI Kiosk - Local Development Stack
+# New Hampshire Chevrolet Showroom Kiosk - Local Development Stack
 # Usage: docker-compose up --build
 
 services:
@@ -9,20 +9,20 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: quirk-kiosk-frontend
+    container_name: showroom-kiosk-frontend
     ports:
       - "3000:3000"
     environment:
       - REACT_APP_API_URL=http://localhost:8000/api/v1
       - REACT_APP_KIOSK_ID=DEV-KIOSK-001
-      - REACT_APP_DEALERSHIP=Quirk Chevrolet
+      - REACT_APP_DEALERSHIP=New Hampshire Chevrolet
     volumes:
       - ./frontend/src:/app/src:ro
       - ./frontend/public:/app/public:ro
     depends_on:
       - backend
     networks:
-      - quirk-network
+      - showroom-network
     restart: unless-stopped
 
   # Backend API Gateway - FastAPI
@@ -30,7 +30,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: quirk-kiosk-backend
+    container_name: showroom-kiosk-backend
     ports:
       - "8000:8000"
     environment:
@@ -50,7 +50,7 @@ services:
       - ai_service
       - redis
     networks:
-      - quirk-network
+      - showroom-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
@@ -64,7 +64,7 @@ services:
     build:
       context: ./ai_service
       dockerfile: Dockerfile
-    container_name: quirk-kiosk-ai
+    container_name: showroom-kiosk-ai
     ports:
       - "8001:8001"
     environment:
@@ -73,7 +73,7 @@ services:
       - ./ai_service/predictor:/app/predictor:ro
       - ./ai_service/models:/app/models:ro
     networks:
-      - quirk-network
+      - showroom-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
@@ -85,11 +85,11 @@ services:
   # Redis - Caching and State Persistence
   redis:
     image: redis:7-alpine
-    container_name: quirk-kiosk-redis
+    container_name: showroom-kiosk-redis
     ports:
       - "6379:6379"
     networks:
-      - quirk-network
+      - showroom-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -98,9 +98,9 @@ services:
       retries: 3
 
 networks:
-  quirk-network:
+  showroom-network:
     driver: bridge
-    name: quirk-ai-network
+    name: showroom-kiosk-network
 
 volumes:
   frontend-modules:

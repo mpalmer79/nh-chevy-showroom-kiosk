@@ -77,7 +77,7 @@ describe('InstantCashOffer Component', () => {
       renderInstantCashOffer();
       
       expect(screen.getByText('Offer ID')).toBeInTheDocument();
-      expect(screen.getByText(/QCO-/)).toBeInTheDocument();
+      expect(screen.getByText(/ICO-/)).toBeInTheDocument();
     });
 
     test('displays expiration countdown', () => {
@@ -262,7 +262,7 @@ describe('InstantCashOffer Component', () => {
       }, { timeout: 3000 });
       
       const acceptedOffer = mockOnAccept.mock.calls[0][0];
-      expect(acceptedOffer.offerId).toMatch(/^QCO-/);
+      expect(acceptedOffer.offerId).toMatch(/^ICO-/);
       expect(acceptedOffer.status).toBe('accepted');
     });
   });

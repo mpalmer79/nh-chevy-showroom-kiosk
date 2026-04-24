@@ -8,10 +8,6 @@ from unittest.mock import patch, MagicMock, AsyncMock
 from datetime import datetime, timedelta
 from fastapi.testclient import TestClient
 import json
-import sys
-
-# Ensure app module is importable
-sys.path.insert(0, '/home/runner/work/quirk-ai-kiosk/quirk-ai-kiosk/backend')
 
 
 # ---

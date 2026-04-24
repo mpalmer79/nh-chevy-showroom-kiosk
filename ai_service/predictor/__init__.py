@@ -1,3 +1,3 @@
 
-"""QUIRK AI Predictor Module"""
+"""NH Chevy Showroom AI Predictor Module"""
 from predictor.server import VehicleRecommender

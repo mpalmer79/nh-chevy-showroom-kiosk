@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Tool Definitions
+NH Chevy Showroom Kiosk - Tool Definitions
 All tool definitions for Claude's tool use capability.
 """
 

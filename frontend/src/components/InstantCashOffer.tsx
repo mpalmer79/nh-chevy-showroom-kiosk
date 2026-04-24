@@ -1,5 +1,5 @@
 /**
- * QUIRK AI Kiosk - Instant Cash Offer
+ * NH Chevy Showroom Kiosk - Instant Cash Offer
  * 
  * Features:
  * - Firm cash offer with 7-day expiration
@@ -56,7 +56,7 @@ interface InstantCashOfferProps {
 
 const generateOfferId = (): string => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let result = 'QCO-'; // Quirk Cash Offer
+  let result = 'ICO-'; // Instant Cash Offer
   for (let i = 0; i < 8; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -503,7 +503,7 @@ const InstantCashOffer: React.FC<InstantCashOfferProps> = ({
             <span style={styles.stepNumber}>1</span>
             <div>
               <span style={styles.stepText}>Bring your vehicle and title</span>
-              <span style={styles.stepSubtext}>Visit any Quirk location within 7 days</span>
+              <span style={styles.stepSubtext}>Visit the dealership within 7 days</span>
             </div>
           </div>
           <div style={styles.stepItem}>

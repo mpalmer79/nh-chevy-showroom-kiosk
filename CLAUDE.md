@@ -1,4 +1,4 @@
-# QUIRK AI KIOSK — Comprehensive Upgrade Game Plan
+# NH CHEVY SHOWROOM KIOSK — Comprehensive Upgrade Game Plan
 
 ## For Claude Code: Read this entire document before starting. Execute phases in order. Commit after each numbered task completes successfully. Do NOT skip tasks. Do NOT create README or documentation files unless explicitly listed as a task. Preserve ALL existing functionality — especially the `searchInventory()` function in `AIAssistant.tsx` with its `colorKeywords` and `modelKeywords` maps, and the Admin Login link in any hero sections.
 
@@ -10,7 +10,7 @@
 4. **"Digital Worksheet" terminology** — never use "4-square worksheet". Always say "Digital Worksheet".
 5. **ALWAYS clear filters** when navigating to inventory/browse screens to prevent stale filter state.
 6. **Physical showroom kiosk context** — customer is ALREADY IN STORE. AI acts as in-person salesperson. Never says "come in" or "find someone."
-7. **Backend URL**: `https://quirk-backend-production.up.railway.app/`
+7. **Backend URL**: `REPLACE_ME_BACKEND_URL (e.g. http://localhost:8000/api/v1)`
 8. **When modifying any component**, check if corresponding test files in `frontend/src/__tests__/` need updates, and update them.
 9. **Run `npm test -- --ci --watchAll=false --passWithNoTests` after each frontend change** to verify nothing broke.
 10. **Run `cd backend && pytest tests/ -v --tb=short` after each backend change** to verify nothing broke.
@@ -139,9 +139,9 @@ Create `frontend/src/styles/tokens.ts`:
 ```typescript
 export const colors = {
   // Brand
-  quirkBlue: '#0077b6',
-  quirkBlueDark: '#005a8c',
-  quirkGold: '#D1AD57',
+  brandBlue: '#0077b6',
+  brandBlueDark: '#005a8c',
+  brandGold: '#D1AD57',
   
   // Neutrals  
   white: '#ffffff',
@@ -290,11 +290,11 @@ Add `REDIS_URL` to:
 ```yaml
   redis:
     image: redis:7-alpine
-    container_name: quirk-kiosk-redis
+    container_name: showroom-kiosk-redis
     ports:
       - "6379:6379"
     networks:
-      - quirk-network
+      - showroom-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]

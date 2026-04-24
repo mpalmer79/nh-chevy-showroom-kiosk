@@ -48,15 +48,15 @@ describe('WelcomeScreen Component', () => {
   // Phase 1: Name Capture Tests
   // ===========================================================================
   describe('Phase 1 - Name Capture', () => {
-    test('displays Quirk AI assistant greeting', () => {
+    test('displays Showroom AI assistant greeting', () => {
       renderWelcomeScreen();
-      expect(screen.getByText(/Quirk AI/i)).toBeInTheDocument();
+      expect(screen.getByText(/Showroom AI/i)).toBeInTheDocument();
       expect(screen.getByText(/assistant/i)).toBeInTheDocument();
     });
 
-    test('displays Welcome to Quirk Chevrolet subtitle', () => {
+    test('displays Welcome to New Hampshire Chevrolet subtitle', () => {
       renderWelcomeScreen();
-      expect(screen.getByText(/Welcome to Quirk Chevrolet/i)).toBeInTheDocument();
+      expect(screen.getByText(/Welcome to New Hampshire Chevrolet/i)).toBeInTheDocument();
     });
 
     test('displays first name input field', () => {
@@ -323,10 +323,10 @@ describe('WelcomeScreen Component', () => {
       expect(screen.getByText(/Browse by model & budget/i)).toBeInTheDocument();
     });
 
-    test('displays "Chat with Quirk AI" path card', async () => {
+    test('displays "Chat with Showroom AI" path card', async () => {
       await renderPhase2();
       
-      expect(screen.getByText(/Chat with Quirk AI/i)).toBeInTheDocument();
+      expect(screen.getByText(/Chat with Showroom AI/i)).toBeInTheDocument();
       expect(screen.getByText(/LET'S HAVE A CONVERSATION/i)).toBeInTheDocument();
     });
 
@@ -355,7 +355,7 @@ describe('WelcomeScreen Component', () => {
     test('clicking Chat with AI card navigates to aiAssistant', async () => {
       await renderPhase2();
 
-      const card = screen.getByText(/Chat with Quirk AI/i).closest('div');
+      const card = screen.getByText(/Chat with Showroom AI/i).closest('div');
       fireEvent.click(card!);
 
       await waitFor(() => {
@@ -366,7 +366,7 @@ describe('WelcomeScreen Component', () => {
     test('clicking path card updates customer data with path', async () => {
       await renderPhase2();
 
-      const card = screen.getByText(/Chat with Quirk AI/i).closest('div');
+      const card = screen.getByText(/Chat with Showroom AI/i).closest('div');
       fireEvent.click(card!);
 
       await waitFor(() => {

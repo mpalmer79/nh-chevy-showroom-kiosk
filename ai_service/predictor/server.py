@@ -1,5 +1,5 @@
 """
-QUIRK AI Service - Vehicle Recommendation Engine
+NH Chevy Showroom Kiosk AI Service - Vehicle Recommendation Engine
 Content-based filtering with feature engineering for vehicle similarity
 """
 from fastapi import FastAPI, HTTPException
@@ -9,7 +9,7 @@ from typing import List, Optional, Dict, Any
 import os
 
 app = FastAPI(
-    title="QUIRK AI Recommendation Service",
+    title="Showroom Kiosk AI Recommendation Service",
     description="AI-powered vehicle recommendations using content-based filtering",
     version="1.0.0",
 )
@@ -261,7 +261,7 @@ recommender = VehicleRecommender()
 @app.get("/")
 async def root():
     return {
-        "service": "QUIRK AI Recommendation Engine",
+        "service": "Showroom Kiosk AI Recommendation Engine",
         "version": "1.0.0",
         "status": "operational",
     }

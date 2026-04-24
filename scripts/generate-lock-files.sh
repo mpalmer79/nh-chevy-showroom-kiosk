@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# QUIRK AI KIOSK - Generate Package Lock Files
+# NH CHEVY SHOWROOM KIOSK - Generate Package Lock Files
 # Run this locally to create deterministic package-lock.json files
 # =============================================================================
 # Usage: ./scripts/generate-lock-files.sh

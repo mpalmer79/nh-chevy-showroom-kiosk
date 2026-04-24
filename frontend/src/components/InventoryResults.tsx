@@ -403,7 +403,7 @@ const InventoryResults: React.FC<KioskComponentProps> = ({ navigateTo, updateCus
                 key={vehicleId}
                 style={styles.vehicleCard}
                 onClick={() => handleVehicleClick(vehicle)}
-                title="View on QuirkChevyNH.com"
+                title="View on dealership inventory site"
               >
                 {/* Match Score - only show if from quiz */}
                 {vehicleWithScore.matchScore && customerData?.quizAnswers && (

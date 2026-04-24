@@ -26,13 +26,14 @@ Configuration (environment variables):
 
 import httpx
 import logging
+import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timezone, timedelta
 
-logger = logging.getLogger("quirk_kiosk.notifications")
+logger = logging.getLogger("showroom_kiosk.notifications")
 
 
 class NotificationService:
@@ -164,7 +165,9 @@ class NotificationService:
         title = titles.get(notification_type, "Customer Assistance Needed")
         
         # Dashboard link
-        dashboard_url = f"https://quirk-frontend-production.up.railway.app/#salesDashboard?session={session_id}"
+        # TODO: set to real deployed frontend URL via env var
+        frontend_base = os.environ.get("FRONTEND_BASE_URL", "http://localhost:3000")
+        dashboard_url = f"{frontend_base}/#salesDashboard?session={session_id}"
         
         return {
             "emoji": emoji,
@@ -309,7 +312,7 @@ class NotificationService:
                         "text": vehicle_label,
                         "emoji": True
                     },
-                    "url": f"https://quirk-frontend-production.up.railway.app/#vehicleDetail?stock={notification.get('vehicle_stock', '')}",
+                    "url": f"{os.environ.get('FRONTEND_BASE_URL', 'http://localhost:3000')}/#vehicleDetail?stock={notification.get('vehicle_stock', '')}",
                     "style": "primary"
                 }
             ]
@@ -323,7 +326,7 @@ class NotificationService:
                 "elements": [
                     {
                         "type": "mrkdwn",
-                        "text": f"Session: `{notification['session_id'][:12]}...` | Quirk AI Kiosk"
+                        "text": f"Session: `{notification['session_id'][:12]}...` | NH Chevy Showroom Kiosk"
                     }
                 ]
             }
@@ -362,7 +365,7 @@ class NotificationService:
         
         # Build SMS message (keep it concise)
         sms_parts = [
-            f"{notification['emoji']} QUIRK KIOSK: {notification['title']}",
+            f"{notification['emoji']} SHOWROOM KIOSK: {notification['title']}",
             f"",
             notification['message']
         ]
@@ -407,7 +410,7 @@ class NotificationService:
             return {"success": False, "error": f"No email recipients for {notification_type}"}
         
         # Build email content
-        subject = f"🚨 {notification['title']} - Quirk Kiosk"
+        subject = f"🚨 {notification['title']} - Showroom Kiosk"
         
         # HTML email body
         html_body = f"""
@@ -481,7 +484,7 @@ class NotificationService:
                     </a>
                 </div>
                 <div class="footer">
-                    Session ID: {notification['session_id'][:12]}... | Quirk AI Kiosk
+                    Session ID: {notification['session_id'][:12]}... | NH Chevy Showroom Kiosk
                 </div>
             </div>
         </body>

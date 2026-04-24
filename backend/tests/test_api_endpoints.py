@@ -129,7 +129,7 @@ class TestHealthEndpoints:
         response = client.get("/")
         assert response.status_code == 200
         data = response.json()
-        assert data["service"] == "Quirk AI Kiosk API"
+        assert data["service"] == "NH Chevy Showroom Kiosk API"
         assert data["status"] == "running"
 
     def test_health_check(self):

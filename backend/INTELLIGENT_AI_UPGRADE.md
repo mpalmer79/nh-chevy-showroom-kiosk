@@ -1,4 +1,4 @@
-# QUIRK AI Kiosk - Intelligent AI Upgrade (V3)
+# NH Chevy Showroom Kiosk - Intelligent AI Upgrade (V3)
 
 ## Overview
 

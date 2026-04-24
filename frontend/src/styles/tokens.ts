@@ -1,8 +1,8 @@
 export const colors = {
   // Brand
-  quirkBlue: '#0077b6',
-  quirkBlueDark: '#005a8c',
-  quirkGold: '#D1AD57',
+  brandBlue: '#0077b6',
+  brandBlueDark: '#005a8c',
+  brandGold: '#D1AD57',
 
   // Neutrals
   white: '#ffffff',

@@ -1,4 +1,4 @@
-# QUIRK AI Kiosk - Frontend React Application (Production)
+# NH Chevy Showroom Kiosk - Frontend React Application (Production)
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -13,7 +13,7 @@ COPY . .
 # Build arguments for environment
 ARG REACT_APP_API_URL
 ARG REACT_APP_KIOSK_ID=KIOSK-001
-ARG REACT_APP_DEALERSHIP=Quirk Chevrolet
+ARG REACT_APP_DEALERSHIP=New Hampshire Chevrolet
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 ENV REACT_APP_KIOSK_ID=$REACT_APP_KIOSK_ID
 ENV REACT_APP_DEALERSHIP=$REACT_APP_DEALERSHIP

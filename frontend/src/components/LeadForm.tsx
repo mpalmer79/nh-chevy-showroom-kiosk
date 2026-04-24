@@ -278,7 +278,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ isOpen, onClose, vehicle, formType 
                 </button>
 
                 <p style={styles.disclaimer}>
-                  By submitting, you agree to be contacted by Quirk Auto Dealers.
+                  By submitting, you agree to be contacted by New Hampshire Chevrolet.
                 </p>
               </form>
             </>

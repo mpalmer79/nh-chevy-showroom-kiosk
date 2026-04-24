@@ -14,7 +14,7 @@ from app.services.entity_extraction import (
 )
 from app.services.inventory_enrichment import enrich_vehicle
 
-logger = logging.getLogger("quirk_ai.recommendations")
+logger = logging.getLogger("showroom_kiosk.ai.recommendations")
 
 
 @dataclass

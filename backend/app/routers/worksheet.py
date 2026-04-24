@@ -24,7 +24,7 @@ from app.models.worksheet import (
 from app.services.worksheet_service import get_worksheet_service
 
 router = APIRouter(prefix="/worksheet", tags=["worksheet"])
-logger = logging.getLogger("quirk_ai.worksheet_router")
+logger = logging.getLogger("showroom_kiosk.ai.worksheet_router")
 
 
 # ---

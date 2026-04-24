@@ -1,5 +1,5 @@
 /**
- * Quirk AI Kiosk - API Service Layer
+ * NH Chevy Showroom Kiosk - API Service Layer
  *
  * Central API client for all communication between the frontend React
  * components and the FastAPI backend. Every outbound HTTP request in the

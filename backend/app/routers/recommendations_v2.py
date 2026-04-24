@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Enhanced Recommendations Router (V2)
+NH Chevy Showroom Kiosk - Enhanced Recommendations Router (V2)
 Improved vehicle recommendations with unified recommendation engine
 """
 
@@ -13,7 +13,7 @@ from pathlib import Path
 from app.core.recommendation_engine import VehicleRecommender
 
 router = APIRouter()
-logger = logging.getLogger("quirk_ai.recommendations_v2")
+logger = logging.getLogger("showroom_kiosk.ai.recommendations_v2")
 
 # Initialize recommender
 recommender = VehicleRecommender()

@@ -1,8 +1,8 @@
-# Quirk Kiosk A-Grade Remaining Fixes Guide
+# NH Chevy Showroom Kiosk A-Grade Remaining Fixes Guide
 
 ## Purpose
 
-This document is an instruction manual for **Claude Code** to raise the current state of the Quirk Kiosk repo from roughly **B+** to **A / A- production quality**.
+This document is an instruction manual for **Claude Code** to raise the current state of the NH Chevy Showroom Kiosk repo from roughly **B+** to **A / A- production quality**.
 
 It is based on:
 - direct review of the updated repo

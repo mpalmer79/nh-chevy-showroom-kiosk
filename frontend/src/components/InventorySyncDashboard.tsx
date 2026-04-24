@@ -1,5 +1,5 @@
 /**
- * QUIRK AI Kiosk - Inventory Sync Status Dashboard
+ * NH Chevy Showroom Kiosk - Inventory Sync Status Dashboard
  * 
  * Monitors PBS DMS inventory sync status including:
  * - Data freshness indicators

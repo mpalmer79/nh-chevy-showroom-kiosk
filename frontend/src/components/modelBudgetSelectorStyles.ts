@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { colors, spacing, typography, borderRadius } from '../styles/tokens';
 
 // =============================================================================
-// QUIRK AI KIOSK - Model Budget Selector Styles
+// NH CHEVY SHOWROOM KIOSK - Model Budget Selector Styles
 // Design: Dark, cutting-edge tech aesthetic with depth and polish
 // =============================================================================
 

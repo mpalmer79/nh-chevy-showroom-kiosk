@@ -11,9 +11,9 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Default URLs (override with arguments)
-BACKEND_URL="${1:-https://quirk-backend-production.up.railway.app}"
-FRONTEND_URL="${2:-https://quirk-frontend-production.up.railway.app}"
+# Default URLs (override with arguments or BACKEND_URL/FRONTEND_URL env vars)
+BACKEND_URL="${1:-${BACKEND_URL:-http://localhost:8000}}"
+FRONTEND_URL="${2:-${FRONTEND_URL:-http://localhost:3000}}"
 
 # Counters
 PASSED=0
@@ -83,7 +83,7 @@ test_json_key() {
 
 echo ""
 echo -e "${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     QUIRK AI KIOSK - DEPLOYMENT VERIFICATION               ║${NC}"
+echo -e "${GREEN}║     NH CHEVY SHOWROOM KIOSK - DEPLOYMENT VERIFICATION      ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo "Backend URL:  $BACKEND_URL"

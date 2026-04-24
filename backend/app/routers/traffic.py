@@ -20,7 +20,7 @@ import os
 import logging
 
 router = APIRouter()
-logger = logging.getLogger("quirk_kiosk.traffic")
+logger = logging.getLogger("showroom_kiosk.traffic")
 
 # Import database module (not individual items - they need to be accessed dynamically)
 from app import database

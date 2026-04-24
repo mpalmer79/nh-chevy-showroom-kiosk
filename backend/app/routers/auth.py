@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Authentication Router
+NH Chevy Showroom Kiosk - Authentication Router
 
 Provides endpoints for:
 - Admin login
@@ -27,7 +27,7 @@ from app.core.auth import (
 from app.core.settings import get_settings
 
 router = APIRouter()
-logger = logging.getLogger("quirk_kiosk.auth_router")
+logger = logging.getLogger("showroom_kiosk.auth_router")
 
 
 # ---

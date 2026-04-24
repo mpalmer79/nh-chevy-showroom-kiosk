@@ -1,5 +1,5 @@
 /**
- * Quirk AI Kiosk - Design System Theme
+ * NH Chevy Showroom Kiosk - Design System Theme
  * Centralized design tokens for consistent styling across all components
  */
 

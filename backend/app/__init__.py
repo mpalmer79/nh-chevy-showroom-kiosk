@@ -1,1 +1,1 @@
-"""QUIRK AI Kiosk Backend Application"""
+"""NH Chevy Showroom Kiosk Backend Application"""

@@ -27,7 +27,8 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ vehicle, isOpen, onClose }) =
 
   // Build vehicle URL - this would be your dealership's website URL
   const stockNumber = vehicle.stockNumber || vehicle.stock_number || '';
-  const baseUrl = 'https://quirkchevynh.com/inventory';
+  // TODO: set REACT_APP_INVENTORY_URL to real dealership inventory URL
+  const baseUrl = process.env.REACT_APP_INVENTORY_URL ?? 'https://example.com/inventory';
   const vehicleUrl = `${baseUrl}/${stockNumber}`;
   
   // QR Code API URL (using free goqr.me API - no dependencies needed)
@@ -160,7 +161,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ vehicle, isOpen, onClose }) =
       <body>
         <div class="card">
           <div class="header">
-            <h1>QUIRK CHEVROLET</h1>
+            <h1>NEW HAMPSHIRE CHEVROLET</h1>
           </div>
           <div class="content">
             <div class="qr-container">
@@ -178,7 +179,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ vehicle, isOpen, onClose }) =
             </div>
           </div>
           <div class="footer">
-            <p>Quirk Chevrolet • Manchester, NH • quirkchevynh.com</p>
+            <p>New Hampshire Chevrolet • Manchester, NH • example.com</p>
           </div>
         </div>
       </body>

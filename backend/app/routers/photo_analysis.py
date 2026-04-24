@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Trade-In Photo Analysis Router
+NH Chevy Showroom Kiosk - Trade-In Photo Analysis Router
 Uses Claude Vision API to analyze vehicle photos and assess condition
 """
 
@@ -15,7 +15,7 @@ import re
 from app.core.security import get_key_manager
 
 router = APIRouter()
-logger = logging.getLogger("quirk_kiosk.photo_analysis")
+logger = logging.getLogger("showroom_kiosk.photo_analysis")
 
 # Anthropic API configuration
 ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
