@@ -127,7 +127,7 @@ const CustomerHandoff: React.FC<KioskComponentProps> = ({ navigateTo, updateCust
           
           <h1 style={styles.successTitle}>You're All Set!</h1>
           <p style={styles.successSubtitle}>
-            A Quirk team member has been notified and will be with you shortly.
+            A team member has been notified and will be with you shortly.
           </p>
 
           {/* Wait Time */}

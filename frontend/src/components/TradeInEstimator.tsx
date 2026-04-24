@@ -1,5 +1,5 @@
 /**
- * QUIRK AI Kiosk - Trade-In Estimator (Redesigned)
+ * NH Chevy Showroom Kiosk - Trade-In Estimator (Redesigned)
  * ------------------------------------------------
  * - Guided step-by-step trade input
  * - Instant valuation estimate with transparent factors

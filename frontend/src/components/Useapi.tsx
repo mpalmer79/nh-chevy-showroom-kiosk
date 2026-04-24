@@ -1,5 +1,5 @@
 /**
- * Quirk AI Kiosk - API Hooks
+ * NH Chevy Showroom Kiosk - API Hooks
  * React hooks for managing API calls with loading states and error handling
  */
 

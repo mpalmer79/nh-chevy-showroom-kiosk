@@ -9,8 +9,8 @@ export const SUGGESTED_PROMPTS = [
   "I need a truck that can tow 10,000 pounds and carry 5 people. What are my options?",
   "I want a sporty car with good tech features.",
   "I drive under 20K miles per year. What are the benefits of leasing my next vehicle?",
-  "Bienvenido a Quirk Chevrolet. ¿Qué puedo ayudarle a lograr hoy?",
-  "Bienvenue chez Quirk Chevrolet. Que puis-je vous aider à accomplir aujourd'hui ?",
+  "Bienvenido a New Hampshire Chevrolet. ¿Qué puedo ayudarle a lograr hoy?",
+  "Bienvenue chez New Hampshire Chevrolet. Que puis-je vous aider à accomplir aujourd'hui ?",
 ];
 
 export const OBJECTION_CATEGORIES: ObjectionCategory[] = [

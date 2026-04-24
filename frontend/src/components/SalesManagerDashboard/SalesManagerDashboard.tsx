@@ -1,5 +1,5 @@
 /**
- * QUIRK AI Kiosk - Sales Manager Dashboard
+ * NH Chevy Showroom Kiosk - Sales Manager Dashboard
  * Refactored main component
  */
 

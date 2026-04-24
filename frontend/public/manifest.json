@@ -1,7 +1,7 @@
 {
-  "short_name": "QUIRK AI",
-  "name": "QUIRK AI Kiosk",
-  "description": "Intelligent vehicle discovery for Quirk Auto Dealers",
+  "short_name": "NH Chevy",
+  "name": "NH Chevy Showroom Kiosk",
+  "description": "Intelligent vehicle discovery for New Hampshire Chevrolet",
   "icons": [
     {
       "src": "favicon.ico",

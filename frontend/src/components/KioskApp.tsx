@@ -566,7 +566,7 @@ const KioskApp: React.FC = () => {
               borderRadius: '12px',
             } : {})
           }} onClick={resetJourney}>
-            <span style={styles.logoText}>QUIRK</span>
+            <span style={styles.logoText}>NH CHEVY</span>
             <span style={styles.logoAI}>AI</span>
           </div>
         </div>
@@ -656,7 +656,7 @@ const KioskApp: React.FC = () => {
           color: '#1e293b',
         } : {})
       }}>
-        <span>Quirk Chevrolet</span>
+        <span>New Hampshire Chevrolet</span>
         <span style={{
           ...styles.footerDot,
           ...(currentScreen === 'inventory' ? { color: 'rgba(0,0,0,0.3)' } : {})

@@ -119,7 +119,7 @@ const VehicleDetail: React.FC<KioskComponentProps> = ({ navigateTo, updateCustom
   const msrp = vehicle.msrp || 0;
   const rebates = vehicle.rebates || DEFAULT_REBATES;
   const totalRebates = rebates.reduce((sum, r) => sum + r.amount, 0);
-  const quirkPrice = msrp - totalRebates;
+  const dealerPrice = msrp - totalRebates;
   const status = vehicle.status || 'In Stock';
   
   // Decode VIN for additional info
@@ -148,7 +148,7 @@ const VehicleDetail: React.FC<KioskComponentProps> = ({ navigateTo, updateCustom
           trim: vehicle.trim,
           exteriorColor: exteriorColor,
           msrp: msrp,
-          salePrice: quirkPrice,
+          salePrice: dealerPrice,
         },
       });
       
@@ -163,7 +163,7 @@ const VehicleDetail: React.FC<KioskComponentProps> = ({ navigateTo, updateCustom
           model: vehicle.model,
           trim: vehicle.trim,
           msrp: msrp,
-          salePrice: quirkPrice,
+          salePrice: dealerPrice,
         },
         actions: ['lets_see_it_clicked'],
       });
@@ -356,11 +356,11 @@ const VehicleDetail: React.FC<KioskComponentProps> = ({ navigateTo, updateCustom
               </div>
             ))}
 
-            {/* Quirk Price */}
+            {/* Dealership Price */}
             <div style={s.divider} />
-            <div style={s.quirkPriceRow}>
-              <span style={s.quirkPriceLabel}>Quirk Price</span>
-              <span style={s.quirkPriceValue}>{formatCurrency(quirkPrice)}</span>
+            <div style={s.dealerPriceRow}>
+              <span style={s.dealerPriceLabel}>Dealership Price</span>
+              <span style={s.dealerPriceValue}>{formatCurrency(dealerPrice)}</span>
             </div>
 
             {/* Conditional Offers */}
@@ -724,17 +724,17 @@ const s: Record<string, CSSProperties> = {
     background: '#e5e5e5',
     margin: '16px 0',
   },
-  quirkPriceRow: {
+  dealerPriceRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  quirkPriceLabel: {
+  dealerPriceLabel: {
     fontSize: '18px',
     fontWeight: 700,
     color: '#1a1a1a',
   },
-  quirkPriceValue: {
+  dealerPriceValue: {
     fontSize: '32px',
     fontWeight: 700,
     color: '#16a34a',

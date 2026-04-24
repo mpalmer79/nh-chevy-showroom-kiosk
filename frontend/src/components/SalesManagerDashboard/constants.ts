@@ -39,6 +39,6 @@ export const DEFAULT_OVERRIDES = {
   leaseResidual: 0.55,
 };
 
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://quirk-backend-production.up.railway.app';
+export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1';
 
 export const REFRESH_INTERVAL = 5000; // 5 seconds

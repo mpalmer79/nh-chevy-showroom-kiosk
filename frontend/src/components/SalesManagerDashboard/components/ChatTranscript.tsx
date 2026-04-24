@@ -35,7 +35,7 @@ export const ChatTranscript: React.FC<ChatTranscriptProps> = ({ messages, onBack
               }}
             >
               <span style={styles.messageRole}>
-                {msg.role === 'user' ? 'Customer' : 'Quirk AI'}
+                {msg.role === 'user' ? 'Customer' : 'Showroom AI'}
               </span>
               <p style={styles.messageContent}>{msg.content}</p>
             </div>

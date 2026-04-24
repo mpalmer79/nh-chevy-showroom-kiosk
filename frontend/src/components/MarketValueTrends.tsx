@@ -1,5 +1,5 @@
 /**
- * QUIRK AI Kiosk - Market Value Trends (Feature #13)
+ * NH Chevy Showroom Kiosk - Market Value Trends (Feature #13)
  * --------------------------------------------------
  * Highlights:
  * - Shows current estimated market value (or vehicle price as fallback)

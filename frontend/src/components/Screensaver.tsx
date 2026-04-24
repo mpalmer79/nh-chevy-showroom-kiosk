@@ -28,7 +28,7 @@ const Screensaver: React.FC<ScreensaverProps> = ({ onTouch }) => {
         transition={{ delay: 0.2, duration: 0.5 }}
       >
         <div style={styles.logo}>
-          <span style={styles.logoQuirk}>QUIRK</span>
+          <span style={styles.logoBrand}>NH CHEVY</span>
           <span style={styles.logoAI}>AI</span>
         </div>
 
@@ -48,7 +48,7 @@ const Screensaver: React.FC<ScreensaverProps> = ({ onTouch }) => {
       </motion.div>
 
       <div style={styles.footer}>
-        <span style={styles.dealership}>Quirk Chevrolet</span>
+        <span style={styles.dealership}>New Hampshire Chevrolet</span>
         <span style={styles.divider}>&bull;</span>
         <span style={styles.tagline}>New England's #1 Dealer</span>
       </div>
@@ -118,7 +118,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '12px',
     marginBottom: '32px',
   },
-  logoQuirk: {
+  logoBrand: {
     fontSize: '4rem',
     fontWeight: 800,
     color: '#ffffff',

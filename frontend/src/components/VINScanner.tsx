@@ -1,5 +1,5 @@
 /**
- * QUIRK AI Kiosk - VIN Scanner Component
+ * NH Chevy Showroom Kiosk - VIN Scanner Component
  * 
  * Camera-based VIN barcode scanner using ZXing library.
  * Supports Code 39, Code 128, and DataMatrix formats commonly used for VIN barcodes.
