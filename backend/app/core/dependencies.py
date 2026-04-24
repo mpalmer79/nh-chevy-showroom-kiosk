@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Dependency Injection Provider
+NH Chevy Showroom Kiosk - Dependency Injection Provider
 Replaces module-level global singletons with FastAPI Depends().
 
 BEFORE (scattered across multiple modules):

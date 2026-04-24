@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Production Middleware
+NH Chevy Showroom Kiosk - Production Middleware
 
 Provides:
 1. Request ID / Correlation ID tracking
@@ -20,7 +20,7 @@ import json
 
 from app.core.settings import get_settings
 
-logger = logging.getLogger("quirk_kiosk.middleware")
+logger = logging.getLogger("showroom_kiosk.middleware")
 
 
 # ---

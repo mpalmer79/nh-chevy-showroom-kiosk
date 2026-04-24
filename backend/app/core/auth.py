@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Authentication & Authorization
+NH Chevy Showroom Kiosk - Authentication & Authorization
 
 Provides multiple authentication methods:
 1. JWT tokens for user sessions
@@ -26,7 +26,7 @@ import secrets
 
 from app.core.settings import get_settings
 
-logger = logging.getLogger("quirk_kiosk.auth")
+logger = logging.getLogger("showroom_kiosk.auth")
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

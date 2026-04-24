@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Security Utilities
+NH Chevy Showroom Kiosk - Security Utilities
 
 Provides secure handling of:
 - API keys with masking
@@ -16,7 +16,7 @@ import secrets
 import hashlib
 from html import escape
 
-logger = logging.getLogger("quirk_kiosk.security")
+logger = logging.getLogger("showroom_kiosk.security")
 
 
 class SecretValue:

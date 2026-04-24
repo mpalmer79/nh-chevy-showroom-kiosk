@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Custom Exception Classes
+NH Chevy Showroom Kiosk - Custom Exception Classes
 
 Provides consistent error handling across the application with:
 - Structured error responses

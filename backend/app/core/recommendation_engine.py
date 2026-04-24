@@ -1,5 +1,5 @@
 """
-Unified Vehicle Recommendation Engine for QUIRK AI Kiosk
+Unified Vehicle Recommendation Engine for NH Chevy Showroom Kiosk
 Handles similarity scoring, feature extraction, and personalized recommendations
 """
 

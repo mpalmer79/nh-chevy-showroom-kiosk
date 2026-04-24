@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - Caching Layer
+NH Chevy Showroom Kiosk - Caching Layer
 
 Provides:
 - Redis caching for production
@@ -16,7 +16,7 @@ import logging
 import asyncio
 from datetime import datetime, timedelta
 
-logger = logging.getLogger("quirk_kiosk.cache")
+logger = logging.getLogger("showroom_kiosk.cache")
 
 T = TypeVar('T')
 

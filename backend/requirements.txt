@@ -1,5 +1,5 @@
 # =============================================================================
-# QUIRK AI KIOSK - Backend Dependencies
+# NH CHEVY SHOWROOM KIOSK - Backend Dependencies
 # =============================================================================
 
 # Core Framework

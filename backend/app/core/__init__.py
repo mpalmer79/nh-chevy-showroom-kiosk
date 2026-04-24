@@ -1,5 +1,5 @@
 """
-Core utilities and services for the Quirk AI Kiosk backend.
+Core utilities and services for the NH Chevy Showroom Kiosk backend.
 """
 
 from .exceptions import (
