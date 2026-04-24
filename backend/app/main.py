@@ -1,5 +1,5 @@
 """
-Quirk AI Kiosk - FastAPI Main Application
+NH Chevy Showroom Kiosk - FastAPI Main Application
 Entry point for the kiosk backend API
 
 Production-hardened with:
@@ -43,7 +43,7 @@ LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 LOG_LEVEL = logging.DEBUG if settings.is_development else logging.INFO
 
 logging.basicConfig(level=LOG_LEVEL, format=LOG_FORMAT)
-logger = logging.getLogger("quirk_kiosk")
+logger = logging.getLogger("showroom_kiosk")
 
 # Import routers
 from app.routers import inventory, recommendations, leads, analytics, traffic
@@ -89,7 +89,7 @@ limiter = Limiter(key_func=get_client_identifier)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application startup and shutdown handler"""
-    logger.info("Quirk AI Kiosk API starting...")
+    logger.info("NH Chevy Showroom Kiosk API starting...")
     logger.info(f"Environment: {settings.environment}")
     logger.info("Loading inventory enrichment service...")
     logger.info("Initializing entity extraction service...")
@@ -126,7 +126,7 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
-    logger.info("Quirk AI Kiosk API shutting down...")
+    logger.info("NH Chevy Showroom Kiosk API shutting down...")
     await shutdown_cache()
     await close_database()
     logger.info("Cleanup complete")
@@ -135,8 +135,8 @@ async def lifespan(app: FastAPI):
 # App initialization
 
 app = FastAPI(
-    title="Quirk AI Kiosk API",
-    description="AI-powered vehicle recommendation and customer interaction system for Quirk Auto Dealers",
+    title="NH Chevy Showroom Kiosk API",
+    description="AI-powered vehicle recommendation and customer interaction system for a New Hampshire Chevrolet dealership",
     version="4.0.0",
     docs_url="/docs" if settings.is_development else None,
     redoc_url="/redoc" if settings.is_development else None,
@@ -260,7 +260,7 @@ app.include_router(tts.router, prefix="/api/v1/tts", tags=["tts"])
 async def root():
     """API root - service information"""
     return {
-        "service": "Quirk AI Kiosk API",
+        "service": "NH Chevy Showroom Kiosk API",
         "status": "running",
         "version": "4.0.0",
         "environment": settings.environment,
@@ -283,7 +283,7 @@ async def health_check():
     health_status = {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "service": "quirk-kiosk-api",
+        "service": "showroom-kiosk-api",
         "version": "4.0.0",
         "environment": settings.environment,
         "checks": {}
