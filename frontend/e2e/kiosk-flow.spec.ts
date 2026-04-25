@@ -149,21 +149,26 @@ test.describe('Kiosk Customer Journey', () => {
       await page.getByText(/skip/i).click();
       await page.getByText('I Have a Stock Number').click();
 
-      // Should see numeric keypad
-      await expect(page.getByText('1')).toBeVisible();
-      await expect(page.getByText('2')).toBeVisible();
-      await expect(page.getByText('Search')).toBeVisible();
-      await expect(page.getByText('Clear')).toBeVisible();
+      // Should see numeric keypad -- target the buttons specifically by role
+      // (avoids matching "1" or "2" inside any other rendered text)
+      await expect(page.getByRole('button', { name: '1', exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: '2', exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Search' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Clear' })).toBeVisible();
     });
 
     test('can enter digits on the keypad', async ({ page }) => {
       await page.getByText(/skip/i).click();
       await page.getByText('I Have a Stock Number').click();
 
-      // Click keypad buttons
-      await page.getByText('3').click();
-      await page.getByText('9').click();
-      await page.getByText('5').click();
+      // Click keypad buttons -- use role+exact so digits in displayed
+      // values (e.g. "39547") don't collide with the keypad button locators.
+      const pressKey = (digit: string) =>
+        page.getByRole('button', { name: digit, exact: true }).click();
+
+      await pressKey('3');
+      await pressKey('9');
+      await pressKey('5');
 
       // Should see M prefix and entered digits
       await expect(page.getByText('M')).toBeVisible();
