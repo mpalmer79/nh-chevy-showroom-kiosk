@@ -248,6 +248,23 @@ nh-chevy-showroom-kiosk/
 
 ---
 
+## Documentation
+
+This repo ships with multiple layers of documentation, each targeted at a different reader:
+
+| Document | Audience | Length | Read time |
+|----------|----------|--------|-----------|
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Engineers wanting a fast architectural orientation | ~200 lines | 5 min |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Engineers diving deep into request flows, services, state machines | ~400 lines | 15 min |
+| [`docs/INDUSTRY_CONTEXT.md`](docs/INDUSTRY_CONTEXT.md) | Reviewers wanting dealership domain context (PBS, four-square, F&I, BDC) | ~300 lines | 10 min |
+| [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) | Engineers running the kiosk locally | — | as needed |
+| [`docs/adr/`](docs/adr/) | Anyone interested in the *why* behind major architectural choices | 5 ADRs | 3 min each |
+| [`CLAUDE.md`](CLAUDE.md) | AI agents (Claude Code, etc.) working on this codebase | — | as needed |
+
+**New here?** Start with [`ARCHITECTURE.md`](ARCHITECTURE.md) for the system overview and one end-to-end request walk, then read [`docs/INDUSTRY_CONTEXT.md`](docs/INDUSTRY_CONTEXT.md) if you want the dealership context behind the design choices.
+
+---
+
 ## Staff Notification System
 
 The kiosk can notify sales staff in real-time when customers need assistance.
