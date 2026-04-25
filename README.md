@@ -12,6 +12,26 @@ An interactive in-store kiosk system that enables customers to browse inventory,
 
 ---
 
+## Demo
+
+> **🖼️ Screenshot placeholder** — replace `docs/images/hero.png` with an actual screenshot of the kiosk's Welcome screen or AI conversation in flight. A 1920×1080 capture works; resize for web. A short GIF (`docs/images/demo.gif`) showing a 10–15-second conversation is even better.
+
+![NH Chevy Showroom Kiosk — Welcome screen](docs/images/hero.png)
+
+A 1920×1080 touchscreen kiosk that lives on the showroom floor. Customers chat with an AI sales assistant grounded in real inventory, build itemized deal worksheets, and connect with sales staff via Slack/SMS/email handoffs — without ever leaving the dealership.
+
+**Three things to know:**
+
+1. **The customer is already in-store.** This is not a website chatbot — every design decision (voice, UX, feature set) follows from the customer being physically present in the showroom.
+2. **The AI uses tools, not RAG.** Eleven tools (search inventory, calculate payments, create a worksheet, notify staff, etc.) — the model decides which to invoke. See [ADR-0003](docs/adr/0003-tool-use-over-rag.md).
+3. **Inventory comes from PBS.** The dealership's nightly Excel export is the source of truth; the kiosk is read-only on inventory. See [ADR-0001](docs/adr/0001-pbs-excel-as-inventory-source-of-truth.md).
+
+📐 **Architecture:** [`ARCHITECTURE.md`](ARCHITECTURE.md) (5-min read) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (deep dive)
+🏪 **Industry context:** [`docs/INDUSTRY_CONTEXT.md`](docs/INDUSTRY_CONTEXT.md)
+📋 **Decision records:** [`docs/adr/`](docs/adr/)
+
+---
+
 ## Quick Start
 
 ```bash
