@@ -3,8 +3,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
-COPY package.json ./
+# Install dependencies (copy lockfile too so npm ci works)
+COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
 
 # Copy application code
