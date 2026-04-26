@@ -22,7 +22,7 @@ const styles: Record<string, CSSProperties> = {
     WebkitOverflowScrolling: 'touch',
     minHeight: 0,
     boxSizing: 'border-box',
-    backgroundImage: 'linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.5)), url(/showroom5.jfif)',
+    backgroundImage: 'linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.5)), url(/showroom.png)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundAttachment: 'fixed',
