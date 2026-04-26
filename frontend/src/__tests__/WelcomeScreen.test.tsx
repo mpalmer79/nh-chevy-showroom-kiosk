@@ -46,8 +46,14 @@ describe('WelcomeScreen Component', () => {
 
   // ===========================================================================
   // Phase 1: Name Capture Tests
+  // ---------------------------------------------------------------------------
+  // TODO: Name entry is currently disabled (WelcomeScreen defaults
+  // `nameSubmitted` to true so the path-selection view is the landing
+  // surface). The implementation JSX is preserved in WelcomeScreen.tsx
+  // for trivial restoration; if name capture comes back, drop `.skip`
+  // here and the tests will exercise it again as-is.
   // ===========================================================================
-  describe('Phase 1 - Name Capture', () => {
+  describe.skip('Phase 1 - Name Capture (currently disabled)', () => {
     test('displays Showroom AI assistant greeting', () => {
       renderWelcomeScreen();
       expect(screen.getByText(/Showroom AI/i)).toBeInTheDocument();
@@ -278,19 +284,16 @@ describe('WelcomeScreen Component', () => {
   // ===========================================================================
   describe('Phase 2 - Path Selection', () => {
     const renderPhase2 = async (customerName?: string) => {
-      const props = customerName 
+      const props = customerName
         ? { customerData: { customerName } }
         : {};
       renderWelcomeScreen(props);
-      
-      // Skip to Phase 2
-      if (!customerName) {
-        const skipBtn = screen.getByText(/Skip for now/i);
-        fireEvent.click(skipBtn);
-        await waitFor(() => {
-          expect(screen.getByText(/How can I help you today/i)).toBeInTheDocument();
-        });
-      }
+      // Path-selection view is the landing surface (name gate is disabled),
+      // so no skip-click is needed. The await keeps the helper async-shaped
+      // for callers that already use it under await.
+      await waitFor(() => {
+        expect(screen.getByText(/How can I help you today/i)).toBeInTheDocument();
+      });
     };
 
     test('displays personalized greeting when customer name provided', async () => {
@@ -309,11 +312,14 @@ describe('WelcomeScreen Component', () => {
       expect(screen.getByText(/How can I help you today/i)).toBeInTheDocument();
     });
 
-    test('displays "I Have a Stock Number" path card', async () => {
+    test('does not display the stock-number entry card on welcome', async () => {
       await renderPhase2();
-      
-      expect(screen.getByText(/I Have a Stock Number/i)).toBeInTheDocument();
-      expect(screen.getByText(/Find the exact vehicle/i)).toBeInTheDocument();
+
+      // The stockLookup entry was removed from the welcome PATHS array.
+      // The route still exists and is reachable via direct hash URL
+      // (#stockLookup); only the welcome-card surface is affected.
+      expect(screen.queryByText(/I Have a Stock Number/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Find the exact vehicle/i)).not.toBeInTheDocument();
     });
 
     test('displays "I Know What I Want" path card', async () => {
@@ -328,17 +334,6 @@ describe('WelcomeScreen Component', () => {
       
       expect(screen.getByText(/Chat with Showroom AI/i)).toBeInTheDocument();
       expect(screen.getByText(/LET'S HAVE A CONVERSATION/i)).toBeInTheDocument();
-    });
-
-    test('clicking Stock Number card navigates to stockLookup', async () => {
-      await renderPhase2();
-
-      const card = screen.getByText(/I Have a Stock Number/i).closest('div');
-      fireEvent.click(card!);
-
-      await waitFor(() => {
-        expect(mockNavigateTo).toHaveBeenCalledWith('stockLookup');
-      });
     });
 
     test('clicking Model Budget card navigates to modelBudget', async () => {
@@ -377,14 +372,14 @@ describe('WelcomeScreen Component', () => {
     test('clicking path card logs traffic session', async () => {
       await renderPhase2();
 
-      const card = screen.getByText(/I Have a Stock Number/i).closest('div');
+      const card = screen.getByText(/Chat with Showroom AI/i).closest('div');
       fireEvent.click(card!);
 
       await waitFor(() => {
         expect(api.logTrafficSession).toHaveBeenCalledWith(
           expect.objectContaining({
-            path: 'stockLookup',
-            actions: ['selected_stockLookup'],
+            path: 'aiAssistant',
+            actions: ['selected_aiAssistant'],
           })
         );
       });
@@ -555,15 +550,20 @@ describe('WelcomeScreen Component', () => {
 
     test('handles traffic log API error gracefully', async () => {
       (api.logTrafficSession as jest.Mock).mockRejectedValue(new Error('API Error'));
-      
+
       renderWelcomeScreen();
 
-      const skipBtn = screen.getByText(/Skip for now/i);
-      fireEvent.click(skipBtn);
-
-      // Should still advance to Phase 2 despite logging error
+      // Path-selection is the landing surface; clicking a path card
+      // triggers a traffic-log call which we have rejected. The click
+      // handler should still call navigateTo regardless.
       await waitFor(() => {
-        expect(screen.getByText(/How can I help you today/i)).toBeInTheDocument();
+        expect(screen.getByText(/Chat with Showroom AI/i)).toBeInTheDocument();
+      });
+      const card = screen.getByText(/Chat with Showroom AI/i).closest('div');
+      fireEvent.click(card!);
+
+      await waitFor(() => {
+        expect(mockNavigateTo).toHaveBeenCalledWith('aiAssistant');
       });
     });
   });
@@ -572,19 +572,22 @@ describe('WelcomeScreen Component', () => {
   // Accessibility Tests
   // ===========================================================================
   describe('Accessibility', () => {
-    test('name input has placeholder text for accessibility', () => {
+    // Name-input / Continue / Skip accessibility checks are skipped while
+    // the name-capture surface is disabled. See the Phase 1 describe.skip
+    // block above for context — these will reactivate together.
+    test.skip('name input has placeholder text for accessibility', () => {
       renderWelcomeScreen();
       const input = screen.getByPlaceholderText(/first name/i);
       expect(input).toBeInTheDocument();
     });
 
-    test('Continue button is a button element', () => {
+    test.skip('Continue button is a button element', () => {
       renderWelcomeScreen();
       const btn = screen.getByText('Continue');
       expect(btn.tagName).toBe('BUTTON');
     });
 
-    test('Skip button is a button element', () => {
+    test.skip('Skip button is a button element', () => {
       renderWelcomeScreen();
       const btn = screen.getByText(/Skip for now/i);
       expect(btn.tagName).toBe('BUTTON');
@@ -592,8 +595,8 @@ describe('WelcomeScreen Component', () => {
 
     test('path cards are clickable', async () => {
       renderWelcomeScreen({ customerData: { customerName: 'John' } });
-      
-      const card = screen.getByText(/I Have a Stock Number/i).closest('div');
+
+      const card = screen.getByText(/Chat with Showroom AI/i).closest('div');
       expect(card).toHaveStyle({ cursor: 'pointer' });
     });
 
@@ -629,17 +632,15 @@ describe('WelcomeScreen Component', () => {
       expect(screen.queryByText('Continue')).not.toBeInTheDocument();
     });
 
-    test('pre-fills name input if customerName exists but not submitted', () => {
-      // This tests the initial state loading
+    // Name/phone pre-fill assertions depend on the name-capture UI rendering
+    // and are skipped while that surface is disabled.
+    test.skip('pre-fills name input if customerName exists but not submitted', () => {
       renderWelcomeScreen({ customerData: { customerName: '' } });
-      
-      // Should show Phase 1 since name is empty
       expect(screen.getByPlaceholderText(/first name/i)).toBeInTheDocument();
     });
 
-    test('pre-fills phone input from customerData', () => {
+    test.skip('pre-fills phone input from customerData', () => {
       renderWelcomeScreen({ customerData: { phone: '(617) 555-1234' } });
-      
       const phoneInput = screen.getByPlaceholderText(/saves your progress/i) as HTMLInputElement;
       expect(phoneInput.value).toBe('(617) 555-1234');
     });

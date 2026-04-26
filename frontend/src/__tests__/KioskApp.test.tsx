@@ -250,11 +250,10 @@ describe('KioskApp Component', () => {
       });
     });
 
-    test('renders header with NH CHEVY logo', async () => {
+    test('renders header with NEW HAMPSHIRE CHEVROLET logo', async () => {
       renderKioskApp();
       await waitFor(() => {
-        expect(screen.getByText('NH CHEVY')).toBeInTheDocument();
-        expect(screen.getByText('AI')).toBeInTheDocument();
+        expect(screen.getByText('NEW HAMPSHIRE CHEVROLET')).toBeInTheDocument();
       });
     });
 
@@ -715,7 +714,7 @@ describe('KioskApp Component', () => {
       });
 
       // Click logo to reset
-      fireEvent.click(screen.getByText('NH CHEVY'));
+      fireEvent.click(screen.getByText('NEW HAMPSHIRE CHEVROLET'));
       act(() => { jest.advanceTimersByTime(200); });
 
       await waitFor(() => {
@@ -744,7 +743,7 @@ describe('KioskApp Component', () => {
       fireEvent.click(screen.getByText('Select Vehicle Data'));
 
       // Reset by clicking logo
-      fireEvent.click(screen.getByText('NH CHEVY'));
+      fireEvent.click(screen.getByText('NEW HAMPSHIRE CHEVROLET'));
       act(() => { jest.advanceTimersByTime(200); });
 
       await waitFor(() => {
@@ -1058,26 +1057,25 @@ describe('KioskApp Component', () => {
   });
 
   describe('Header', () => {
-    test('header contains NH CHEVY branding', async () => {
+    test('header contains NEW HAMPSHIRE CHEVROLET branding', async () => {
       renderKioskApp();
-      
+
       await waitFor(() => {
-        expect(screen.getByText('NH CHEVY')).toBeInTheDocument();
+        expect(screen.getByText('NEW HAMPSHIRE CHEVROLET')).toBeInTheDocument();
       });
-      
-      const header = screen.getByText('NH CHEVY').closest('header');
+
+      const header = screen.getByText('NEW HAMPSHIRE CHEVROLET').closest('header');
       expect(header).toBeInTheDocument();
-      expect(screen.getByText('AI')).toBeInTheDocument();
     });
 
     test('logo is clickable', async () => {
       renderKioskApp();
-      
+
       await waitFor(() => {
-        expect(screen.getByText('NH CHEVY')).toBeInTheDocument();
+        expect(screen.getByText('NEW HAMPSHIRE CHEVROLET')).toBeInTheDocument();
       });
-      
-      const logoText = screen.getByText('NH CHEVY');
+
+      const logoText = screen.getByText('NEW HAMPSHIRE CHEVROLET');
       const logoContainer = logoText.closest('div');
       expect(logoContainer).toHaveStyle({ cursor: 'pointer' });
     });
