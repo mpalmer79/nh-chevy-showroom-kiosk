@@ -14,8 +14,6 @@ An interactive in-store kiosk system that enables customers to browse inventory,
 
 ## Demo
 
-> **🖼️ Screenshot placeholder** — replace `docs/images/hero.png` with an actual screenshot of the kiosk's Welcome screen or AI conversation in flight. A 1920×1080 capture works; resize for web. A short GIF (`docs/images/demo.gif`) showing a 10–15-second conversation is even better.
-
 ![NH Chevy Showroom Kiosk — Welcome screen](docs/images/hero.png)
 
 A 1920×1080 touchscreen kiosk that lives on the showroom floor. Customers chat with an AI sales assistant grounded in real inventory, build itemized deal worksheets, and connect with sales staff via Slack/SMS/email handoffs — without ever leaving the dealership.
