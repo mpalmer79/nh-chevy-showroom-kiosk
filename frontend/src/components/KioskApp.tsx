@@ -566,8 +566,7 @@ const KioskApp: React.FC = () => {
               borderRadius: '12px',
             } : {})
           }} onClick={resetJourney}>
-            <span style={styles.logoText}>NH CHEVY</span>
-            <span style={styles.logoAI}>AI</span>
+            <span style={styles.logoText}>NEW HAMPSHIRE CHEVROLET</span>
           </div>
         </div>
         

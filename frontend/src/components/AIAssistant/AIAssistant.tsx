@@ -66,8 +66,13 @@ const AIAssistant: React.FC<KioskComponentProps> = ({
     loadInventory();
   }, []);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom whenever a NEW message arrives.
+  // Empty-state (messages.length === 0) keeps the page at its natural
+  // top position so the suggested-prompts list is read top-to-bottom
+  // (English prompts first; bilingual greetings are at indices 8-9 of
+  // SUGGESTED_PROMPTS and shouldn't dominate the first impression).
   useEffect(() => {
+    if (messages.length === 0) return;
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 

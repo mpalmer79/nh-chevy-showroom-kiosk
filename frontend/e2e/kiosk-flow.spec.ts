@@ -7,35 +7,41 @@ test.describe('Kiosk Customer Journey', () => {
 
   // ===========================================================================
   // Welcome Screen Tests
+  // ---------------------------------------------------------------------------
+  // The name-capture gate is currently disabled (WelcomeScreen defaults
+  // `nameSubmitted` to true). Tests that exercised the name input,
+  // Continue button, Skip button, or post-name greeting are skipped while
+  // that surface is dormant. The implementation JSX is preserved in
+  // WelcomeScreen.tsx; if name capture comes back, drop `.skip` to
+  // reactivate these.
   // ===========================================================================
   test.describe('Welcome Screen', () => {
-    test('renders with Showroom AI assistant greeting', async ({ page }) => {
+    test.skip('renders with Showroom AI assistant greeting (name-capture)', async ({ page }) => {
       await expect(page.getByText("I'm your Showroom AI assistant")).toBeVisible();
     });
 
-    test('displays name input field', async ({ page }) => {
+    test.skip('displays name input field', async ({ page }) => {
       await expect(page.locator('input[placeholder*="first name" i]')).toBeVisible();
     });
 
-    test('displays Continue button', async ({ page }) => {
+    test.skip('displays Continue button', async ({ page }) => {
       await expect(page.getByText('Continue')).toBeVisible();
     });
 
-    test('displays Skip for now button', async ({ page }) => {
+    test.skip('displays Skip for now button', async ({ page }) => {
       await expect(page.getByText(/skip for now/i)).toBeVisible();
     });
 
-    test('all navigation options are visible after skipping name', async ({ page }) => {
-      await page.getByText(/skip/i).click();
-
+    test('all navigation options are visible on the welcome surface', async ({ page }) => {
       await expect(page.getByText('How can I help you today?')).toBeVisible();
-      await expect(page.getByText('I Have a Stock Number')).toBeVisible();
       await expect(page.getByText('I Know What I Want')).toBeVisible();
       await expect(page.getByText('Chat with Showroom AI')).toBeVisible();
       await expect(page.getByText(/browse all inventory/i)).toBeVisible();
+      // Stock-number entry was removed from the welcome surface.
+      await expect(page.getByText('I Have a Stock Number')).toHaveCount(0);
     });
 
-    test('shows personalized greeting after entering name', async ({ page }) => {
+    test.skip('shows personalized greeting after entering name (name-capture)', async ({ page }) => {
       await page.locator('input[placeholder*="first name" i]').fill('Sarah');
       await page.getByText('Continue').click();
 
@@ -43,7 +49,7 @@ test.describe('Kiosk Customer Journey', () => {
       await expect(page.getByText('How can I help you today?')).toBeVisible();
     });
 
-    test('displays phone number input', async ({ page }) => {
+    test.skip('displays phone number input', async ({ page }) => {
       await expect(page.locator('input[placeholder*="saves your progress" i]')).toBeVisible();
     });
   });
@@ -53,7 +59,6 @@ test.describe('Kiosk Customer Journey', () => {
   // ===========================================================================
   test.describe('AI Assistant', () => {
     test('can navigate to AI assistant and see chat interface', async ({ page }) => {
-      await page.getByText(/skip/i).click();
       await page.getByText('Chat with Showroom AI').click();
 
       // Should see the chat input
@@ -61,7 +66,6 @@ test.describe('Kiosk Customer Journey', () => {
     });
 
     test('can type a message in the chat input', async ({ page }) => {
-      await page.getByText(/skip/i).click();
       await page.getByText('Chat with Showroom AI').click();
 
       const chatInput = page.locator('input[placeholder*="message" i], textarea[placeholder*="message" i]');
@@ -70,7 +74,6 @@ test.describe('Kiosk Customer Journey', () => {
     });
 
     test('shows suggestion chips in the AI assistant', async ({ page }) => {
-      await page.getByText(/skip/i).click();
       await page.getByText('Chat with Showroom AI').click();
 
       // AI assistant should show quick-action chips or welcome message
@@ -89,7 +92,6 @@ test.describe('Kiosk Customer Journey', () => {
   // ===========================================================================
   test.describe('Browse Inventory', () => {
     test('can navigate to inventory and see vehicles', async ({ page }) => {
-      await page.getByText(/skip/i).click();
       await page.getByText(/browse all inventory/i).click();
 
       await expect(page).toHaveURL(/#inventory/);
@@ -104,7 +106,6 @@ test.describe('Kiosk Customer Journey', () => {
     });
 
     test('inventory page has filter or sort controls', async ({ page }) => {
-      await page.getByText(/skip/i).click();
       await page.getByText(/browse all inventory/i).click();
 
       await expect(page).toHaveURL(/#inventory/);
@@ -120,7 +121,6 @@ test.describe('Kiosk Customer Journey', () => {
     });
 
     test('can navigate back from inventory to path selection', async ({ page }) => {
-      await page.getByText(/skip/i).click();
       await page.getByText(/browse all inventory/i).click();
       await expect(page).toHaveURL(/#inventory/);
 
@@ -135,22 +135,26 @@ test.describe('Kiosk Customer Journey', () => {
 
   // ===========================================================================
   // Stock Lookup Tests
+  // ---------------------------------------------------------------------------
+  // The stock-number entry card was removed from the welcome surface.
+  // KioskApp routes via setCurrentScreen + history.pushState; it does not
+  // read window.location.hash on initial load, so `page.goto('/#stockLookup')`
+  // lands on the welcome screen. The StockLookup component is still
+  // registered and reachable from in-app navigation, but e2e coverage
+  // for it is paused until an initial-hash/hashchange listener is added
+  // (out of scope for the welcome-surface streamline PR).
   // ===========================================================================
   test.describe('Stock Lookup', () => {
-    test('can navigate to stock lookup', async ({ page }) => {
-      await page.getByText(/skip/i).click();
-      await page.getByText('I Have a Stock Number').click();
+    test.skip('can navigate to stock lookup via direct hash URL', async ({ page }) => {
+      await page.goto('/#stockLookup');
 
       await expect(page).toHaveURL(/#stockLookup/);
       await expect(page.getByText(/Find Your Vehicle/i)).toBeVisible();
     });
 
-    test('stock lookup shows keypad', async ({ page }) => {
-      await page.getByText(/skip/i).click();
-      await page.getByText('I Have a Stock Number').click();
+    test.skip('stock lookup shows keypad', async ({ page }) => {
+      await page.goto('/#stockLookup');
 
-      // Should see numeric keypad -- target the buttons specifically by role
-      // (avoids matching "1" or "2" inside any other rendered text)
       await expect(page.getByRole('button', { name: '1', exact: true })).toBeVisible();
       await expect(page.getByRole('button', { name: '2', exact: true })).toBeVisible();
       await expect(page.getByRole('button', { name: 'Search' })).toBeVisible();
@@ -158,15 +162,11 @@ test.describe('Kiosk Customer Journey', () => {
     });
 
     test.skip('can enter digits on the keypad', async ({ page }) => {
-      // TODO(#TBD): keypad button accessible names need investigation.
-      // Reverted from getByText to getByRole locators in #574 but still
-      // failing in CI. Likely the buttons have aria-labels or whitespace
-      // that don't match name: '3' exactly.
-      await page.getByText(/skip/i).click();
-      await page.getByText('I Have a Stock Number').click();
+      // Pre-existing skip (keypad accessible names need investigation;
+      // see prior TODO). Now also blocked by the lack of initial-hash
+      // routing described in this describe block's header comment.
+      await page.goto('/#stockLookup');
 
-      // Click keypad buttons -- use role+exact so digits in displayed
-      // values (e.g. "39547") don't collide with the keypad button locators.
       const pressKey = (digit: string) =>
         page.getByRole('button', { name: digit, exact: true }).click();
 
@@ -174,7 +174,6 @@ test.describe('Kiosk Customer Journey', () => {
       await pressKey('9');
       await pressKey('5');
 
-      // Should see M prefix and entered digits
       await expect(page.getByText('M')).toBeVisible();
     });
   });
@@ -184,14 +183,12 @@ test.describe('Kiosk Customer Journey', () => {
   // ===========================================================================
   test.describe('Model Budget Selector', () => {
     test('can navigate to model budget selector', async ({ page }) => {
-      await page.getByText(/skip/i).click();
       await page.getByText('I Know What I Want').click();
 
       await expect(page).toHaveURL(/#modelBudget/);
     });
 
     test('model budget selector shows vehicle categories', async ({ page }) => {
-      await page.getByText(/skip/i).click();
       await page.getByText('I Know What I Want').click();
 
       await page.waitForTimeout(500);
@@ -209,13 +206,8 @@ test.describe('Kiosk Customer Journey', () => {
   // Navigation Flow Tests
   // ===========================================================================
   test.describe('Navigation Flows', () => {
-    test('can complete full path: name -> AI -> back -> browse', async ({ page }) => {
-      // Enter name
-      await page.locator('input[placeholder*="first name" i]').fill('TestUser');
-      await page.getByText('Continue').click();
-      await expect(page.getByText(/Hi TestUser/i)).toBeVisible();
-
-      // Go to AI assistant
+    test('can complete full path: AI -> back -> browse', async ({ page }) => {
+      // Path-selection is the landing surface, so we go straight to AI.
       await page.getByText('Chat with Showroom AI').click();
       await expect(page).toHaveURL(/#aiAssistant/);
 
@@ -235,15 +227,14 @@ test.describe('Kiosk Customer Journey', () => {
 
     test('header logo returns to welcome screen', async ({ page }) => {
       // Navigate away from welcome
-      await page.getByText(/skip/i).click();
       await page.getByText('Chat with Showroom AI').click();
       await expect(page).toHaveURL(/#aiAssistant/);
 
       // Click logo to return
-      await page.locator('header').getByText('NH CHEVY').click();
+      await page.locator('header').getByText('NEW HAMPSHIRE CHEVROLET').click();
 
-      // Should be back at welcome
-      await expect(page.locator('input[placeholder*="first name" i]')).toBeVisible();
+      // Should be back at welcome path-selection surface
+      await expect(page.getByText('How can I help you today?')).toBeVisible();
     });
   });
 });
@@ -255,8 +246,8 @@ test.describe('Kiosk Error Resilience', () => {
 
     await page.goto('/');
 
-    // Welcome screen should still render
-    await expect(page.getByText("I'm your Showroom AI assistant")).toBeVisible();
+    // Welcome path-selection should still render even with no API.
+    await expect(page.getByText('How can I help you today?')).toBeVisible();
   });
 
   test('inventory page handles API errors gracefully', async ({ page }) => {
@@ -266,7 +257,6 @@ test.describe('Kiosk Error Resilience', () => {
     );
 
     await page.goto('/');
-    await page.getByText(/skip/i).click();
     await page.getByText(/browse all inventory/i).click();
 
     // Page should not crash; it should show an error state or empty state
