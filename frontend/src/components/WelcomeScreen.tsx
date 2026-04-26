@@ -295,7 +295,7 @@ const WelcomeScreen: React.FC<KioskComponentProps> = ({ navigateTo, updateCustom
 
 const s: Record<string, CSSProperties> = {
   container: { minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', position: 'relative', fontFamily: "'Montserrat', sans-serif", boxSizing: 'border-box' },
-  bgImage: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'url("/showroom.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0 },
+  bgImage: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundImage: 'url("/showroom.png")', backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0 },
   bgOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(15,25,20,0.85) 100%)', zIndex: 1 },
   
   // Two Column Layout for Phase 1
