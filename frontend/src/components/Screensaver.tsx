@@ -75,7 +75,7 @@ const styles: Record<string, React.CSSProperties> = {
   backgroundImage: {
     position: 'absolute',
     inset: 0,
-    backgroundImage: 'url(/showroom.jpg)',
+    backgroundImage: 'url(/showroom.png)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
