@@ -45,8 +45,11 @@ const VINScanner: React.FC<VINScannerProps> = ({ isOpen, onClose, onScan }) => {
   const animationFrameRef = useRef<number | null>(null);
   const barcodeDetectorRef = useRef<any>(null);
 
-  // Check for multiple cameras
+  // Check for multiple cameras (only when modal is open --
+  // calling enumerateDevices on mount can trigger a hardware-permission
+  // prompt before the user has expressed any intent to scan).
   useEffect(() => {
+    if (!isOpen) return;
     const checkCameras = async () => {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -57,10 +60,12 @@ const VINScanner: React.FC<VINScannerProps> = ({ isOpen, onClose, onScan }) => {
       }
     };
     checkCameras();
-  }, []);
+  }, [isOpen]);
 
-  // Initialize barcode detector
+  // Initialize barcode detector (only when modal is open)
   useEffect(() => {
+    if (!isOpen) return;
+    if (barcodeDetectorRef.current) return;
     // Check for native BarcodeDetector API (Chrome, Edge)
     if ('BarcodeDetector' in window) {
       try {
@@ -72,7 +77,7 @@ const VINScanner: React.FC<VINScannerProps> = ({ isOpen, onClose, onScan }) => {
         console.log('Native BarcodeDetector not available:', err);
       }
     }
-  }, []);
+  }, [isOpen]);
 
   // Start camera stream
   const startCamera = useCallback(async () => {
