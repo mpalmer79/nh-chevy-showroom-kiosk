@@ -20,7 +20,12 @@ const WelcomeScreen: React.FC<KioskComponentProps> = ({ navigateTo, updateCustom
   const [stats, setStats] = useState<InventoryStats | null>(null);
   const [customerName, setCustomerName] = useState(customerData?.customerName || '');
   const [customerPhone, setCustomerPhone] = useState(customerData?.phone || '');
-  const [nameSubmitted, setNameSubmitted] = useState(!!customerData?.customerName || !!customerData?.namePhaseCompleted);
+  // Name entry is opt-in via the Sales Desk flow; default the welcome
+  // surface to the path-selection view to reduce time-to-engagement.
+  // (Kept the original initializer pattern in comments below for easy
+  // restoration if we re-enable name capture as a default.)
+  // const [nameSubmitted, setNameSubmitted] = useState(!!customerData?.customerName || !!customerData?.namePhaseCompleted);
+  const [nameSubmitted, setNameSubmitted] = useState(true);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   const formatPhoneNumber = (value: string): string => {
