@@ -11,7 +11,7 @@ test.describe('NH Chevy Showroom Kiosk - Smoke Tests', () => {
     // disabled). The "I Have a Stock Number" card is no longer surfaced.
     await expect(page.getByText('How can I help you today?')).toBeVisible();
     await expect(page.getByText('I Know What I Want')).toBeVisible();
-    await expect(page.getByText('Chat with Showroom AI')).toBeVisible();
+    await expect(page.getByText('Chat with our Virtual Assistant')).toBeVisible();
     await expect(page.getByText('I Have a Stock Number')).toHaveCount(0);
   });
 
@@ -22,7 +22,7 @@ test.describe('NH Chevy Showroom Kiosk - Smoke Tests', () => {
   });
 
   test('can navigate to AI Assistant', async ({ page }) => {
-    await page.getByText('Chat with Showroom AI').click();
+    await page.getByText('Chat with our Virtual Assistant').click();
 
     await expect(page).toHaveURL(/#aiAssistant/);
     await expect(page.locator('input[placeholder*="message" i]')).toBeVisible();
@@ -62,7 +62,7 @@ test.describe('NH Chevy Showroom Kiosk - Smoke Tests', () => {
   });
 
   test('logo click resets journey to welcome', async ({ page }) => {
-    await page.getByText('Chat with Showroom AI').click();
+    await page.getByText('Chat with our Virtual Assistant').click();
     await expect(page).toHaveURL(/#aiAssistant/);
 
     await page.locator('header').getByText('NEW HAMPSHIRE CHEVROLET').click();

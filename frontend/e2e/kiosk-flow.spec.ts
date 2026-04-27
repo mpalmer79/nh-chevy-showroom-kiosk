@@ -35,7 +35,7 @@ test.describe('Kiosk Customer Journey', () => {
     test('all navigation options are visible on the welcome surface', async ({ page }) => {
       await expect(page.getByText('How can I help you today?')).toBeVisible();
       await expect(page.getByText('I Know What I Want')).toBeVisible();
-      await expect(page.getByText('Chat with Showroom AI')).toBeVisible();
+      await expect(page.getByText('Chat with our Virtual Assistant')).toBeVisible();
       await expect(page.getByText(/browse all inventory/i)).toBeVisible();
       // Stock-number entry was removed from the welcome surface.
       await expect(page.getByText('I Have a Stock Number')).toHaveCount(0);
@@ -59,14 +59,14 @@ test.describe('Kiosk Customer Journey', () => {
   // ===========================================================================
   test.describe('AI Assistant', () => {
     test('can navigate to AI assistant and see chat interface', async ({ page }) => {
-      await page.getByText('Chat with Showroom AI').click();
+      await page.getByText('Chat with our Virtual Assistant').click();
 
       // Should see the chat input
       await expect(page.locator('input[placeholder*="message" i], textarea[placeholder*="message" i]')).toBeVisible();
     });
 
     test('can type a message in the chat input', async ({ page }) => {
-      await page.getByText('Chat with Showroom AI').click();
+      await page.getByText('Chat with our Virtual Assistant').click();
 
       const chatInput = page.locator('input[placeholder*="message" i], textarea[placeholder*="message" i]');
       await chatInput.fill('Show me some trucks');
@@ -74,7 +74,7 @@ test.describe('Kiosk Customer Journey', () => {
     });
 
     test('shows suggestion chips in the AI assistant', async ({ page }) => {
-      await page.getByText('Chat with Showroom AI').click();
+      await page.getByText('Chat with our Virtual Assistant').click();
 
       // AI assistant should show quick-action chips or welcome message
       // Wait for the interface to be fully loaded
@@ -208,7 +208,7 @@ test.describe('Kiosk Customer Journey', () => {
   test.describe('Navigation Flows', () => {
     test('can complete full path: AI -> back -> browse', async ({ page }) => {
       // Path-selection is the landing surface, so we go straight to AI.
-      await page.getByText('Chat with Showroom AI').click();
+      await page.getByText('Chat with our Virtual Assistant').click();
       await expect(page).toHaveURL(/#aiAssistant/);
 
       // Go back
@@ -227,7 +227,7 @@ test.describe('Kiosk Customer Journey', () => {
 
     test('header logo returns to welcome screen', async ({ page }) => {
       // Navigate away from welcome
-      await page.getByText('Chat with Showroom AI').click();
+      await page.getByText('Chat with our Virtual Assistant').click();
       await expect(page).toHaveURL(/#aiAssistant/);
 
       // Click logo to return
