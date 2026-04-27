@@ -522,7 +522,7 @@ const KioskApp: React.FC = () => {
     <div style={{
       ...styles.container,
       ...(currentScreen === 'aiAssistant' ? {
-        backgroundImage: 'linear-gradient(rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.4)), url(/showroom3.jfif)',
+        backgroundImage: 'linear-gradient(rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.4)), url(/showroom.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
         backgroundRepeat: 'no-repeat',
@@ -531,18 +531,16 @@ const KioskApp: React.FC = () => {
       {/* Header */}
       <header style={{
         ...styles.header,
-        // Per-screen overrides preserved, recolored to the green theme so
-        // the header reads as branded on every surface, not chrome.
         ...(currentScreen === 'inventory' ? {
-          background: 'linear-gradient(90deg, #f0fdf4 0%, #dcfce7 100%)',
-          borderBottom: '1px solid rgba(0,0,0,0.08)',
+          background: '#ffffff',
+          borderBottom: '1px solid rgba(0,0,0,0.1)',
         } : {}),
         ...(currentScreen === 'modelBudget' ? {
           background: 'transparent',
           borderBottom: 'none',
         } : {}),
         ...(currentScreen === 'aiAssistant' ? {
-          background: 'linear-gradient(90deg, rgba(134,239,172,0.6) 0%, rgba(21,128,61,0.85) 100%)',
+          background: 'rgba(0,0,0,0.5)',
           backdropFilter: 'blur(10px)',
         } : {})
       }}>
@@ -738,10 +736,8 @@ const styles: Record<string, CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '20px 40px',
-    borderBottom: '1px solid rgba(0,0,0,0.08)',
-    // Light-to-medium-dark green gradient, left to right.
-    // green-300 (#86efac) -> green-400 (#4ade80) -> green-700 (#15803d).
-    background: 'linear-gradient(90deg, #86efac 0%, #4ade80 50%, #15803d 100%)',
+    borderBottom: '1px solid rgba(255,255,255,0.1)',
+    background: 'rgba(0,0,0,0.3)',
     backdropFilter: 'blur(10px)',
     zIndex: 100,
   },
@@ -764,12 +760,11 @@ const styles: Record<string, CSSProperties> = {
     transition: 'transform 0.2s ease',
   },
   logoText: {
-    fontSize: '24px',
+    fontSize: '32px',
     fontWeight: '800',
-    letterSpacing: '0.5px',
-    color: '#064e3b',                                       // green-900 -- dark, high contrast on the lighter gradient stops
-    whiteSpace: 'nowrap',                                   // never wrap "NEW HAMPSHIRE CHEVROLET" to a second line
-    textShadow: '0 1px 2px rgba(255,255,255,0.25)',         // subtle lift against the deeper-green right side of the gradient
+    letterSpacing: '2px',
+    color: '#ffffff',
+    whiteSpace: 'nowrap',
   },
   logoAI: {
     fontSize: '20px',
