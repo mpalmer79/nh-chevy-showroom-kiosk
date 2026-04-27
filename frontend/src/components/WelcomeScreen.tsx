@@ -12,7 +12,7 @@ type StatType = 'total' | 'suv' | 'truck' | 'price' | null;
 // and is reachable via direct hash URL (#stockLookup), but it's no longer
 // surfaced as a primary CTA from the welcome screen.
 const PATHS: Array<{ id: PathId; title: string; subtitle: string; description: string; gradient: string; iconPath: string }> = [
-  { id: 'aiAssistant', title: 'Chat with Showroom AI', subtitle: "LET'S HAVE A CONVERSATION", description: "(BEST OPTION) Let's walk through this together and find the right vehicle that fits what you're looking for.", gradient: 'linear-gradient(135deg, #D4AF37 0%, #B8960C 100%)', iconPath: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
+  { id: 'aiAssistant', title: 'Chat with our Virtual Assistant', subtitle: "LET'S HAVE A CONVERSATION", description: "(BEST OPTION) Let's walk through this together and find the right vehicle that fits what you're looking for.", gradient: 'linear-gradient(135deg, #D4AF37 0%, #B8960C 100%)', iconPath: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' },
   { id: 'modelBudget', title: 'I Know What I Want', subtitle: 'Browse by model & budget', description: 'Select your preferred model and set your budget to see matching inventory.', gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', iconPath: 'M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5' },
 ];
 
