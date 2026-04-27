@@ -11,7 +11,8 @@ export const styles: Record<string, CSSProperties> = {
     margin: '0 auto',
     width: '100%',
     boxSizing: 'border-box',
-    background: colors.white,
+    // Light green gradient surface, persists for the whole chat session.
+    background: 'linear-gradient(180deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%)',
     minHeight: '100%',
   },
   header: {
@@ -94,7 +95,9 @@ export const styles: Record<string, CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: spacing.md,
-    background: '#fafafa',
+    // Transparent so the parent container's green gradient shows through
+    // for the entire chat session, not just the empty state.
+    background: 'transparent',
     borderRadius: borderRadius.lg,
     margin: '0 -10px',
     paddingLeft: '10px',
